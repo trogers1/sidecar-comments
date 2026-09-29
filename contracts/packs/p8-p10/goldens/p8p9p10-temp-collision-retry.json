@@ -1,0 +1,1 @@
+{"case":"P8-TEMP-COLLISION-RETRY","fault":{"operation":"temp_exclusive_create","outcomes":["EEXIST","EEXIST","success"]},"expect":{"status":0,"temp_mode":"0600","temp_survivors":0}}

@@ -1,0 +1,1 @@
+{"case":"P9-PARENT-FSYNC-DELETE-UNKNOWN","fault":{"operation":"parent_fsync","when":"after successful unlink","outcome":"error-or-unknown"},"expect":{"status":7,"error":"io","details":{"path":"parent","operation":"fsync","commit_may_have_succeeded":true},"stdout":""}}

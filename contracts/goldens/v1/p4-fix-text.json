@@ -1,0 +1,38 @@
+{
+  "fixture_version": 1,
+  "id": "p4-fix-text",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "--output",
+    "text",
+    "fix",
+    "--add-missing-message-ids",
+    "--file",
+    "a.comments"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [
+    "writer_platform"
+  ],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 0,
+    "stdout_b64": "Zml4IGNoYW5nZWQ9ZmFsc2UgcmVzdWx0PXsiYXNzaWdubWVudHMiOltdLCJzdG9yYWdlX3JldmlzaW9uIjpudWxsLCJjYW5vbmljYWxfcmV2aXNpb24iOiJzaGEyNTY6ZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9Cg==",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": [
+        {
+          "path": ".a.comments.sidecar.lock",
+          "kind": "file",
+          "bytes_b64": "",
+          "mode": "0600"
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,12 @@
-# 🛵 Sidecar Comments v1 — implementation-ready blueprint
+# 🛵 Sidecar Comments v1 — superseded implementation-ready blueprint
+
+> **Superseded for toolchain planning.** This historical draft's Go 1.26
+> assumption is replaced by the checked-in Go 1.27.1 module/toolchain contract.
+> Its production implementation sections remain unexecuted; the only current
+> implementation is the contracts-only harness described in `README.md` and
+> `contracts/runner/README.md`. The historical cutover runbook and replacement
+> skill deliverables are superseded by `docs/v1/compatibility.md`: callers own
+> cutover outside this repository, with no runtime/test dependency on `../config`.
 
 ## 1. Scope, hard cut, and engineering rules
 

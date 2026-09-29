@@ -1,0 +1,41 @@
+{
+  "capability_version": 1,
+  "unavailable_outcome": {
+    "result": "UNAVAILABLE",
+    "failure_class": "capability",
+    "nonzero": true,
+    "never": ["skip", "pass"]
+  },
+  "capabilities": [
+    {
+      "id": "deterministic_blob_limit_input",
+      "inputs": ["name", "byte_length", "seed", "pattern", "limit"],
+      "guarantees": ["materializes exact deterministic bytes without checked-in expansion", "can assert limit and limit-plus-one inputs"],
+      "unavailable_reason": "deterministic blob/limit input adapter is not implemented by the pre-implementation harness"
+    },
+    {
+      "id": "process_orchestration",
+      "inputs": ["actors", "barriers", "timeout", "release_order"],
+      "guarantees": ["starts independent child processes", "waits for declared readiness before release", "collects every exit and stream"],
+      "unavailable_reason": "barrier-controlled process orchestration/readiness adapter is not implemented by the pre-implementation harness"
+    },
+    {
+      "id": "held_lock_identity_replacement",
+      "inputs": ["lock_path", "holder", "replacement", "phase"],
+      "guarantees": ["holds an advisory sibling lock", "replaces target or lock only at the declared phase", "preserves substituted-object observation"],
+      "unavailable_reason": "held-lock and identity-replacement adapter is not implemented by the pre-implementation harness"
+    },
+    {
+      "id": "fault_injection",
+      "inputs": ["operation", "occurrence", "outcome"],
+      "guarantees": ["injects only the declared filesystem, clock, or randomness fault", "records whether commit may have occurred"],
+      "unavailable_reason": "controlled fault injection is not implemented by the pre-implementation harness"
+    },
+    {
+      "id": "platform_control",
+      "inputs": ["goos", "goarch"],
+      "guarantees": ["runs a fixture under the declared platform classification before target open"],
+      "unavailable_reason": "controlled non-writer platform adapter is not implemented by the pre-implementation harness"
+    }
+  ]
+}

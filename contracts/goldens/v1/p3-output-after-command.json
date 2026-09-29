@@ -1,0 +1,1 @@
+{"fixture_version":1,"id":"p3-output-after-command","requirements":["V1-CLI-SURFACE"],"argv":["validate","--output","json","--file","a.txt.comments"],"env":[],"stdin_b64":"","requires":[],"initial_fs":{"entries":[]},"expect":{"status":2,"stdout_b64":"","stderr_template":"error usage usage:argv:malformed\n","invocation_error":"argv","final_fs":{"entries":[]}}}

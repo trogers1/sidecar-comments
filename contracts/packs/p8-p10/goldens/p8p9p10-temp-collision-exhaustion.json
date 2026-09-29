@@ -1,0 +1,1 @@
+{"case":"P8-TEMP-COLLISION-EXHAUSTION","fault":{"operation":"temp_exclusive_create","outcomes":"EEXIST x16"},"expect":{"status":7,"error":"io","details":{"path":"temp","operation":"create"},"commit_may_have_succeeded":false,"old_bytes_preserved":true,"temp_survivors":0}}

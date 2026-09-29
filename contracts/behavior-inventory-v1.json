@@ -1,0 +1,1302 @@
+{
+  "inventory_version": 1,
+  "pack_required_red": "contracts/packs/required-red-v1.json",
+  "requirements": {
+    "documents": [
+      "docs/v1/index.md",
+      "docs/v1/protocol.md",
+      "docs/v1/cli.md",
+      "docs/v1/format.md",
+      "docs/v1/domain-and-unicode.md",
+      "docs/v1/source-and-location.md",
+      "docs/v1/storage-security.md",
+      "docs/v1/neovim.md",
+      "docs/v1/conformance.md"
+    ],
+    "plan": "plans/initial.md"
+  },
+  "behaviors": [
+    {
+      "id": "BHV-PRO-VERSION-JSON-ENVELOPE",
+      "fixtures": [
+        "version-json"
+      ]
+    },
+    {
+      "id": "BHV-CLI-VERSION-TEXT",
+      "fixtures": [
+        "version-text"
+      ]
+    },
+    {
+      "id": "BHV-READ-MISSING-VALIDATE",
+      "fixtures": [
+        "validate-missing"
+      ]
+    },
+    {
+      "id": "BHV-READ-MISSING-LIST",
+      "fixtures": [
+        "list-missing"
+      ]
+    },
+    {
+      "id": "BHV-READ-MISSING-GET",
+      "fixtures": [
+        "get-missing"
+      ]
+    },
+    {
+      "id": "BHV-EMPTY-ZERO-VALIDATE",
+      "fixtures": [
+        "zero-validate"
+      ]
+    },
+    {
+      "id": "BHV-EMPTY-ZERO-FORMAT-CHECK",
+      "fixtures": [
+        "zero-format-check"
+      ]
+    },
+    {
+      "id": "BHV-EMPTY-ZERO-FORMAT",
+      "fixtures": [
+        "zero-format"
+      ]
+    },
+    {
+      "id": "BHV-TARGET-NO-SUFFIX",
+      "fixtures": [
+        "target-no-suffix"
+      ]
+    },
+    {
+      "id": "BHV-TARGET-DOT-NAME",
+      "fixtures": [
+        "target-dot"
+      ]
+    },
+    {
+      "id": "BHV-TARGET-TEMP-SUFFIX",
+      "fixtures": [
+        "target-temp"
+      ]
+    },
+    {
+      "id": "BHV-FORMAT-CANONICAL-VALIDATE",
+      "fixtures": [
+        "canonical-validate"
+      ]
+    },
+    {
+      "id": "BHV-FORMAT-WHITESPACE",
+      "fixtures": [
+        "whitespace"
+      ]
+    },
+    {
+      "id": "BHV-FORMAT-BOM",
+      "fixtures": [
+        "bom"
+      ]
+    },
+    {
+      "id": "BHV-FORMAT-RESERVED-PREFIX",
+      "fixtures": [
+        "reserved"
+      ]
+    },
+    {
+      "id": "BHV-FORMAT-THREAD-END",
+      "fixtures": [
+        "bad-end"
+      ]
+    },
+    {
+      "id": "BHV-META-DUPLICATE-KEY",
+      "fixtures": [
+        "meta-duplicate"
+      ]
+    },
+    {
+      "id": "BHV-META-UNKNOWN-KEY",
+      "fixtures": [
+        "meta-unknown"
+      ]
+    },
+    {
+      "id": "BHV-META-SURROGATE-ESCAPE",
+      "fixtures": [
+        "meta-surrogate"
+      ]
+    },
+    {
+      "id": "BHV-FORMAT-CRLF-CANONICALIZE",
+      "fixtures": [
+        "format-crlf"
+      ]
+    },
+    {
+      "id": "BHV-REPAIR-VALIDATE",
+      "fixtures": [
+        "repair-validate"
+      ]
+    },
+    {
+      "id": "BHV-REPAIR-FIX-CHECK",
+      "fixtures": [
+        "repair-fix-check"
+      ]
+    },
+    {
+      "id": "BHV-SOURCE-ANCHOR",
+      "fixtures": [
+        "source-anchor"
+      ]
+    },
+    {
+      "id": "BHV-SOURCE-BOM",
+      "fixtures": [
+        "source-bom"
+      ]
+    },
+    {
+      "id": "BHV-SOURCE-BARE-CR",
+      "fixtures": [
+        "source-cr"
+      ]
+    },
+    {
+      "id": "BHV-SOURCE-ANCHOR-MISMATCH",
+      "fixtures": [
+        "source-anchor-bad"
+      ]
+    },
+    {
+      "id": "BHV-THREAD-CREATE",
+      "fixtures": [
+        "thread-create"
+      ]
+    },
+    {
+      "id": "BHV-THREAD-MOVE",
+      "fixtures": [
+        "thread-move"
+      ]
+    },
+    {
+      "id": "BHV-MESSAGE-ADD",
+      "fixtures": [
+        "message-add"
+      ]
+    },
+    {
+      "id": "BHV-MESSAGE-UPDATE-NOOP",
+      "fixtures": [
+        "message-update-noop"
+      ]
+    },
+    {
+      "id": "BHV-MESSAGE-DELETE-LAST",
+      "fixtures": [
+        "message-delete-last"
+      ]
+    },
+    {
+      "id": "BHV-DOMAIN-ID-PAIR",
+      "fixtures": [
+        "id-pair"
+      ]
+    },
+    {
+      "id": "BHV-DOMAIN-EXTERNAL-AUTHOR",
+      "fixtures": [
+        "external-required"
+      ]
+    },
+    {
+      "id": "BHV-APPLY-CREATE",
+      "fixtures": [
+        "apply-create"
+      ]
+    },
+    {
+      "id": "BHV-APPLY-PROTOCOL-VERSION",
+      "fixtures": [
+        "apply-protocol"
+      ]
+    },
+    {
+      "id": "BHV-APPLY-UNKNOWN-OP",
+      "fixtures": [
+        "apply-unknown"
+      ]
+    },
+    {
+      "id": "BHV-APPLY-EMPTY",
+      "fixtures": [
+        "apply-empty"
+      ]
+    },
+    {
+      "id": "BHV-WRITER-REVISION-CONFLICT",
+      "fixtures": [
+        "revision-conflict"
+      ]
+    },
+    {
+      "id": "BHV-STORE-SYMLINK",
+      "fixtures": [
+        "target-symlink"
+      ]
+    },
+    {
+      "id": "BHV-STORE-DIRECTORY",
+      "fixtures": [
+        "target-directory"
+      ]
+    },
+    {
+      "id": "BHV-STORE-HARDLINK",
+      "fixtures": [
+        "target-hardlink"
+      ]
+    },
+    {
+      "id": "BHV-CLI-P3-COMMAND-MISSING",
+      "fixtures": [
+        "p3-command-missing"
+      ]
+    },
+    {
+      "id": "BHV-CLI-P3-COMMAND-UNKNOWN",
+      "fixtures": [
+        "p3-command-unknown"
+      ]
+    },
+    {
+      "id": "BHV-CLI-P3-GLOBAL-ORDER",
+      "fixtures": [
+        "p3-output-after-command"
+      ]
+    },
+    {
+      "id": "BHV-CLI-P3-FORBID-NONE-READ",
+      "fixtures": [
+        "p3-output-none-read"
+      ]
+    },
+    {
+      "id": "BHV-CLI-P3-STDIN-ARBITRATION",
+      "fixtures": [
+        "p3-stdin-arbitration"
+      ]
+    },
+    {
+      "id": "BHV-PRO-P3-APPLY-DUPLICATE",
+      "fixtures": [
+        "p3-apply-stdin-duplicate"
+      ]
+    },
+    {
+      "id": "BHV-PRO-P3-APPLY-SURROGATE",
+      "fixtures": [
+        "p3-apply-stdin-surrogate"
+      ]
+    },
+    {
+      "id": "BHV-PRO-P3-APPLY-UNKNOWN-FIELD",
+      "fixtures": [
+        "p3-apply-stdin-unknown-field"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-BEFORE-COMMAND",
+      "fixtures": [
+        "p4-output-before-command"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-REPEATED",
+      "fixtures": [
+        "p4-output-repeated"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-MISSING",
+      "fixtures": [
+        "p4-output-missing"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-INVALID",
+      "fixtures": [
+        "p4-output-invalid"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-MISSING",
+      "fixtures": [
+        "p4-thread-missing"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-UNKNOWN",
+      "fixtures": [
+        "p4-thread-unknown"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-MISSING",
+      "fixtures": [
+        "p4-message-missing"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-UNKNOWN",
+      "fixtures": [
+        "p4-message-unknown"
+      ]
+    },
+    {
+      "id": "BHV-P4-UNKNOWN-FLAG",
+      "fixtures": [
+        "p4-unknown-flag"
+      ]
+    },
+    {
+      "id": "BHV-P4-POSITIONAL",
+      "fixtures": [
+        "p4-positional"
+      ]
+    },
+    {
+      "id": "BHV-P4-VALIDATE-REQUIRED",
+      "fixtures": [
+        "p4-validate-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-FORMAT-REQUIRED",
+      "fixtures": [
+        "p4-format-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-FIX-REQUIRED",
+      "fixtures": [
+        "p4-fix-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-LIST-REQUIRED",
+      "fixtures": [
+        "p4-thread-list-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-GET-REQUIRED",
+      "fixtures": [
+        "p4-thread-get-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-CREATE-REQUIRED",
+      "fixtures": [
+        "p4-thread-create-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-MOVE-REQUIRED",
+      "fixtures": [
+        "p4-thread-move-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-DELETE-REQUIRED",
+      "fixtures": [
+        "p4-thread-delete-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-ADD-REQUIRED",
+      "fixtures": [
+        "p4-message-add-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-UPDATE-REQUIRED",
+      "fixtures": [
+        "p4-message-update-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-DELETE-REQUIRED",
+      "fixtures": [
+        "p4-message-delete-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-APPLY-REQUIRED",
+      "fixtures": [
+        "p4-apply-required"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-VERSION",
+      "fixtures": [
+        "p4-output-id-version"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-VALIDATE",
+      "fixtures": [
+        "p4-output-id-validate"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-FORMAT",
+      "fixtures": [
+        "p4-output-id-format"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-THREAD-LIST",
+      "fixtures": [
+        "p4-output-id-thread-list"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-THREAD-GET",
+      "fixtures": [
+        "p4-output-id-thread-get"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-THREAD-MOVE",
+      "fixtures": [
+        "p4-output-id-thread-move"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-THREAD-DELETE",
+      "fixtures": [
+        "p4-output-id-thread-delete"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-MESSAGE-UPDATE",
+      "fixtures": [
+        "p4-output-id-message-update"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-MESSAGE-DELETE",
+      "fixtures": [
+        "p4-output-id-message-delete"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-ID-APPLY",
+      "fixtures": [
+        "p4-output-id-apply"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-NONE-VERSION",
+      "fixtures": [
+        "p4-output-none-version"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-NONE-VALIDATE",
+      "fixtures": [
+        "p4-output-none-validate"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-NONE-THREAD-LIST",
+      "fixtures": [
+        "p4-output-none-thread-list"
+      ]
+    },
+    {
+      "id": "BHV-P4-OUTPUT-NONE-THREAD-GET",
+      "fixtures": [
+        "p4-output-none-thread-get"
+      ]
+    },
+    {
+      "id": "BHV-P4-VALIDATE-TEXT",
+      "fixtures": [
+        "p4-validate-text"
+      ]
+    },
+    {
+      "id": "BHV-P4-VALIDATE-JSON",
+      "fixtures": [
+        "p4-validate-json"
+      ]
+    },
+    {
+      "id": "BHV-P4-VALIDATE-DEFAULT",
+      "fixtures": [
+        "p4-validate-default"
+      ]
+    },
+    {
+      "id": "BHV-P4-FORMAT-TEXT",
+      "fixtures": [
+        "p4-format-text"
+      ]
+    },
+    {
+      "id": "BHV-P4-FORMAT-JSON",
+      "fixtures": [
+        "p4-format-json"
+      ]
+    },
+    {
+      "id": "BHV-P4-FORMAT-DEFAULT",
+      "fixtures": [
+        "p4-format-default"
+      ]
+    },
+    {
+      "id": "BHV-P4-FIX-TEXT",
+      "fixtures": [
+        "p4-fix-text"
+      ]
+    },
+    {
+      "id": "BHV-P4-FIX-JSON",
+      "fixtures": [
+        "p4-fix-json"
+      ]
+    },
+    {
+      "id": "BHV-P4-FIX-DEFAULT",
+      "fixtures": [
+        "p4-fix-default"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-LIST-TEXT",
+      "fixtures": [
+        "p4-thread-list-text"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-LIST-JSON",
+      "fixtures": [
+        "p4-thread-list-json"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-LIST-DEFAULT",
+      "fixtures": [
+        "p4-thread-list-default"
+      ]
+    },
+    {
+      "id": "BHV-P4-VERSION-DEFAULT",
+      "fixtures": [
+        "p4-version-default"
+      ]
+    },
+    {
+      "id": "BHV-P4-VERSION-TEXT",
+      "fixtures": [
+        "p4-version-text"
+      ]
+    },
+    {
+      "id": "BHV-P4-VERSION-JSON",
+      "fixtures": [
+        "p4-version-json"
+      ]
+    },
+    {
+      "id": "BHV-P4-APPLY-PROTOCOL-MISSING",
+      "fixtures": [
+        "p4-apply-protocol-missing"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-GET-NOT-FOUND",
+      "fixtures": [
+        "p4-thread-get-not-found"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-MOVE-NOT-FOUND",
+      "fixtures": [
+        "p4-thread-move-not-found"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-DELETE-NOT-FOUND",
+      "fixtures": [
+        "p4-thread-delete-not-found"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-ADD-NOT-FOUND",
+      "fixtures": [
+        "p4-message-add-not-found"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-UPDATE-NOT-FOUND",
+      "fixtures": [
+        "p4-message-update-not-found"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-DELETE-NOT-FOUND",
+      "fixtures": [
+        "p4-message-delete-not-found"
+      ]
+    },
+    {
+      "id": "BHV-P4-THREAD-CREATE-PRECONDITION",
+      "fixtures": [
+        "p4-thread-create-precondition"
+      ]
+    },
+    {
+      "id": "BHV-P4-MESSAGE-ADD-PRECONDITION",
+      "fixtures": [
+        "p4-message-add-precondition"
+      ]
+    },
+    {
+      "id": "BHV-CLI-GENERATED-OUTPUT-ID-THREAD-CREATE",
+      "fixtures": [
+        "generated-output-id-thread-create"
+      ]
+    },
+    {
+      "id": "BHV-CLI-GENERATED-OUTPUT-ID-MESSAGE-ADD",
+      "fixtures": [
+        "generated-output-id-message-add"
+      ]
+    },
+    {
+      "id": "BHV-FMT-REPAIR-FIX-WRITE-GENERATED-ID",
+      "fixtures": [
+        "repair-fix-write-generated-id"
+      ]
+    }
+  ],
+  "required_red": [
+    {
+      "id": "BHV-RED-P4-FORMAT-GRAMMAR-THREAD-START-TERMINAL",
+      "reason": "no direct executable golden isolates the exact thread-start terminal"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-GRAMMAR-THREAD-END-TERMINAL",
+      "reason": "no direct executable golden isolates the exact matching thread-end terminal"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-GRAMMAR-ROLE-USER-BOT-EXTERNAL",
+      "reason": "no direct executable golden proves all three role terminals and role mapping"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-GRAMMAR-LOCATION-AND-UUID",
+      "reason": "no direct executable golden covers malformed location and UUID terminals"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-METADATA-CLOSED-FORMS-AND-KINDS",
+      "reason": "no direct executable golden covers every closed metadata, external-author, and GitLab form"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-METADATA-TOKEN-FAILURES",
+      "reason": "no direct executable golden covers every nested duplicate, token-kind, escape, and non-object failure"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-CANONICAL-SORT-ENCODE-FINAL-LF",
+      "reason": "no direct executable golden binds sorted canonical output, compact encoding, and exactly one final LF"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-BODY-FRAMING-TRAILING-LF-INTERNAL-BLANKS",
+      "reason": "no direct executable golden binds decoded trailing logical LFs and internal blank body lines"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-RESERVED-PREFIX-EACH",
+      "reason": "no direct executable golden isolates each reserved-prefix body rejection"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-STRUCTURAL-MALFORMED-TERMINALS",
+      "reason": "no direct executable golden covers every missing, unmatched, premature, and malformed structural delimiter"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-NONCANONICAL-ENUMERATED-VARIANTS",
+      "reason": "no direct executable golden covers each accepted CRLF, order, metadata, final-LF, and omitted-separator formatter variant"
+    },
+    {
+      "id": "BHV-RED-P4-FORMAT-CHECK-AND-WRITE-MATRIX",
+      "reason": "no direct executable golden binds check no-write versus write for every formatter-only variant"
+    },
+    {
+      "id": "BHV-RED-P7-REPAIR-ONLY-MISSING-USER-BOT-METADATA-IDS",
+      "reason": "no direct executable golden proves repair rejects every non-ID and external metadata defect"
+    },
+    {
+      "id": "BHV-RED-P7-REPAIR-FIX-PHYSICAL-ORDER-ASSIGNMENTS",
+      "reason": "no direct executable golden binds multi-ID assignment order to physical document order"
+    },
+    {
+      "id": "BHV-RED-P7-REPAIR-FIX-RETRY-NOOP",
+      "reason": "no direct executable golden proves a retry after repair is changed:false with no assignments"
+    },
+    {
+      "id": "BHV-RED-P7-REPAIR-REVISION-NULL-AND-CANONICAL",
+      "reason": "no direct executable golden covers repair-needed null canonical revision and normal canonical revision states"
+    },
+    {
+      "id": "BHV-RED-P7-READ-VALIDATE-LIST-GET-CANONICAL",
+      "reason": "no direct executable golden binds successful validate/list/get DTOs for a populated canonical document"
+    },
+    {
+      "id": "BHV-RED-P7-READ-MISSING-ZERO-WHITESPACE-MATRIX",
+      "reason": "no direct executable golden isolates every validate/list/get result and required error across missing, zero-byte, and whitespace targets"
+    },
+    {
+      "id": "BHV-RED-P3-FLAGS-MUTATION-IF-REVISION-PLACEMENT-REPETITION-MISSING-VALUE-INVALID-VALUE",
+      "reason": "no direct executable revision-option matrix golden"
+    },
+    {
+      "id": "BHV-RED-P3-FLAGS-MUTATION-LOCK-TIMEOUT-PLACEMENT-REPETITION-MISSING-VALUE-RANGE",
+      "reason": "no direct executable lock-timeout matrix golden"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-BODY-FILE",
+      "reason": "no direct executable stdin body success/error golden"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-GITLAB-JSON",
+      "reason": "no direct executable stdin metadata success/error golden"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-OPERATIONS-FILE",
+      "reason": "no direct executable stdin apply success/error golden"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-BODY-GITLAB-CONFLICT",
+      "reason": "no direct executable body/metadata stdin conflict golden"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-BODY-OPERATIONS-CONFLICT",
+      "reason": "no direct executable body/apply stdin conflict golden"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-GITLAB-OPERATIONS-CONFLICT",
+      "reason": "no direct executable metadata/apply stdin conflict golden"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-EMPTY",
+      "reason": "no direct executable empty-stdin request/body goldens"
+    },
+    {
+      "id": "BHV-RED-P3-STDIN-MULTIPLE",
+      "reason": "no direct executable multiple-stdin usage golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-USAGE",
+      "reason": "no direct executable usage details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-VALIDATION",
+      "reason": "no direct executable validation details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-REPAIR",
+      "reason": "no direct executable repair details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-CONFLICT-REVISION",
+      "reason": "no direct executable revision-conflict details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-CONFLICT-LOCK-TIMEOUT",
+      "reason": "no direct executable lock-timeout details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-CONFLICT-IDENTITY-CHANGED",
+      "reason": "no direct executable identity-conflict details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-NOT-FOUND-SINGLE-AND-APPLY-INDEX",
+      "reason": "no direct executable not-found details/index golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-PRECONDITION-SINGLE-AND-APPLY-INDEX",
+      "reason": "no direct executable precondition details/index golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-IO-COMMIT-MAY-HAVE-SUCCEEDED",
+      "reason": "no direct executable io details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-ERROR-UNSUPPORTED",
+      "reason": "no direct executable unsupported details/channel/status golden"
+    },
+    {
+      "id": "BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-SUCCESS",
+      "reason": "no direct executable exact JSON success stream golden"
+    },
+    {
+      "id": "BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-ERROR",
+      "reason": "no direct executable exact JSON error stream golden"
+    },
+    {
+      "id": "BHV-RED-P3-CHANNEL-TEXT-ERROR-AND-ID-NONE-SUPPRESSION",
+      "reason": "no direct executable text/id/none channel golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-DUPLICATE",
+      "reason": "no direct executable duplicate-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-WRONG-TOKEN",
+      "reason": "no direct executable wrong-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-OUT-OF-RANGE",
+      "reason": "no direct executable out-of-range-number golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-NULL",
+      "reason": "no direct executable null-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-MALFORMED",
+      "reason": "no direct executable malformed-JSON golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-TRAILING",
+      "reason": "no direct executable trailing-bytes golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-INVALID-ESCAPE",
+      "reason": "no direct executable invalid-escape golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-SURROGATE",
+      "reason": "no direct executable surrogate golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-UNKNOWN",
+      "reason": "no direct executable unknown-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-CREATE-MISSING",
+      "reason": "no direct executable missing-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-DUPLICATE",
+      "reason": "no direct executable duplicate-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-WRONG-TOKEN",
+      "reason": "no direct executable wrong-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-OUT-OF-RANGE",
+      "reason": "no direct executable out-of-range-number golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-NULL",
+      "reason": "no direct executable null-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-MALFORMED",
+      "reason": "no direct executable malformed-JSON golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-TRAILING",
+      "reason": "no direct executable trailing-bytes golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-INVALID-ESCAPE",
+      "reason": "no direct executable invalid-escape golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-SURROGATE",
+      "reason": "no direct executable surrogate golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-UNKNOWN",
+      "reason": "no direct executable unknown-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-MOVE-MISSING",
+      "reason": "no direct executable missing-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-DUPLICATE",
+      "reason": "no direct executable duplicate-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-WRONG-TOKEN",
+      "reason": "no direct executable wrong-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-OUT-OF-RANGE",
+      "reason": "no direct executable out-of-range-number golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-NULL",
+      "reason": "no direct executable null-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-MALFORMED",
+      "reason": "no direct executable malformed-JSON golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-TRAILING",
+      "reason": "no direct executable trailing-bytes golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-INVALID-ESCAPE",
+      "reason": "no direct executable invalid-escape golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-SURROGATE",
+      "reason": "no direct executable surrogate golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-UNKNOWN",
+      "reason": "no direct executable unknown-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-THREAD-DELETE-MISSING",
+      "reason": "no direct executable missing-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-DUPLICATE",
+      "reason": "no direct executable duplicate-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-WRONG-TOKEN",
+      "reason": "no direct executable wrong-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-OUT-OF-RANGE",
+      "reason": "no direct executable out-of-range-number golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-NULL",
+      "reason": "no direct executable null-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-MALFORMED",
+      "reason": "no direct executable malformed-JSON golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-TRAILING",
+      "reason": "no direct executable trailing-bytes golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-INVALID-ESCAPE",
+      "reason": "no direct executable invalid-escape golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-SURROGATE",
+      "reason": "no direct executable surrogate golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-UNKNOWN",
+      "reason": "no direct executable unknown-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-ADD-MISSING",
+      "reason": "no direct executable missing-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-DUPLICATE",
+      "reason": "no direct executable duplicate-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-WRONG-TOKEN",
+      "reason": "no direct executable wrong-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-OUT-OF-RANGE",
+      "reason": "no direct executable out-of-range-number golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-NULL",
+      "reason": "no direct executable null-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-MALFORMED",
+      "reason": "no direct executable malformed-JSON golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-TRAILING",
+      "reason": "no direct executable trailing-bytes golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-INVALID-ESCAPE",
+      "reason": "no direct executable invalid-escape golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-SURROGATE",
+      "reason": "no direct executable surrogate golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-UNKNOWN",
+      "reason": "no direct executable unknown-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-MISSING",
+      "reason": "no direct executable missing-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-DUPLICATE",
+      "reason": "no direct executable duplicate-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-WRONG-TOKEN",
+      "reason": "no direct executable wrong-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-OUT-OF-RANGE",
+      "reason": "no direct executable out-of-range-number golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-NULL",
+      "reason": "no direct executable null-token golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-MALFORMED",
+      "reason": "no direct executable malformed-JSON golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-TRAILING",
+      "reason": "no direct executable trailing-bytes golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-INVALID-ESCAPE",
+      "reason": "no direct executable invalid-escape golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-SURROGATE",
+      "reason": "no direct executable surrogate golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-UNKNOWN",
+      "reason": "no direct executable unknown-field golden"
+    },
+    {
+      "id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-MISSING",
+      "reason": "no direct executable missing-field golden"
+    },
+    {
+      "id": "BHV-RED-ERROR-PRECEDENCE-MATRIX",
+      "reason": "mandatory sidecar/source/body/metadata/operations precedence fixtures are unavailable"
+    },
+    {
+      "id": "BHV-RED-P5-ID-LOWERCASE-HYPHENATED-LEXICAL",
+      "reason": "no direct executable fixture rejects each noncanonical UUID lexical form without changing the document"
+    },
+    {
+      "id": "BHV-RED-P5-ID-UUIDV7-VERSION-NIBBLE",
+      "reason": "no direct executable fixture rejects a non-v7 UUID in each ThreadID and MessageID input position"
+    },
+    {
+      "id": "BHV-RED-P5-ID-RFC9562-VARIANT",
+      "reason": "no direct executable fixture rejects each non-RFC-9562 UUID variant in each ID namespace"
+    },
+    {
+      "id": "BHV-RED-P5-ID-NIL",
+      "reason": "no direct executable fixture rejects the all-zero UUID in thread and message positions"
+    },
+    {
+      "id": "BHV-RED-P5-ID-TYPED-NAMESPACES",
+      "reason": "no direct executable fixture proves ThreadID and MessageID are non-interchangeable at every public DTO boundary"
+    },
+    {
+      "id": "BHV-RED-P5-ID-THREAD-DOCUMENT-UNIQUENESS",
+      "reason": "no direct executable fixture rejects a duplicate ThreadID while preserving the original bytes"
+    },
+    {
+      "id": "BHV-RED-P5-ID-MESSAGE-DOCUMENT-UNIQUENESS",
+      "reason": "no direct executable fixture rejects a duplicate MessageID across threads while preserving the original bytes"
+    },
+    {
+      "id": "BHV-RED-P5-ID-CROSS-NAMESPACE-EQUALITY",
+      "reason": "no direct executable fixture accepts one UUID once as a ThreadID and once as a MessageID"
+    },
+    {
+      "id": "BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REPEATED-CLOCK",
+      "reason": "no controlled-clock executable fixture proves generated UUID byte order is strictly increasing when milliseconds repeat"
+    },
+    {
+      "id": "BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REGRESSED-CLOCK",
+      "reason": "no controlled-clock executable fixture proves generated UUID byte order is strictly increasing when the clock regresses"
+    },
+    {
+      "id": "BHV-RED-P5-ID-GENERATE-CSPRNG-RANDOMNESS",
+      "reason": "no executable fixture verifies generation consumes CSPRNG-backed entropy rather than deterministic or pass-through labels"
+    },
+    {
+      "id": "BHV-RED-P5-ID-GENERATE-DOCUMENT-COLLISION-RETRY-16",
+      "reason": "no controlled-randomness executable fixture proves document collision retries stop after at most sixteen attempts"
+    },
+    {
+      "id": "BHV-RED-P5-ID-GENERATE-RANDOMNESS-EXHAUSTED-EXIT-7",
+      "reason": "no controlled-randomness executable fixture asserts exit 7 io:randomness_exhausted, exact details, and unchanged state"
+    },
+    {
+      "id": "BHV-RED-P5-ID-GENERATE-CLOCK-FAILURE-EXIT-7",
+      "reason": "no typed clock-fault capability exists for a direct exit 7 io:clock fixture with exact details and unchanged state"
+    },
+    {
+      "id": "BHV-RED-P5-ID-GENERATE-CSPRNG-FAILURE-EXIT-7",
+      "reason": "no typed CSPRNG-fault capability exists for a direct exit 7 io:csprng fixture with exact details and unchanged state"
+    },
+    {
+      "id": "BHV-RED-P5-AUTHOR-HUMAN-CLOSED-OPTIONAL-NAME",
+      "reason": "no direct executable fixture covers human absent-name, valid-name, forbidden field, and unchanged-state branches"
+    },
+    {
+      "id": "BHV-RED-P5-AUTHOR-AGENT-CLOSED-OPTIONAL-NAME",
+      "reason": "no direct executable fixture covers agent absent-name, valid-name, forbidden field, and unchanged-state branches"
+    },
+    {
+      "id": "BHV-RED-P5-AUTHOR-EXTERNAL-REQUIRED-IDENTITY-AND-NAME",
+      "reason": "no direct executable fixture covers external required identity/name, closed fields, exact error, and unchanged state"
+    },
+    {
+      "id": "BHV-RED-P5-AUTHOR-KIND-CLOSED-UNION",
+      "reason": "no direct executable fixture rejects unknown, null, and cross-variant author discriminators"
+    },
+    {
+      "id": "BHV-RED-P5-GITLAB-NOTE-CLOSED-UNION",
+      "reason": "no direct executable fixture covers note fields, positive integer bounds, and closed-form rejection"
+    },
+    {
+      "id": "BHV-RED-P5-GITLAB-SYSTEM-NOTE-CLOSED-UNION",
+      "reason": "no direct executable fixture covers system_note fields, positive integer bounds, and closed-form rejection"
+    },
+    {
+      "id": "BHV-RED-P5-GITLAB-IMMUTABLE-AFTER-CREATE",
+      "reason": "no direct executable mutation fixture proves GitLab metadata cannot be inferred or changed and bytes remain unchanged on rejection"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-NFC-NAME-COMPOSED-ACCEPTED",
+      "reason": "no direct executable fixture accepts a composed NFC name and preserves its exact UTF-8 bytes"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-NFC-NAME-DECOMPOSED-REJECTED",
+      "reason": "no direct executable fixture rejects a decomposed non-NFC name rather than normalizing it"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-NAME-CONTROL-REJECTED",
+      "reason": "no direct executable fixture rejects Cc, CR, LF, and NUL Name inputs with exact error and unchanged state"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-EXTERNAL-IDENTITY-CONTROL-REJECTED",
+      "reason": "no direct executable fixture rejects Cc, CR, LF, and NUL ExternalIdentity inputs"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-WHITESPACE-BODY-BOUNDARIES",
+      "reason": "no direct executable fixture enumerates Unicode 16 White_Space-only rejection and adjacent non-whitespace acceptance"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-SCALAR-COUNT-NON-BMP",
+      "reason": "no direct executable fixture proves Name and ExternalIdentity scalar limits count non-BMP scalars, not bytes or UTF-16 units"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-MALFORMED-UTF8",
+      "reason": "no direct executable fixture rejects malformed UTF-8 in body, metadata, source, and apply request paths"
+    },
+    {
+      "id": "BHV-RED-P5-UNICODE-SURROGATE-JSON-ESCAPE",
+      "reason": "no direct executable fixture rejects every forbidden surrogate JSON escape at public request boundaries"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-SIDECAR-4194304-PLUS-ONE-BOUNDED-READ",
+      "reason": "no large-input direct fixture proves a 4 MiB sidecar plus one byte is rejected before unbounded allocation"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-THREADS-1024-PLUS-ONE",
+      "reason": "no direct executable fixture proves the 1,025th resulting thread returns the exact precondition error and leaves bytes unchanged"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-MESSAGES-PER-THREAD-256-PLUS-ONE",
+      "reason": "no direct executable fixture proves the 257th resulting thread message is rejected with unchanged bytes"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-MESSAGES-DOCUMENT-16384-PLUS-ONE",
+      "reason": "no direct executable fixture proves the 16,385th resulting document message is rejected with unchanged bytes"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-ANCHOR-4096-PLUS-ONE-BOUNDED-DECODE",
+      "reason": "no direct executable fixture proves a decoded 4,097-byte anchor is rejected before unbounded decode/allocation"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-BODY-65536-PLUS-ONE-NORMALIZED",
+      "reason": "no direct executable fixture proves a 65,537-byte logical body is rejected with exact usage error and unchanged state"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-BODY-131074-PLUS-ONE-TRANSPORT-READ",
+      "reason": "no direct executable fixture proves body transport rejects byte 131,075 before unbounded allocation"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-METADATA-16384-PLUS-ONE-BOUNDED-READ",
+      "reason": "no direct executable fixture proves raw GitLab metadata byte 16,385 is rejected before unbounded allocation"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-SOURCE-16777216-PLUS-ONE-BOUNDED-READ",
+      "reason": "no large-input direct fixture proves a source byte 16,777,217 is rejected before unbounded allocation"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-APPLY-1048576-PLUS-ONE-BOUNDED-READ",
+      "reason": "no large-input direct fixture proves apply request byte 1,048,577 is rejected before unbounded allocation"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-APPLY-OPERATIONS-ZERO",
+      "reason": "no direct executable fixture asserts the exact usage error for an empty apply operation list and unchanged state"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-APPLY-OPERATIONS-257-PLUS-ONE",
+      "reason": "no direct executable fixture proves 257 operations are rejected before mutation"
+    },
+    {
+      "id": "BHV-RED-P5-LIMIT-APPLY-SEQUENTIAL-RESULTING-DOCUMENT",
+      "reason": "no direct executable fixture proves limits are checked after each sequential operation and rolls the whole batch back"
+    },
+    {
+      "id": "BHV-RED-SECURE-STORE-RACES",
+      "reason": "mandatory adversarial lock, identity, durability, and subprocess-race fixtures are unavailable"
+    },
+    {
+      "id": "BHV-RED-PARSER-PROPERTIES-FUZZ",
+      "reason": "mandatory production parser/domain property and fuzz packs are unavailable"
+    },
+    {
+      "id": "BHV-RED-NEOVIM-FAIL-CLOSURE",
+      "reason": "mandatory Neovim 0.12 popup/extmark/fail-closure pack is unavailable"
+    },
+    {
+      "id": "BHV-RED-P4-THREAD-MOVE-PRECONDITION",
+      "reason": "thread move has no single-operation semantic precondition; revision mismatch is conflict and source failure is validation"
+    },
+    {
+      "id": "BHV-RED-P4-THREAD-DELETE-PRECONDITION",
+      "reason": "thread delete has no single-operation semantic precondition; revision mismatch is conflict"
+    },
+    {
+      "id": "BHV-RED-P4-MESSAGE-UPDATE-PRECONDITION",
+      "reason": "message update has no single-operation semantic precondition; equal body is a no-op and revision mismatch is conflict"
+    },
+    {
+      "id": "BHV-RED-P4-MESSAGE-DELETE-PRECONDITION",
+      "reason": "message delete has no single-operation semantic precondition; revision mismatch is conflict"
+    }
+  ]
+}

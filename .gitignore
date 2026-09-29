@@ -1,2 +1,4 @@
 /.pi/orchestration
+/.tmp/
 /nvim.log
+/bin/

@@ -1,0 +1,53 @@
+{
+  "fixture_version": 1,
+  "id": "p4-thread-move-not-found",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "thread",
+    "move",
+    "--file",
+    "a.comments",
+    "--id",
+    "018f0000-0000-7000-8000-000000000102",
+    "--location",
+    "lost"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [
+    "writer_platform"
+  ],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.comments",
+        "kind": "file",
+        "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlciA8IS0tIHNpZGVjYXItbWV0YTogeyJpZCI6IjAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDEwMSJ9IC0tPgpoZWxsbwpbL0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDFdCg==",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 5,
+    "stdout_b64": "",
+    "stderr_b64": "ZXJyb3Igbm90X2ZvdW5kIG5vdF9mb3VuZDp0aHJlYWQK",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "a.comments",
+          "kind": "file",
+          "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlciA8IS0tIHNpZGVjYXItbWV0YTogeyJpZCI6IjAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDEwMSJ9IC0tPgpoZWxsbwpbL0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDFdCg==",
+          "mode": "0600"
+        },
+        {
+          "path": ".a.comments.sidecar.lock",
+          "kind": "file",
+          "bytes_b64": "",
+          "mode": "0600"
+        }
+      ]
+    }
+  }
+}

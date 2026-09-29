@@ -1,0 +1,2946 @@
+{
+  "ledger_version": 2,
+  "mode": "shadow_traceability_only",
+  "v1_inventory": "contracts/behavior-inventory-v1.json",
+  "required_red_registry": "contracts/packs/required-red-v1.json",
+  "obligations": [
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-GRAMMAR-THREAD-START-TERMINAL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-GRAMMAR-THREAD-START-TERMINAL",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-GRAMMAR-THREAD-START-TERMINAL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden isolates the exact thread-start terminal",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-GRAMMAR-THREAD-END-TERMINAL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-GRAMMAR-THREAD-END-TERMINAL",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-GRAMMAR-THREAD-END-TERMINAL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden isolates the exact matching thread-end terminal",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-GRAMMAR-ROLE-USER-BOT-EXTERNAL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-GRAMMAR-ROLE-USER-BOT-EXTERNAL",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-GRAMMAR-ROLE-USER-BOT-EXTERNAL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden proves all three role terminals and role mapping",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-GRAMMAR-LOCATION-AND-UUID",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-GRAMMAR-LOCATION-AND-UUID",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-GRAMMAR-LOCATION-AND-UUID"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden covers malformed location and UUID terminals",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-METADATA-CLOSED-FORMS-AND-KINDS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-METADATA-CLOSED-FORMS-AND-KINDS",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-METADATA-CLOSED-FORMS-AND-KINDS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden covers every closed metadata, external-author, and GitLab form",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-METADATA-TOKEN-FAILURES",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-METADATA-TOKEN-FAILURES",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-METADATA-TOKEN-FAILURES"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden covers every nested duplicate, token-kind, escape, and non-object failure",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-CANONICAL-SORT-ENCODE-FINAL-LF",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-CANONICAL-SORT-ENCODE-FINAL-LF",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-CANONICAL-SORT-ENCODE-FINAL-LF"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden binds sorted canonical output, compact encoding, and exactly one final LF",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-BODY-FRAMING-TRAILING-LF-INTERNAL-BLANKS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-BODY-FRAMING-TRAILING-LF-INTERNAL-BLANKS",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-BODY-FRAMING-TRAILING-LF-INTERNAL-BLANKS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden binds decoded trailing logical LFs and internal blank body lines",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-RESERVED-PREFIX-EACH",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-RESERVED-PREFIX-EACH",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-RESERVED-PREFIX-EACH"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden isolates each reserved-prefix body rejection",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-STRUCTURAL-MALFORMED-TERMINALS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-STRUCTURAL-MALFORMED-TERMINALS",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-STRUCTURAL-MALFORMED-TERMINALS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden covers every missing, unmatched, premature, and malformed structural delimiter",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-NONCANONICAL-ENUMERATED-VARIANTS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-NONCANONICAL-ENUMERATED-VARIANTS",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-NONCANONICAL-ENUMERATED-VARIANTS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden covers each accepted CRLF, order, metadata, final-LF, and omitted-separator formatter variant",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-FORMAT-CHECK-AND-WRITE-MATRIX",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-FORMAT-CHECK-AND-WRITE-MATRIX",
+      "aliases": [
+        "BHV-RED-P4-FORMAT-CHECK-AND-WRITE-MATRIX"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden binds check no-write versus write for every formatter-only variant",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P7-REPAIR-ONLY-MISSING-USER-BOT-METADATA-IDS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P7-REPAIR-ONLY-MISSING-USER-BOT-METADATA-IDS",
+      "aliases": [
+        "BHV-RED-P7-REPAIR-ONLY-MISSING-USER-BOT-METADATA-IDS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden proves repair rejects every non-ID and external metadata defect",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P7-REPAIR-FIX-PHYSICAL-ORDER-ASSIGNMENTS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P7-REPAIR-FIX-PHYSICAL-ORDER-ASSIGNMENTS",
+      "aliases": [
+        "BHV-RED-P7-REPAIR-FIX-PHYSICAL-ORDER-ASSIGNMENTS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden binds multi-ID assignment order to physical document order",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P7-REPAIR-FIX-RETRY-NOOP",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P7-REPAIR-FIX-RETRY-NOOP",
+      "aliases": [
+        "BHV-RED-P7-REPAIR-FIX-RETRY-NOOP"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden proves a retry after repair is changed:false with no assignments",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P7-REPAIR-REVISION-NULL-AND-CANONICAL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P7-REPAIR-REVISION-NULL-AND-CANONICAL",
+      "aliases": [
+        "BHV-RED-P7-REPAIR-REVISION-NULL-AND-CANONICAL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden covers repair-needed null canonical revision and normal canonical revision states",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P7-READ-VALIDATE-LIST-GET-CANONICAL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P7-READ-VALIDATE-LIST-GET-CANONICAL",
+      "aliases": [
+        "BHV-RED-P7-READ-VALIDATE-LIST-GET-CANONICAL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden binds successful validate/list/get DTOs for a populated canonical document",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P7-READ-MISSING-ZERO-WHITESPACE-MATRIX",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P7-READ-MISSING-ZERO-WHITESPACE-MATRIX",
+      "aliases": [
+        "BHV-RED-P7-READ-MISSING-ZERO-WHITESPACE-MATRIX"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable golden isolates every validate/list/get result and required error across missing, zero-byte, and whitespace targets",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-FLAGS-MUTATION-IF-REVISION-PLACEMENT-REPETITION-MISSING-VALUE-INVALID-VALUE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-FLAGS-MUTATION-IF-REVISION-PLACEMENT-REPETITION-MISSING-VALUE-INVALID-VALUE",
+      "aliases": [
+        "BHV-RED-P3-FLAGS-MUTATION-IF-REVISION-PLACEMENT-REPETITION-MISSING-VALUE-INVALID-VALUE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable revision-option matrix golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-FLAGS-MUTATION-LOCK-TIMEOUT-PLACEMENT-REPETITION-MISSING-VALUE-RANGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-FLAGS-MUTATION-LOCK-TIMEOUT-PLACEMENT-REPETITION-MISSING-VALUE-RANGE",
+      "aliases": [
+        "BHV-RED-P3-FLAGS-MUTATION-LOCK-TIMEOUT-PLACEMENT-REPETITION-MISSING-VALUE-RANGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable lock-timeout matrix golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-BODY-FILE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-BODY-FILE",
+      "aliases": [
+        "BHV-RED-P3-STDIN-BODY-FILE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable stdin body success/error golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-GITLAB-JSON",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-GITLAB-JSON",
+      "aliases": [
+        "BHV-RED-P3-STDIN-GITLAB-JSON"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable stdin metadata success/error golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-OPERATIONS-FILE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-OPERATIONS-FILE",
+      "aliases": [
+        "BHV-RED-P3-STDIN-OPERATIONS-FILE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable stdin apply success/error golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-BODY-GITLAB-CONFLICT",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-BODY-GITLAB-CONFLICT",
+      "aliases": [
+        "BHV-RED-P3-STDIN-BODY-GITLAB-CONFLICT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable body/metadata stdin conflict golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-BODY-OPERATIONS-CONFLICT",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-BODY-OPERATIONS-CONFLICT",
+      "aliases": [
+        "BHV-RED-P3-STDIN-BODY-OPERATIONS-CONFLICT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable body/apply stdin conflict golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-GITLAB-OPERATIONS-CONFLICT",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-GITLAB-OPERATIONS-CONFLICT",
+      "aliases": [
+        "BHV-RED-P3-STDIN-GITLAB-OPERATIONS-CONFLICT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable metadata/apply stdin conflict golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-EMPTY",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-EMPTY",
+      "aliases": [
+        "BHV-RED-P3-STDIN-EMPTY"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable empty-stdin request/body goldens",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-STDIN-MULTIPLE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-STDIN-MULTIPLE",
+      "aliases": [
+        "BHV-RED-P3-STDIN-MULTIPLE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable multiple-stdin usage golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-USAGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-USAGE",
+      "aliases": [
+        "BHV-RED-P3-ERROR-USAGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable usage details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-VALIDATION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-VALIDATION",
+      "aliases": [
+        "BHV-RED-P3-ERROR-VALIDATION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable validation details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-REPAIR",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-REPAIR",
+      "aliases": [
+        "BHV-RED-P3-ERROR-REPAIR"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable repair details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-CONFLICT-REVISION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-CONFLICT-REVISION",
+      "aliases": [
+        "BHV-RED-P3-ERROR-CONFLICT-REVISION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable revision-conflict details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-CONFLICT-LOCK-TIMEOUT",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-CONFLICT-LOCK-TIMEOUT",
+      "aliases": [
+        "BHV-RED-P3-ERROR-CONFLICT-LOCK-TIMEOUT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable lock-timeout details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-CONFLICT-IDENTITY-CHANGED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-CONFLICT-IDENTITY-CHANGED",
+      "aliases": [
+        "BHV-RED-P3-ERROR-CONFLICT-IDENTITY-CHANGED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable identity-conflict details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-NOT-FOUND-SINGLE-AND-APPLY-INDEX",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-NOT-FOUND-SINGLE-AND-APPLY-INDEX",
+      "aliases": [
+        "BHV-RED-P3-ERROR-NOT-FOUND-SINGLE-AND-APPLY-INDEX"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable not-found details/index golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-PRECONDITION-SINGLE-AND-APPLY-INDEX",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-PRECONDITION-SINGLE-AND-APPLY-INDEX",
+      "aliases": [
+        "BHV-RED-P3-ERROR-PRECONDITION-SINGLE-AND-APPLY-INDEX"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable precondition details/index golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-IO-COMMIT-MAY-HAVE-SUCCEEDED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-IO-COMMIT-MAY-HAVE-SUCCEEDED",
+      "aliases": [
+        "BHV-RED-P3-ERROR-IO-COMMIT-MAY-HAVE-SUCCEEDED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable io details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-ERROR-UNSUPPORTED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-ERROR-UNSUPPORTED",
+      "aliases": [
+        "BHV-RED-P3-ERROR-UNSUPPORTED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable unsupported details/channel/status golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-SUCCESS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-SUCCESS",
+      "aliases": [
+        "BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-SUCCESS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable exact JSON success stream golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-ERROR",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-ERROR",
+      "aliases": [
+        "BHV-RED-P3-CHANNEL-ONE-LF-NO-JSONL-JSON-ERROR"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable exact JSON error stream golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-CHANNEL-TEXT-ERROR-AND-ID-NONE-SUPPRESSION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-CHANNEL-TEXT-ERROR-AND-ID-NONE-SUPPRESSION",
+      "aliases": [
+        "BHV-RED-P3-CHANNEL-TEXT-ERROR-AND-ID-NONE-SUPPRESSION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable text/id/none channel golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-DUPLICATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-DUPLICATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-DUPLICATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable duplicate-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-WRONG-TOKEN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-WRONG-TOKEN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-WRONG-TOKEN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable wrong-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-OUT-OF-RANGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-OUT-OF-RANGE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-OUT-OF-RANGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable out-of-range-number golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-NULL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-NULL",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-NULL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable null-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-MALFORMED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-MALFORMED",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-MALFORMED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable malformed-JSON golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-TRAILING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-TRAILING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-TRAILING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable trailing-bytes golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-INVALID-ESCAPE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-INVALID-ESCAPE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-INVALID-ESCAPE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable invalid-escape golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-SURROGATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-SURROGATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-SURROGATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable surrogate golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-UNKNOWN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-UNKNOWN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable unknown-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-CREATE-MISSING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-CREATE-MISSING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-CREATE-MISSING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable missing-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-DUPLICATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-DUPLICATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-DUPLICATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable duplicate-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-WRONG-TOKEN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-WRONG-TOKEN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-WRONG-TOKEN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable wrong-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-OUT-OF-RANGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-OUT-OF-RANGE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-OUT-OF-RANGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable out-of-range-number golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-NULL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-NULL",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-NULL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable null-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-MALFORMED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-MALFORMED",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-MALFORMED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable malformed-JSON golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-TRAILING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-TRAILING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-TRAILING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable trailing-bytes golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-INVALID-ESCAPE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-INVALID-ESCAPE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-INVALID-ESCAPE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable invalid-escape golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-SURROGATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-SURROGATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-SURROGATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable surrogate golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-UNKNOWN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-UNKNOWN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable unknown-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-MOVE-MISSING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-MOVE-MISSING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-MOVE-MISSING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable missing-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-DUPLICATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-DUPLICATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-DUPLICATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable duplicate-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-WRONG-TOKEN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-WRONG-TOKEN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-WRONG-TOKEN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable wrong-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-OUT-OF-RANGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-OUT-OF-RANGE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-OUT-OF-RANGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable out-of-range-number golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-NULL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-NULL",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-NULL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable null-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-MALFORMED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-MALFORMED",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-MALFORMED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable malformed-JSON golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-TRAILING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-TRAILING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-TRAILING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable trailing-bytes golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-INVALID-ESCAPE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-INVALID-ESCAPE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-INVALID-ESCAPE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable invalid-escape golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-SURROGATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-SURROGATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-SURROGATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable surrogate golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-UNKNOWN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-UNKNOWN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable unknown-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-THREAD-DELETE-MISSING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-THREAD-DELETE-MISSING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-THREAD-DELETE-MISSING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable missing-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-DUPLICATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-DUPLICATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-DUPLICATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable duplicate-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-WRONG-TOKEN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-WRONG-TOKEN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-WRONG-TOKEN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable wrong-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-OUT-OF-RANGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-OUT-OF-RANGE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-OUT-OF-RANGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable out-of-range-number golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-NULL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-NULL",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-NULL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable null-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-MALFORMED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-MALFORMED",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-MALFORMED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable malformed-JSON golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-TRAILING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-TRAILING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-TRAILING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable trailing-bytes golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-INVALID-ESCAPE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-INVALID-ESCAPE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-INVALID-ESCAPE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable invalid-escape golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-SURROGATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-SURROGATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-SURROGATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable surrogate golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-UNKNOWN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-UNKNOWN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable unknown-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-ADD-MISSING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-ADD-MISSING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-ADD-MISSING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable missing-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-DUPLICATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-DUPLICATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-DUPLICATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable duplicate-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-WRONG-TOKEN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-WRONG-TOKEN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-WRONG-TOKEN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable wrong-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-OUT-OF-RANGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-OUT-OF-RANGE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-OUT-OF-RANGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable out-of-range-number golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-NULL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-NULL",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-NULL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable null-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-MALFORMED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-MALFORMED",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-MALFORMED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable malformed-JSON golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-TRAILING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-TRAILING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-TRAILING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable trailing-bytes golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-INVALID-ESCAPE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-INVALID-ESCAPE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-INVALID-ESCAPE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable invalid-escape golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-SURROGATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-SURROGATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-SURROGATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable surrogate golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-UNKNOWN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-UNKNOWN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable unknown-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-UPDATE-MISSING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-UPDATE-MISSING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-UPDATE-MISSING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable missing-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-DUPLICATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-DUPLICATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-DUPLICATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable duplicate-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-WRONG-TOKEN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-WRONG-TOKEN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-WRONG-TOKEN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable wrong-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-OUT-OF-RANGE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-OUT-OF-RANGE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-OUT-OF-RANGE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable out-of-range-number golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-NULL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-NULL",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-NULL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable null-token golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-MALFORMED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-MALFORMED",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-MALFORMED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable malformed-JSON golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-TRAILING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-TRAILING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-TRAILING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable trailing-bytes golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-INVALID-ESCAPE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-INVALID-ESCAPE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-INVALID-ESCAPE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable invalid-escape golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-SURROGATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-SURROGATE",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-SURROGATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable surrogate golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-UNKNOWN",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-UNKNOWN",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable unknown-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P3-APPLY-MESSAGE-DELETE-MISSING",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P3-APPLY-MESSAGE-DELETE-MISSING",
+      "aliases": [
+        "BHV-RED-P3-APPLY-MESSAGE-DELETE-MISSING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable missing-field golden",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-ERROR-PRECEDENCE-MATRIX",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-ERROR-PRECEDENCE-MATRIX",
+      "aliases": [
+        "BHV-RED-ERROR-PRECEDENCE-MATRIX"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "mandatory sidecar/source/body/metadata/operations precedence fixtures are unavailable",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-LOWERCASE-HYPHENATED-LEXICAL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-LOWERCASE-HYPHENATED-LEXICAL",
+      "aliases": [
+        "BHV-RED-P5-ID-LOWERCASE-HYPHENATED-LEXICAL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects each noncanonical UUID lexical form without changing the document",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-UUIDV7-VERSION-NIBBLE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-UUIDV7-VERSION-NIBBLE",
+      "aliases": [
+        "BHV-RED-P5-ID-UUIDV7-VERSION-NIBBLE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects a non-v7 UUID in each ThreadID and MessageID input position",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-RFC9562-VARIANT",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-RFC9562-VARIANT",
+      "aliases": [
+        "BHV-RED-P5-ID-RFC9562-VARIANT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects each non-RFC-9562 UUID variant in each ID namespace",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-NIL",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-NIL",
+      "aliases": [
+        "BHV-RED-P5-ID-NIL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects the all-zero UUID in thread and message positions",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-TYPED-NAMESPACES",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-TYPED-NAMESPACES",
+      "aliases": [
+        "BHV-RED-P5-ID-TYPED-NAMESPACES"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves ThreadID and MessageID are non-interchangeable at every public DTO boundary",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-THREAD-DOCUMENT-UNIQUENESS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-THREAD-DOCUMENT-UNIQUENESS",
+      "aliases": [
+        "BHV-RED-P5-ID-THREAD-DOCUMENT-UNIQUENESS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects a duplicate ThreadID while preserving the original bytes",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-MESSAGE-DOCUMENT-UNIQUENESS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-MESSAGE-DOCUMENT-UNIQUENESS",
+      "aliases": [
+        "BHV-RED-P5-ID-MESSAGE-DOCUMENT-UNIQUENESS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects a duplicate MessageID across threads while preserving the original bytes",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-CROSS-NAMESPACE-EQUALITY",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-CROSS-NAMESPACE-EQUALITY",
+      "aliases": [
+        "BHV-RED-P5-ID-CROSS-NAMESPACE-EQUALITY"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture accepts one UUID once as a ThreadID and once as a MessageID",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REPEATED-CLOCK",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REPEATED-CLOCK",
+      "aliases": [
+        "BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REPEATED-CLOCK"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no controlled-clock executable fixture proves generated UUID byte order is strictly increasing when milliseconds repeat",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REGRESSED-CLOCK",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REGRESSED-CLOCK",
+      "aliases": [
+        "BHV-RED-P5-ID-GENERATE-STRICTLY-MONOTONIC-REGRESSED-CLOCK"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no controlled-clock executable fixture proves generated UUID byte order is strictly increasing when the clock regresses",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-GENERATE-CSPRNG-RANDOMNESS",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-GENERATE-CSPRNG-RANDOMNESS",
+      "aliases": [
+        "BHV-RED-P5-ID-GENERATE-CSPRNG-RANDOMNESS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no executable fixture verifies generation consumes CSPRNG-backed entropy rather than deterministic or pass-through labels",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-GENERATE-DOCUMENT-COLLISION-RETRY-16",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-GENERATE-DOCUMENT-COLLISION-RETRY-16",
+      "aliases": [
+        "BHV-RED-P5-ID-GENERATE-DOCUMENT-COLLISION-RETRY-16"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no controlled-randomness executable fixture proves document collision retries stop after at most sixteen attempts",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-GENERATE-RANDOMNESS-EXHAUSTED-EXIT-7",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-GENERATE-RANDOMNESS-EXHAUSTED-EXIT-7",
+      "aliases": [
+        "BHV-RED-P5-ID-GENERATE-RANDOMNESS-EXHAUSTED-EXIT-7"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no controlled-randomness executable fixture asserts exit 7 io:randomness_exhausted, exact details, and unchanged state",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-GENERATE-CLOCK-FAILURE-EXIT-7",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-GENERATE-CLOCK-FAILURE-EXIT-7",
+      "aliases": [
+        "BHV-RED-P5-ID-GENERATE-CLOCK-FAILURE-EXIT-7"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no typed clock-fault capability exists for a direct exit 7 io:clock fixture with exact details and unchanged state",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-ID-GENERATE-CSPRNG-FAILURE-EXIT-7",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-ID-GENERATE-CSPRNG-FAILURE-EXIT-7",
+      "aliases": [
+        "BHV-RED-P5-ID-GENERATE-CSPRNG-FAILURE-EXIT-7"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no typed CSPRNG-fault capability exists for a direct exit 7 io:csprng fixture with exact details and unchanged state",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-AUTHOR-HUMAN-CLOSED-OPTIONAL-NAME",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-AUTHOR-HUMAN-CLOSED-OPTIONAL-NAME",
+      "aliases": [
+        "BHV-RED-P5-AUTHOR-HUMAN-CLOSED-OPTIONAL-NAME"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture covers human absent-name, valid-name, forbidden field, and unchanged-state branches",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-AUTHOR-AGENT-CLOSED-OPTIONAL-NAME",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-AUTHOR-AGENT-CLOSED-OPTIONAL-NAME",
+      "aliases": [
+        "BHV-RED-P5-AUTHOR-AGENT-CLOSED-OPTIONAL-NAME"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture covers agent absent-name, valid-name, forbidden field, and unchanged-state branches",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-AUTHOR-EXTERNAL-REQUIRED-IDENTITY-AND-NAME",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-AUTHOR-EXTERNAL-REQUIRED-IDENTITY-AND-NAME",
+      "aliases": [
+        "BHV-RED-P5-AUTHOR-EXTERNAL-REQUIRED-IDENTITY-AND-NAME"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture covers external required identity/name, closed fields, exact error, and unchanged state",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-AUTHOR-KIND-CLOSED-UNION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-AUTHOR-KIND-CLOSED-UNION",
+      "aliases": [
+        "BHV-RED-P5-AUTHOR-KIND-CLOSED-UNION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects unknown, null, and cross-variant author discriminators",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-GITLAB-NOTE-CLOSED-UNION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-GITLAB-NOTE-CLOSED-UNION",
+      "aliases": [
+        "BHV-RED-P5-GITLAB-NOTE-CLOSED-UNION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture covers note fields, positive integer bounds, and closed-form rejection",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-GITLAB-SYSTEM-NOTE-CLOSED-UNION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-GITLAB-SYSTEM-NOTE-CLOSED-UNION",
+      "aliases": [
+        "BHV-RED-P5-GITLAB-SYSTEM-NOTE-CLOSED-UNION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture covers system_note fields, positive integer bounds, and closed-form rejection",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-GITLAB-IMMUTABLE-AFTER-CREATE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-GITLAB-IMMUTABLE-AFTER-CREATE",
+      "aliases": [
+        "BHV-RED-P5-GITLAB-IMMUTABLE-AFTER-CREATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable mutation fixture proves GitLab metadata cannot be inferred or changed and bytes remain unchanged on rejection",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-NFC-NAME-COMPOSED-ACCEPTED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-NFC-NAME-COMPOSED-ACCEPTED",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-NFC-NAME-COMPOSED-ACCEPTED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture accepts a composed NFC name and preserves its exact UTF-8 bytes",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-NFC-NAME-DECOMPOSED-REJECTED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-NFC-NAME-DECOMPOSED-REJECTED",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-NFC-NAME-DECOMPOSED-REJECTED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects a decomposed non-NFC name rather than normalizing it",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-NAME-CONTROL-REJECTED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-NAME-CONTROL-REJECTED",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-NAME-CONTROL-REJECTED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects Cc, CR, LF, and NUL Name inputs with exact error and unchanged state",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-EXTERNAL-IDENTITY-CONTROL-REJECTED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-EXTERNAL-IDENTITY-CONTROL-REJECTED",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-EXTERNAL-IDENTITY-CONTROL-REJECTED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects Cc, CR, LF, and NUL ExternalIdentity inputs",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-WHITESPACE-BODY-BOUNDARIES",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-WHITESPACE-BODY-BOUNDARIES",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-WHITESPACE-BODY-BOUNDARIES"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture enumerates Unicode 16 White_Space-only rejection and adjacent non-whitespace acceptance",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-SCALAR-COUNT-NON-BMP",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-SCALAR-COUNT-NON-BMP",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-SCALAR-COUNT-NON-BMP"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves Name and ExternalIdentity scalar limits count non-BMP scalars, not bytes or UTF-16 units",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-MALFORMED-UTF8",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-MALFORMED-UTF8",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-MALFORMED-UTF8"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects malformed UTF-8 in body, metadata, source, and apply request paths",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-UNICODE-SURROGATE-JSON-ESCAPE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-UNICODE-SURROGATE-JSON-ESCAPE",
+      "aliases": [
+        "BHV-RED-P5-UNICODE-SURROGATE-JSON-ESCAPE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture rejects every forbidden surrogate JSON escape at public request boundaries",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-SIDECAR-4194304-PLUS-ONE-BOUNDED-READ",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-SIDECAR-4194304-PLUS-ONE-BOUNDED-READ",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-SIDECAR-4194304-PLUS-ONE-BOUNDED-READ"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no large-input direct fixture proves a 4 MiB sidecar plus one byte is rejected before unbounded allocation",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-THREADS-1024-PLUS-ONE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-THREADS-1024-PLUS-ONE",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-THREADS-1024-PLUS-ONE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves the 1,025th resulting thread returns the exact precondition error and leaves bytes unchanged",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-MESSAGES-PER-THREAD-256-PLUS-ONE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-MESSAGES-PER-THREAD-256-PLUS-ONE",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-MESSAGES-PER-THREAD-256-PLUS-ONE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves the 257th resulting thread message is rejected with unchanged bytes",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-MESSAGES-DOCUMENT-16384-PLUS-ONE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-MESSAGES-DOCUMENT-16384-PLUS-ONE",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-MESSAGES-DOCUMENT-16384-PLUS-ONE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves the 16,385th resulting document message is rejected with unchanged bytes",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-ANCHOR-4096-PLUS-ONE-BOUNDED-DECODE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-ANCHOR-4096-PLUS-ONE-BOUNDED-DECODE",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-ANCHOR-4096-PLUS-ONE-BOUNDED-DECODE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves a decoded 4,097-byte anchor is rejected before unbounded decode/allocation",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-BODY-65536-PLUS-ONE-NORMALIZED",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-BODY-65536-PLUS-ONE-NORMALIZED",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-BODY-65536-PLUS-ONE-NORMALIZED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves a 65,537-byte logical body is rejected with exact usage error and unchanged state",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-BODY-131074-PLUS-ONE-TRANSPORT-READ",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-BODY-131074-PLUS-ONE-TRANSPORT-READ",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-BODY-131074-PLUS-ONE-TRANSPORT-READ"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves body transport rejects byte 131,075 before unbounded allocation",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-METADATA-16384-PLUS-ONE-BOUNDED-READ",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-METADATA-16384-PLUS-ONE-BOUNDED-READ",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-METADATA-16384-PLUS-ONE-BOUNDED-READ"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves raw GitLab metadata byte 16,385 is rejected before unbounded allocation",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-SOURCE-16777216-PLUS-ONE-BOUNDED-READ",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-SOURCE-16777216-PLUS-ONE-BOUNDED-READ",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-SOURCE-16777216-PLUS-ONE-BOUNDED-READ"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no large-input direct fixture proves a source byte 16,777,217 is rejected before unbounded allocation",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-APPLY-1048576-PLUS-ONE-BOUNDED-READ",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-APPLY-1048576-PLUS-ONE-BOUNDED-READ",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-APPLY-1048576-PLUS-ONE-BOUNDED-READ"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no large-input direct fixture proves apply request byte 1,048,577 is rejected before unbounded allocation",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-APPLY-OPERATIONS-ZERO",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-APPLY-OPERATIONS-ZERO",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-APPLY-OPERATIONS-ZERO"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture asserts the exact usage error for an empty apply operation list and unchanged state",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-APPLY-OPERATIONS-257-PLUS-ONE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-APPLY-OPERATIONS-257-PLUS-ONE",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-APPLY-OPERATIONS-257-PLUS-ONE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves 257 operations are rejected before mutation",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P5-LIMIT-APPLY-SEQUENTIAL-RESULTING-DOCUMENT",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P5-LIMIT-APPLY-SEQUENTIAL-RESULTING-DOCUMENT",
+      "aliases": [
+        "BHV-RED-P5-LIMIT-APPLY-SEQUENTIAL-RESULTING-DOCUMENT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "no direct executable fixture proves limits are checked after each sequential operation and rolls the whole batch back",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-SECURE-STORE-RACES",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-SECURE-STORE-RACES",
+      "aliases": [
+        "BHV-RED-SECURE-STORE-RACES"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "mandatory adversarial lock, identity, durability, and subprocess-race fixtures are unavailable",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-PARSER-PROPERTIES-FUZZ",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-PARSER-PROPERTIES-FUZZ",
+      "aliases": [
+        "BHV-RED-PARSER-PROPERTIES-FUZZ"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "mandatory production parser/domain property and fuzz packs are unavailable",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-NEOVIM-FAIL-CLOSURE",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-NEOVIM-FAIL-CLOSURE",
+      "aliases": [
+        "BHV-RED-NEOVIM-FAIL-CLOSURE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "mandatory Neovim 0.12 popup/extmark/fail-closure pack is unavailable",
+      "normative_source": "docs/v1/index.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-THREAD-MOVE-PRECONDITION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-THREAD-MOVE-PRECONDITION",
+      "aliases": [
+        "BHV-RED-P4-THREAD-MOVE-PRECONDITION"
+      ],
+      "status": "not_applicable",
+      "reviewed": true,
+      "rationale": "thread move has no single-operation semantic precondition; revision mismatch is conflict and source failure is validation",
+      "normative_source": "docs/v1/cli.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-THREAD-DELETE-PRECONDITION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-THREAD-DELETE-PRECONDITION",
+      "aliases": [
+        "BHV-RED-P4-THREAD-DELETE-PRECONDITION"
+      ],
+      "status": "not_applicable",
+      "reviewed": true,
+      "rationale": "thread delete has no single-operation semantic precondition; revision mismatch is conflict",
+      "normative_source": "docs/v1/cli.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-MESSAGE-UPDATE-PRECONDITION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-MESSAGE-UPDATE-PRECONDITION",
+      "aliases": [
+        "BHV-RED-P4-MESSAGE-UPDATE-PRECONDITION"
+      ],
+      "status": "not_applicable",
+      "reviewed": true,
+      "rationale": "message update has no single-operation semantic precondition; equal body is a no-op and revision mismatch is conflict",
+      "normative_source": "docs/v1/cli.md"
+    },
+    {
+      "id": "SHADOW-V2-BHV-RED-P4-MESSAGE-DELETE-PRECONDITION",
+      "kind": "v1_required_red",
+      "legacy_id": "BHV-RED-P4-MESSAGE-DELETE-PRECONDITION",
+      "aliases": [
+        "BHV-RED-P4-MESSAGE-DELETE-PRECONDITION"
+      ],
+      "status": "not_applicable",
+      "reviewed": true,
+      "rationale": "message delete has no single-operation semantic precondition; revision mismatch is conflict",
+      "normative_source": "docs/v1/cli.md"
+    },
+    {
+      "id": "SHADOW-V2-P6-LOCATION-FILE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-LOCATION-FILE",
+      "aliases": [
+        "P6-LOCATION-FILE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/0"
+    },
+    {
+      "id": "SHADOW-V2-P6-LOCATION-LINE-RUNE-BOUNDARY",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-LOCATION-LINE-RUNE-BOUNDARY",
+      "aliases": [
+        "P6-LOCATION-LINE-RUNE-BOUNDARY"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/1"
+    },
+    {
+      "id": "SHADOW-V2-P6-LOCATION-RANGE-CRLF-ANCHOR",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-LOCATION-RANGE-CRLF-ANCHOR",
+      "aliases": [
+        "P6-LOCATION-RANGE-CRLF-ANCHOR"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/2"
+    },
+    {
+      "id": "SHADOW-V2-P6-LOCATION-LOST-NO-SOURCE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-LOCATION-LOST-NO-SOURCE",
+      "aliases": [
+        "P6-LOCATION-LOST-NO-SOURCE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/3"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-MISSING",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-MISSING",
+      "aliases": [
+        "P6-SOURCE-MISSING"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/4"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-DIRECTORY",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-DIRECTORY",
+      "aliases": [
+        "P6-SOURCE-DIRECTORY"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/5"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-SYMLINK",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-SYMLINK",
+      "aliases": [
+        "P6-SOURCE-SYMLINK"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/6"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-BOM",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-BOM",
+      "aliases": [
+        "P6-SOURCE-BOM"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/7"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-INVALID-UTF8",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-INVALID-UTF8",
+      "aliases": [
+        "P6-SOURCE-INVALID-UTF8"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/8"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-NUL",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-NUL",
+      "aliases": [
+        "P6-SOURCE-NUL"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/9"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-MIXED-ENDINGS",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-MIXED-ENDINGS",
+      "aliases": [
+        "P6-SOURCE-MIXED-ENDINGS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/10"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-IMPLICIT-PRELOCK",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-IMPLICIT-PRELOCK",
+      "aliases": [
+        "P6-SOURCE-IMPLICIT-PRELOCK"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/goldens/11"
+    },
+    {
+      "id": "SHADOW-V2-P6-POST-LOCK-SOURCE-REPLACEMENT",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-POST-LOCK-SOURCE-REPLACEMENT",
+      "aliases": [
+        "P6-POST-LOCK-SOURCE-REPLACEMENT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/known_gaps/0"
+    },
+    {
+      "id": "SHADOW-V2-P6-SOURCE-SIZE-LIMIT-BLOBS",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-SOURCE-SIZE-LIMIT-BLOBS",
+      "aliases": [
+        "P6-SOURCE-SIZE-LIMIT-BLOBS"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/known_gaps/1"
+    },
+    {
+      "id": "SHADOW-V2-P6-MALFORMED-LOCATION-COORDINATE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P6-MALFORMED-LOCATION-COORDINATE",
+      "aliases": [
+        "P6-MALFORMED-LOCATION-COORDINATE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p6/manifest.json#/known_gaps/2"
+    },
+    {
+      "id": "SHADOW-V2-P8-TARGET-SYMLINK",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-TARGET-SYMLINK",
+      "aliases": [
+        "P8-TARGET-SYMLINK"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/0"
+    },
+    {
+      "id": "SHADOW-V2-P8-TARGET-DIRECTORY",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-TARGET-DIRECTORY",
+      "aliases": [
+        "P8-TARGET-DIRECTORY"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/1"
+    },
+    {
+      "id": "SHADOW-V2-P8-TARGET-HARDLINK",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-TARGET-HARDLINK",
+      "aliases": [
+        "P8-TARGET-HARDLINK"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/2"
+    },
+    {
+      "id": "SHADOW-V2-P8-LOCK-CLASSIFICATION",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-LOCK-CLASSIFICATION",
+      "aliases": [
+        "P8-LOCK-CLASSIFICATION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/3"
+    },
+    {
+      "id": "SHADOW-V2-P8-LOCK-MODE-AND-REUSE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-LOCK-MODE-AND-REUSE",
+      "aliases": [
+        "P8-LOCK-MODE-AND-REUSE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/4"
+    },
+    {
+      "id": "SHADOW-V2-P8-TARGET-MODE-PRESERVATION",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-TARGET-MODE-PRESERVATION",
+      "aliases": [
+        "P8-TARGET-MODE-PRESERVATION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/5"
+    },
+    {
+      "id": "SHADOW-V2-P8-LOCK-TIMEOUT",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-LOCK-TIMEOUT",
+      "aliases": [
+        "P8-LOCK-TIMEOUT"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/6"
+    },
+    {
+      "id": "SHADOW-V2-P8-IDENTITY-CHANGED",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-IDENTITY-CHANGED",
+      "aliases": [
+        "P8-IDENTITY-CHANGED"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/7"
+    },
+    {
+      "id": "SHADOW-V2-P8-TEMP-COLLISION-RETRY",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-TEMP-COLLISION-RETRY",
+      "aliases": [
+        "P8-TEMP-COLLISION-RETRY"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/8"
+    },
+    {
+      "id": "SHADOW-V2-P8-TEMP-COLLISION-EXHAUSTION",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P8-TEMP-COLLISION-EXHAUSTION",
+      "aliases": [
+        "P8-TEMP-COLLISION-EXHAUSTION"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/9"
+    },
+    {
+      "id": "SHADOW-V2-P9-PRE-RENAME-WRITE-FAILURE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P9-PRE-RENAME-WRITE-FAILURE",
+      "aliases": [
+        "P9-PRE-RENAME-WRITE-FAILURE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/10"
+    },
+    {
+      "id": "SHADOW-V2-P9-RENAME-FAILURE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P9-RENAME-FAILURE",
+      "aliases": [
+        "P9-RENAME-FAILURE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/11"
+    },
+    {
+      "id": "SHADOW-V2-P9-PARENT-FSYNC-REPLACE-UNKNOWN",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P9-PARENT-FSYNC-REPLACE-UNKNOWN",
+      "aliases": [
+        "P9-PARENT-FSYNC-REPLACE-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/12"
+    },
+    {
+      "id": "SHADOW-V2-P9-PARENT-FSYNC-DELETE-UNKNOWN",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P9-PARENT-FSYNC-DELETE-UNKNOWN",
+      "aliases": [
+        "P9-PARENT-FSYNC-DELETE-UNKNOWN"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/13"
+    },
+    {
+      "id": "SHADOW-V2-P9-POST-DURABILITY-CLEANUP",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P9-POST-DURABILITY-CLEANUP",
+      "aliases": [
+        "P9-POST-DURABILITY-CLEANUP"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/14"
+    },
+    {
+      "id": "SHADOW-V2-P10-INDEPENDENT-REVISION-RACE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P10-INDEPENDENT-REVISION-RACE",
+      "aliases": [
+        "P10-INDEPENDENT-REVISION-RACE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/15"
+    },
+    {
+      "id": "SHADOW-V2-P10-INDEPENDENT-LOCK-RACE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P10-INDEPENDENT-LOCK-RACE",
+      "aliases": [
+        "P10-INDEPENDENT-LOCK-RACE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/16"
+    },
+    {
+      "id": "SHADOW-V2-P10-INDEPENDENT-LOST-UPDATE-RACE",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P10-INDEPENDENT-LOST-UPDATE-RACE",
+      "aliases": [
+        "P10-INDEPENDENT-LOST-UPDATE-RACE"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/17"
+    },
+    {
+      "id": "SHADOW-V2-P10-UNSUPPORTED-WRITER-PLATFORM",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P10-UNSUPPORTED-WRITER-PLATFORM",
+      "aliases": [
+        "P10-UNSUPPORTED-WRITER-PLATFORM"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p8-p10/manifest.json#/cases/18"
+    },
+    {
+      "id": "SHADOW-V2-P11-01",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-01",
+      "aliases": [
+        "P11-01"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-01"
+    },
+    {
+      "id": "SHADOW-V2-P11-02",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-02",
+      "aliases": [
+        "P11-02"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-02"
+    },
+    {
+      "id": "SHADOW-V2-P11-03",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-03",
+      "aliases": [
+        "P11-03"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-03"
+    },
+    {
+      "id": "SHADOW-V2-P11-04",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-04",
+      "aliases": [
+        "P11-04"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-04"
+    },
+    {
+      "id": "SHADOW-V2-P11-05",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-05",
+      "aliases": [
+        "P11-05"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-05"
+    },
+    {
+      "id": "SHADOW-V2-P11-06",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-06",
+      "aliases": [
+        "P11-06"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-06"
+    },
+    {
+      "id": "SHADOW-V2-P11-07",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-07",
+      "aliases": [
+        "P11-07"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-07"
+    },
+    {
+      "id": "SHADOW-V2-P11-08",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-08",
+      "aliases": [
+        "P11-08"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-08"
+    },
+    {
+      "id": "SHADOW-V2-P11-09",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-09",
+      "aliases": [
+        "P11-09"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-09"
+    },
+    {
+      "id": "SHADOW-V2-P11-10",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-10",
+      "aliases": [
+        "P11-10"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-10"
+    },
+    {
+      "id": "SHADOW-V2-P11-11",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-11",
+      "aliases": [
+        "P11-11"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-11"
+    },
+    {
+      "id": "SHADOW-V2-P11-12",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-12",
+      "aliases": [
+        "P11-12"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-12"
+    },
+    {
+      "id": "SHADOW-V2-P11-13",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-13",
+      "aliases": [
+        "P11-13"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-13"
+    },
+    {
+      "id": "SHADOW-V2-P11-14",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-14",
+      "aliases": [
+        "P11-14"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-14"
+    },
+    {
+      "id": "SHADOW-V2-P11-15",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-15",
+      "aliases": [
+        "P11-15"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-15"
+    },
+    {
+      "id": "SHADOW-V2-P11-16",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-16",
+      "aliases": [
+        "P11-16"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-16"
+    },
+    {
+      "id": "SHADOW-V2-P11-17",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-17",
+      "aliases": [
+        "P11-17"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-17"
+    },
+    {
+      "id": "SHADOW-V2-P11-18",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-18",
+      "aliases": [
+        "P11-18"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-18"
+    },
+    {
+      "id": "SHADOW-V2-P11-19",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-19",
+      "aliases": [
+        "P11-19"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-19"
+    },
+    {
+      "id": "SHADOW-V2-P11-20",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-20",
+      "aliases": [
+        "P11-20"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-20"
+    },
+    {
+      "id": "SHADOW-V2-P11-21",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P11-21",
+      "aliases": [
+        "P11-21"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p11-21"
+    },
+    {
+      "id": "SHADOW-V2-P12-01",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-01",
+      "aliases": [
+        "P12-01"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-01"
+    },
+    {
+      "id": "SHADOW-V2-P12-02",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-02",
+      "aliases": [
+        "P12-02"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-02"
+    },
+    {
+      "id": "SHADOW-V2-P12-03",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-03",
+      "aliases": [
+        "P12-03"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-03"
+    },
+    {
+      "id": "SHADOW-V2-P12-04",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-04",
+      "aliases": [
+        "P12-04"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-04"
+    },
+    {
+      "id": "SHADOW-V2-P12-05",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-05",
+      "aliases": [
+        "P12-05"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-05"
+    },
+    {
+      "id": "SHADOW-V2-P12-06",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-06",
+      "aliases": [
+        "P12-06"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-06"
+    },
+    {
+      "id": "SHADOW-V2-P12-07",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-07",
+      "aliases": [
+        "P12-07"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-07"
+    },
+    {
+      "id": "SHADOW-V2-P12-08",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-08",
+      "aliases": [
+        "P12-08"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-08"
+    },
+    {
+      "id": "SHADOW-V2-P12-09",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-09",
+      "aliases": [
+        "P12-09"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-09"
+    },
+    {
+      "id": "SHADOW-V2-P12-10",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-10",
+      "aliases": [
+        "P12-10"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-10"
+    },
+    {
+      "id": "SHADOW-V2-P12-11",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-11",
+      "aliases": [
+        "P12-11"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-11"
+    },
+    {
+      "id": "SHADOW-V2-P12-12",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-12",
+      "aliases": [
+        "P12-12"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-12"
+    },
+    {
+      "id": "SHADOW-V2-P12-13",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-13",
+      "aliases": [
+        "P12-13"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-13"
+    },
+    {
+      "id": "SHADOW-V2-P12-14",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-14",
+      "aliases": [
+        "P12-14"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-14"
+    },
+    {
+      "id": "SHADOW-V2-P12-15",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-15",
+      "aliases": [
+        "P12-15"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-15"
+    },
+    {
+      "id": "SHADOW-V2-P12-16",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-16",
+      "aliases": [
+        "P12-16"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-16"
+    },
+    {
+      "id": "SHADOW-V2-P12-17",
+      "kind": "registered_pack_scenario",
+      "legacy_id": "P12-17",
+      "aliases": [
+        "P12-17"
+      ],
+      "status": "pending",
+      "reviewed": false,
+      "rationale": "Retains the registered pack scenario as a traceability obligation; no executable result or proof is asserted.",
+      "normative_source": "contracts/packs/p11-p12/manifest.md#p12-17"
+    },
+    {
+      "id": "BHV-RED-ARCHITECTURE-MODULE-BOUNDARIES",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "architecture",
+      "rationale": "Pending coverage for the prescribed package ownership and dependency direction; this records no execution or proof.",
+      "normative_source": "docs/v1/architecture.md#planned-module-and-packages"
+    },
+    {
+      "id": "BHV-RED-ARCHITECTURE-TRUST-BOUNDARIES",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "architecture",
+      "rationale": "Pending coverage for untrusted-input validation and prohibited implementation techniques; this records no execution or proof.",
+      "normative_source": "docs/v1/architecture.md#trust-boundaries-and-code-principles"
+    },
+    {
+      "id": "BHV-RED-ARCHITECTURE-AUTOMATED-BOUNDARY-CHECKS",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "architecture",
+      "rationale": "Pending coverage for the required automated architecture-boundary checks; this records no execution or proof.",
+      "normative_source": "docs/v1/architecture.md#automated-boundary-checks"
+    },
+    {
+      "id": "BHV-RED-COMPATIBILITY-V1-ACCEPTANCE",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "compatibility",
+      "rationale": "Pending coverage for v1-only compatibility, rejection, and version handling; this records no execution or proof.",
+      "normative_source": "docs/v1/compatibility.md#compatibility-policy"
+    },
+    {
+      "id": "BHV-RED-COMPATIBILITY-PROVISIONING-ENVIRONMENTS",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "compatibility",
+      "rationale": "Pending coverage for pinned provisioning and supported mutation environments; this records no execution or proof.",
+      "normative_source": "docs/v1/compatibility.md#provisioning-and-supported-environments"
+    },
+    {
+      "id": "BHV-RED-COMPATIBILITY-NO-EXTERNAL-CONFIGURATION",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "compatibility",
+      "rationale": "Pending coverage for the no-inventory and no-external-configuration boundary; this records no execution or proof.",
+      "normative_source": "docs/v1/compatibility.md#no-inventory-or-external-configuration"
+    },
+    {
+      "id": "BHV-RED-COMPATIBILITY-DURABILITY-RECOVERY",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "compatibility",
+      "rationale": "Pending coverage for recovery after uncertain durability outcomes; this records no execution or proof.",
+      "normative_source": "docs/v1/compatibility.md#durability-recovery"
+    },
+    {
+      "id": "BHV-RED-NEOVIM-PUBLIC-API-STATE",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "neovim",
+      "rationale": "Pending coverage for the public Lua API, commands, and observable state; this records no execution or proof.",
+      "normative_source": "docs/v1/neovim.md#public-lua-api-commands-and-state"
+    },
+    {
+      "id": "BHV-RED-NEOVIM-BINARY-ELIGIBILITY",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "neovim",
+      "rationale": "Pending coverage for binary resolution and source-buffer eligibility; this records no execution or proof.",
+      "normative_source": "docs/v1/neovim.md#binary-resolution-and-eligibility"
+    },
+    {
+      "id": "BHV-RED-NEOVIM-UI-ASYNC-CORRELATION",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "neovim",
+      "rationale": "Pending coverage for UI rendering and stale asynchronous response suppression; this records no execution or proof.",
+      "normative_source": "docs/v1/neovim.md#observable-ui-and-async-rules"
+    },
+    {
+      "id": "BHV-RED-NEOVIM-FAIL-CLOSURE-DIRTY-BUFFERS",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "neovim",
+      "rationale": "Pending coverage for blocked states, repair confirmation, and dirty-buffer mutation closure; this records no execution or proof.",
+      "normative_source": "docs/v1/neovim.md#fail-closure-and-dirty-buffers"
+    },
+    {
+      "id": "BHV-RED-BODY-TRANSPORT-FRAMING",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "body_transport",
+      "rationale": "Pending coverage for body framing, trailing line feeds, and reserved delimiters; this records no execution or proof.",
+      "normative_source": "docs/v1/format.md#framing-algorithm"
+    },
+    {
+      "id": "BHV-RED-BODY-TRANSPORT-APPLY-LOGICAL-BYTES",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "body_transport",
+      "rationale": "Pending coverage for apply-request logical body byte transport; this records no execution or proof.",
+      "normative_source": "docs/v1/protocol.md#apply-request"
+    },
+    {
+      "id": "BHV-RED-OUTPUT-JSON-ENVELOPES",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "output_results",
+      "rationale": "Pending coverage for exact JSON success and error envelope transport; this records no execution or proof.",
+      "normative_source": "docs/v1/protocol.md#envelopes-and-output-mode"
+    },
+    {
+      "id": "BHV-RED-OUTPUT-MODES",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "output_results",
+      "rationale": "Pending coverage for text, id, none, and invalid output-mode behavior; this records no execution or proof.",
+      "normative_source": "docs/v1/protocol.md#envelopes-and-output-mode"
+    },
+    {
+      "id": "BHV-RED-RESULTS-VARIANTS-CHANGED",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "output_results",
+      "rationale": "Pending coverage for result DTO variants, nullability, and command changed semantics; this records no execution or proof.",
+      "normative_source": "docs/v1/protocol.md#dtos-and-result-variants"
+    },
+    {
+      "id": "BHV-RED-STORAGE-WRITER-PLATFORM-GATE",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "storage",
+      "rationale": "Pending coverage for supported writer-platform gating and reduced read support; this records no execution or proof.",
+      "normative_source": "docs/v1/storage-security.md#supported-writer-platforms"
+    },
+    {
+      "id": "BHV-RED-STORAGE-SECURE-OBJECT-CLASSIFICATION",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "storage",
+      "rationale": "Pending coverage for secure target and lock object classification; this records no execution or proof.",
+      "normative_source": "docs/v1/storage-security.md#secure-object-rules"
+    },
+    {
+      "id": "BHV-RED-STORAGE-LOCK-FAILURE-CLASSIFICATION",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "storage",
+      "rationale": "Pending coverage for lock timeout, invalid-lock, and lock I/O failure classification; this records no execution or proof.",
+      "normative_source": "docs/v1/storage-security.md#secure-object-rules"
+    },
+    {
+      "id": "BHV-RED-STORAGE-TRANSACTION-REVALIDATION",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "storage",
+      "rationale": "Pending coverage for locked reread, write authorization revalidation, and identity checks; this records no execution or proof.",
+      "normative_source": "docs/v1/storage-security.md#required-writer-transaction"
+    },
+    {
+      "id": "BHV-RED-STORAGE-COMMIT-DURABILITY-FAILURES",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "storage",
+      "rationale": "Pending coverage for atomic replacement, deletion, and commit-may-have-succeeded failures; this records no execution or proof.",
+      "normative_source": "docs/v1/storage-security.md#atomic-replace-and-deletion"
+    },
+    {
+      "id": "BHV-RED-SOURCE-OBJECT-ENDINGS",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "source",
+      "rationale": "Pending coverage for source object, size, encoding, and line-ending validation; this records no execution or proof.",
+      "normative_source": "docs/v1/source-and-location.md#source-validator"
+    },
+    {
+      "id": "BHV-RED-SOURCE-RUNE-BOUNDARY-COORDINATES",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "source",
+      "rationale": "Pending coverage for UTF-8 rune-boundary coordinate validation; this records no execution or proof.",
+      "normative_source": "docs/v1/source-and-location.md#source-validator"
+    },
+    {
+      "id": "BHV-RED-SOURCE-ANCHOR-VALIDATION",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "source",
+      "rationale": "Pending coverage for source-anchor matching and public location failure symbols; this records no execution or proof.",
+      "normative_source": "docs/v1/source-and-location.md#public-location-failure-symbols"
+    },
+    {
+      "id": "BHV-RED-SOURCE-LOCKED-REVALIDATION",
+      "kind": "omission",
+      "aliases": [],
+      "status": "pending",
+      "reviewed": false,
+      "coverage_category": "source",
+      "rationale": "Pending coverage for pre-lock and locked source revalidation before mutation commit; this records no execution or proof.",
+      "normative_source": "docs/v1/source-and-location.md#when-validation-occurs"
+    }
+  ]
+}

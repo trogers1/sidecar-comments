@@ -1,0 +1,55 @@
+{
+  "fixture_version": 1,
+  "id": "target-hardlink",
+  "requirements": [
+    "V1-STORE-OBJECT"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "format",
+    "--file",
+    "a.txt.comments"
+  ],
+  "stdin_b64": "",
+  "requires": [
+    "writer_platform",
+    "hardlink"
+  ],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "other",
+        "kind": "file",
+        "bytes_b64": "c2hhcmVk",
+        "mode": "0600"
+      },
+      {
+        "path": "a.txt.comments",
+        "kind": "hardlink",
+        "target": "other"
+      }
+    ]
+  },
+  "expect": {
+    "status": 3,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_type:multilink\",\"details\":{\"path\":\"target_type\",\"reason\":\"multilink\"}}}\n",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "other",
+          "kind": "file",
+          "bytes_b64": "c2hhcmVk",
+          "mode": "0600"
+        },
+        {
+          "path": "a.txt.comments",
+          "kind": "hardlink",
+          "target": "other"
+        }
+      ]
+    }
+  },
+  "env": []
+}

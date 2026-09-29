@@ -1,0 +1,1 @@
+{"case":"P8-TARGET-MODE-PRESERVATION","matrix":[{"target_mode":"0644","expect_mode":"0644"},{"target":"absent","umask":"0077","expect_mode":"0600"}],"expect":{"status":0,"atomic_replace":true}}

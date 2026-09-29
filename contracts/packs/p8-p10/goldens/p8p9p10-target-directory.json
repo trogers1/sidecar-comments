@@ -1,0 +1,1 @@
+{"case":"P8-TARGET-DIRECTORY","setup":{"target":"directory"},"command":"format --file a.txt.comments","expect":{"status":3,"error":"validation:target_type","details":{"path":"target_type","reason":"directory"},"unchanged":["target"]}}

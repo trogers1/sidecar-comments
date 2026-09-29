@@ -1,0 +1,45 @@
+{
+  "fixture_version": 1,
+  "id": "apply-empty",
+  "requirements": [
+    "V1-CLI-APPLY",
+    "V1-PRO-APPLY"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "apply",
+    "--file",
+    "a.txt.comments",
+    "--operations-file",
+    "ops"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "ops",
+        "kind": "file",
+        "bytes_b64": "eyJwcm90b2NvbCI6IDEsICJvcGVyYXRpb25zIjogW119",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_b64": "eyJwcm90b2NvbCI6MSwiZXJyb3IiOnsiY29kZSI6InVzYWdlIiwibWVzc2FnZSI6InVzYWdlOm9wZXJhdGlvbnM6bWFsZm9ybWVkIiwiZGV0YWlscyI6eyJmaWVsZCI6Im9wZXJhdGlvbnMiLCJyZWFzb24iOiJtYWxmb3JtZWQifX19Cg==",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "ops",
+          "kind": "file",
+          "bytes_b64": "eyJwcm90b2NvbCI6IDEsICJvcGVyYXRpb25zIjogW119",
+          "mode": "0600"
+        }
+      ]
+    }
+  },
+  "env": []
+}

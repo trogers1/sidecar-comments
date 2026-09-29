@@ -1,0 +1,28 @@
+{
+  "fixture_version": 1,
+  "id": "p4-validate-text",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "--output",
+    "text",
+    "validate",
+    "--file",
+    "a.comments"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 0,
+    "stdout_b64": "dmFsaWRhdGUgY2hhbmdlZD1mYWxzZSByZXN1bHQ9eyJ2YWxpZCI6dHJ1ZSwid2FybmluZ3MiOltdLCJzdG9yYWdlX3JldmlzaW9uIjpudWxsLCJjYW5vbmljYWxfcmV2aXNpb24iOiJzaGEyNTY6ZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9Cg==",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

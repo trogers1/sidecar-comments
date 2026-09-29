@@ -1,0 +1,1 @@
+{"case":"P10-INDEPENDENT-REVISION-RACE","actors":["independent executable A","independent executable B"],"schedule":["both read same revision","release both commits"],"expect":{"successes":1,"conflicts":[{"status":4,"kind":"revision"}],"final":"winner bytes"}}

@@ -1,0 +1,31 @@
+{
+  "fixture_version": 1,
+  "id": "p4-output-id-thread-get",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "--output",
+    "id",
+    "thread",
+    "get",
+    "--file",
+    "a.comments",
+    "--id",
+    "018f0000-0000-7000-8000-000000000001"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6b3V0cHV0OmluY29tcGF0aWJsZQo=",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

@@ -1,0 +1,1 @@
+{"case":"P10-UNSUPPORTED-WRITER-PLATFORM","host":{"os_arch":"not darwin/arm64 and not linux/amd64"},"commands":["format","fix","thread create","thread move","message add","message update","message delete","apply"],"expect":{"status":7,"error":"io","details":{"operation":"unsupported_secure_filesystem","path":"target"},"opened_target":false}}

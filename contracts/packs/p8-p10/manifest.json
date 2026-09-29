@@ -1,0 +1,45 @@
+{
+  "pack_version": 1,
+  "id": "p8-p10-storage-transaction-concurrency-red",
+  "status": "red-unregistered",
+  "golden_root": "contracts/packs/p8-p10/goldens",
+  "non_goals": ["production implementation code", "claiming direct corpus-fixture coverage before a complete fixture contract exists"],
+  "capabilities": {
+    "writer_platform": {"provided_by_current_runner": true},
+    "symlink": {"provided_by_current_runner": true},
+    "directory": {"provided_by_current_runner": true},
+    "hardlink": {"provided_by_current_runner": true},
+    "process": {"provided_by_current_runner": true},
+    "fault_injection": {"provided_by_current_runner": true, "currently_unavailable_reason": "controlled fault injection is not implemented by the pre-implementation harness"},
+    "process_orchestration": {"provided_by_current_runner": false, "needed_for": "barrier-controlled independent subprocess interleavings"},
+    "platform_control": {"provided_by_current_runner": false, "needed_for": "run one mutation fixture on a non-writer OS/architecture"}
+  },
+  "unavailable_contract": {
+    "result": "UNAVAILABLE",
+    "failure_class": "capability",
+    "nonzero": true,
+    "fault_injection": "UNAVAILABLE CASE-ID [capability]: mandatory capability fault_injection unavailable: controlled fault injection is not implemented by the pre-implementation harness",
+    "unknown_capability": "UNAVAILABLE CASE-ID [capability]: mandatory capability CAPABILITY unavailable: unknown capability"
+  },
+  "cases": [
+    {"id":"P8-TARGET-SYMLINK","golden":"goldens/p8p9p10-target-symlink.json","requires":["writer_platform","symlink"],"assert":"mutation rejects target symlink with exit 3 validation:target_type reason symlink; target is unchanged"},
+    {"id":"P8-TARGET-DIRECTORY","golden":"goldens/p8p9p10-target-directory.json","requires":["writer_platform","directory"],"assert":"mutation rejects target directory with exit 3 validation:target_type reason directory; target is unchanged"},
+    {"id":"P8-TARGET-HARDLINK","golden":"goldens/p8p9p10-target-hardlink.json","requires":["writer_platform","hardlink"],"assert":"mutation rejects a regular target whose link count is not one with exit 3 validation:target_type reason hardlink; both names retain original bytes"},
+    {"id":"P8-LOCK-CLASSIFICATION","golden":"goldens/p8p9p10-lock-classification.json","requires":["writer_platform","symlink","directory"],"assert":"symlink and directory sibling locks each fail exit 3 validation:lock_type with exact reason and no target write"},
+    {"id":"P8-LOCK-MODE-AND-REUSE","golden":"goldens/p8p9p10-lock-mode-reuse.json","requires":["writer_platform"],"assert":"a newly created persistent lock is regular mode 0600; an unlocked valid pre-existing 0600 lock is reused"},
+    {"id":"P8-TARGET-MODE-PRESERVATION","golden":"goldens/p8p9p10-target-mode-preservation.json","requires":["writer_platform"],"assert":"atomic replacement retains original target mode 0644 while a new target uses 0600 after the declared umask"},
+    {"id":"P8-LOCK-TIMEOUT","golden":"goldens/p8p9p10-lock-timeout.json","requires":["writer_platform","process_orchestration"],"assert":"a separately held sibling advisory lock exhausts the configured timeout and returns exit 4 conflict:lock_timeout details kind lock_timeout; bytes and lock identity are unchanged","unavailable":"unknown_capability"},
+    {"id":"P8-IDENTITY-CHANGED","golden":"goldens/p8p9p10-identity-changed.json","requires":["writer_platform","process_orchestration"],"assert":"replace target or lock between verification and commit; return exit 4 conflict:identity_changed details kind identity_changed and never overwrite the substituted object","unavailable":"unknown_capability"},
+    {"id":"P8-TEMP-COLLISION-RETRY","golden":"goldens/p8p9p10-temp-collision-retry.json","requires":["writer_platform","fault_injection"],"assert":"forced same-directory exclusive-create collisions are retried and the successful temp is mode 0600; no temp survives","unavailable":"fault_injection"},
+    {"id":"P8-TEMP-COLLISION-EXHAUSTION","golden":"goldens/p8p9p10-temp-collision-exhaustion.json","requires":["writer_platform","fault_injection"],"assert":"exactly 16 forced collisions return exit 7 io path temp operation create, preserve old bytes, and leave no implementation-created temp","unavailable":"fault_injection"},
+    {"id":"P9-PRE-RENAME-WRITE-FAILURE","golden":"goldens/p8p9p10-pre-rename-write-failure.json","requires":["writer_platform","fault_injection"],"assert":"temp write or temp fsync failure returns exit 7 io without commit_may_have_succeeded, preserves old bytes, and removes the temp","unavailable":"fault_injection"},
+    {"id":"P9-RENAME-FAILURE","golden":"goldens/p8p9p10-rename-failure.json","requires":["writer_platform","fault_injection"],"assert":"rename failure returns exit 7 io path target operation rename without commit_may_have_succeeded; old bytes remain","unavailable":"fault_injection"},
+    {"id":"P9-PARENT-FSYNC-REPLACE-UNKNOWN","golden":"goldens/p8p9p10-parent-fsync-replace-unknown.json","requires":["writer_platform","fault_injection"],"assert":"failure or unknown outcome of parent fsync after successful rename returns exit 7 io path parent operation fsync commit_may_have_succeeded true and emits no success stream","unavailable":"fault_injection"},
+    {"id":"P9-PARENT-FSYNC-DELETE-UNKNOWN","golden":"goldens/p8p9p10-parent-fsync-delete-unknown.json","requires":["writer_platform","fault_injection"],"assert":"failure or unknown outcome of parent fsync after successful unlink returns exit 7 io path parent operation fsync commit_may_have_succeeded true and emits no success stream","unavailable":"fault_injection"},
+    {"id":"P9-POST-DURABILITY-CLEANUP","golden":"goldens/p8p9p10-post-durability-cleanup.json","requires":["writer_platform","fault_injection"],"assert":"close or lock-release failure injected only after successful parent fsync cannot replace durable success, alter output, or alter changed/revisions","unavailable":"fault_injection"},
+    {"id":"P10-INDEPENDENT-REVISION-RACE","golden":"goldens/p8p9p10-independent-revision-race.json","requires":["writer_platform","process","process_orchestration"],"assert":"two independent executables released from a read barrier with the same expected revision produce exactly one success and one exit-4 revision conflict; final bytes equal the winner serialization","unavailable":"unknown_capability"},
+    {"id":"P10-INDEPENDENT-LOCK-RACE","golden":"goldens/p8p9p10-independent-lock-race.json","requires":["writer_platform","process","process_orchestration"],"assert":"a holder and waiter in separate executables serialize through the sibling lock; waiter observes holder revision and does not enter a concurrent commit","unavailable":"unknown_capability"},
+    {"id":"P10-INDEPENDENT-LOST-UPDATE-RACE","golden":"goldens/p8p9p10-independent-lost-update-race.json","requires":["writer_platform","process","process_orchestration"],"assert":"two independently launched stale read-modify-write operations cannot silently lose an accepted update: the stale contender conflicts and final content contains only the accepted operation","unavailable":"unknown_capability"},
+    {"id":"P10-UNSUPPORTED-WRITER-PLATFORM","golden":"goldens/p8p9p10-unsupported-writer-platform.json","requires":["platform_control"],"assert":"on an OS/architecture other than darwin/arm64 or linux/amd64, every mutation fails before target open with exit 7 io operation unsupported_secure_filesystem path target","unavailable":"unknown_capability"}
+  ]
+}

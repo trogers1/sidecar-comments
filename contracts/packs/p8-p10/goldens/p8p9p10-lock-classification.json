@@ -1,0 +1,1 @@
+{"case":"P8-LOCK-CLASSIFICATION","matrix":[{"lock":"symlink","reason":"symlink"},{"lock":"directory","reason":"directory"}],"command":"format --file a.txt.comments","expect":{"status":3,"error":"validation:lock_type","details":{"path":"lock_type","reason":"$matrix.reason"},"unchanged":["target","lock"]}}

@@ -1,0 +1,55 @@
+{
+  "capability_version": 2,
+  "schema": "contracts/schema/corpus-v2.json",
+  "design_state": "declarative-only",
+  "unavailable_outcome": {
+    "result": "UNAVAILABLE",
+    "failure_class": "capability",
+    "nonzero": true,
+    "never": ["skip", "pass", "proven"]
+  },
+  "capabilities": [
+    {
+      "id": "deterministic_blob_limit_input",
+      "input_kind": "deterministic_blob",
+      "status": "unavailable",
+      "unavailable_reason": "No v2 blob materializer has been implemented or exercised.",
+      "guarantees": ["The seed, algorithm, byte length, and limit are explicit.", "The limit boundary can be represented without checking in expanded bytes."]
+    },
+    {
+      "id": "process_orchestration",
+      "input_kind": "actors_barriers",
+      "status": "unavailable",
+      "unavailable_reason": "No v2 child-process or barrier controller has been implemented or exercised.",
+      "guarantees": ["Actor readiness and release order are declared.", "Every actor has a closed command and barrier assignment."]
+    },
+    {
+      "id": "held_lock_identity_replacement",
+      "input_kind": "lock_identity_replacement",
+      "status": "unavailable",
+      "unavailable_reason": "No v2 held-lock or object-identity replacement controller has been implemented or exercised.",
+      "guarantees": ["The replaced identity, phase barrier, and replacement class are declared."]
+    },
+    {
+      "id": "fault_injection",
+      "input_kind": "fault_injection",
+      "status": "unavailable",
+      "unavailable_reason": "No v2 controlled filesystem, clock, or randomness injector has been implemented or exercised.",
+      "guarantees": ["Operation, occurrence, and typed fault outcome are declared."]
+    },
+    {
+      "id": "platform_object_umask_control",
+      "input_kind": "platform_object_umask",
+      "status": "unavailable",
+      "unavailable_reason": "No v2 platform classifier or object/umask controller has been implemented or exercised.",
+      "guarantees": ["Platform tuple, object kind, and umask are explicit."]
+    },
+    {
+      "id": "editor_control",
+      "input_kind": "editor",
+      "status": "unavailable",
+      "unavailable_reason": "No v2 editor protocol controller has been implemented or exercised.",
+      "guarantees": ["Editor argv, file-argument protocol, and expected exit status are explicit."]
+    }
+  ]
+}

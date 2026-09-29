@@ -1,0 +1,17 @@
+{
+  "pack_fixture_version": 1,
+  "id": "p11-p12-apply-indexed-not-found",
+  "kind": "controlled-golden",
+  "requires": ["writer_platform"],
+  "argv": ["--output", "json", "apply", "--file", "a.txt.comments", "--operations-file", "ops"],
+  "operations_request": {"protocol":1,"operations":[{"op":"thread_move","thread_id":"018f0000-0000-7000-8000-000000000099","location":{"kind":"lost"}}]},
+  "initial_target": "missing",
+  "expect": {
+    "status": 5,
+    "stdout": "",
+    "stderr": {"protocol":1,"error":{"code":"not_found","message":"not_found:thread","details":{"entity":"thread","id":"018f0000-0000-7000-8000-000000000099","index":0}}},
+    "final_target": "missing",
+    "partial_results": false
+  },
+  "unavailable_outcome": "If the pack loader cannot materialize operations_request as exact UTF-8 request bytes and observe the final filesystem, report unavailable rather than treating an unindexed single-command error as equivalent."
+}

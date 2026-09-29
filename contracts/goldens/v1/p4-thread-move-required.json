@@ -1,0 +1,29 @@
+{
+  "fixture_version": 1,
+  "id": "p4-thread-move-required",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "thread",
+    "move",
+    "--file",
+    "a.comments",
+    "--id",
+    "018f0000-0000-7000-8000-000000000001"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6YXJndjpyZXF1aXJlZAo=",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

@@ -1,0 +1,1 @@
+{"fixture_version":1,"id":"p3-output-none-read","requirements":["V1-CLI-SURFACE"],"argv":["--output","none","validate","--file","a.txt.comments"],"env":[],"stdin_b64":"","requires":[],"initial_fs":{"entries":[]},"expect":{"status":2,"stdout_b64":"","stderr_template":"error usage usage:output:incompatible\n","final_fs":{"entries":[]}}}

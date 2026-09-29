@@ -1,0 +1,28 @@
+{
+  "pack_fixture_version": 1,
+  "id": "p11-p12-apply-six-dto-transaction",
+  "kind": "controlled-golden",
+  "requires": ["writer_platform"],
+  "argv": ["--output", "none", "apply", "--file", "a.txt.comments", "--operations-file", "ops"],
+  "operations_request": {
+    "protocol": 1,
+    "operations": [
+      {"op":"thread_create","thread_id":"018f0000-0000-7000-8000-000000000001","message_id":"018f0000-0000-7000-8000-000000000101","location":{"kind":"lost"},"author":{"kind":"human"},"body":"one"},
+      {"op":"message_add","thread_id":"018f0000-0000-7000-8000-000000000001","message_id":"018f0000-0000-7000-8000-000000000102","author":{"kind":"agent"},"body":"two"},
+      {"op":"message_update","thread_id":"018f0000-0000-7000-8000-000000000001","message_id":"018f0000-0000-7000-8000-000000000101","body":"ONE"},
+      {"op":"thread_move","thread_id":"018f0000-0000-7000-8000-000000000001","location":{"kind":"lost"}},
+      {"op":"message_delete","thread_id":"018f0000-0000-7000-8000-000000000001","message_id":"018f0000-0000-7000-8000-000000000102"},
+      {"op":"thread_delete","thread_id":"018f0000-0000-7000-8000-000000000001"}
+    ]
+  },
+  "expect": {
+    "status": 0,
+    "stdout": "",
+    "stderr": "",
+    "changed": true,
+    "ordered_operation_results": ["thread_create", "message_add", "message_update", "thread_move", "message_delete", "thread_delete"],
+    "final_target": "missing",
+    "atomic_commits": 1
+  },
+  "unavailable_outcome": "This is not corpus-v1 JSON because the unmodified runner cannot inject an object request without base64 transport or assert an atomic-commit count. A pack loader must mark it unavailable if those capabilities are absent."
+}

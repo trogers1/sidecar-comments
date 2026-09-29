@@ -1,0 +1,1 @@
+{"case":"P8-TARGET-SYMLINK","setup":{"target":"symlink"},"command":"format --file a.txt.comments","expect":{"status":3,"error":"validation:target_type","details":{"path":"target_type","reason":"symlink"},"unchanged":["target"]}}

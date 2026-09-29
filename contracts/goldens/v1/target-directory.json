@@ -1,0 +1,43 @@
+{
+  "fixture_version": 1,
+  "id": "target-directory",
+  "requirements": [
+    "V1-STORE-OBJECT"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "format",
+    "--file",
+    "a.txt.comments"
+  ],
+  "stdin_b64": "",
+  "requires": [
+    "writer_platform",
+    "directory"
+  ],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.txt.comments",
+        "kind": "directory",
+        "mode": "0755"
+      }
+    ]
+  },
+  "expect": {
+    "status": 3,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_type:directory\",\"details\":{\"path\":\"target_type\",\"reason\":\"directory\"}}}\n",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "a.txt.comments",
+          "kind": "directory",
+          "mode": "0755"
+        }
+      ]
+    }
+  },
+  "env": []
+}

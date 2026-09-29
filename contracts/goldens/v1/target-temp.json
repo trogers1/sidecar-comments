@@ -1,0 +1,28 @@
+{
+  "fixture_version": 1,
+  "id": "target-temp",
+  "requirements": [
+    "V1-IDX"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "validate",
+    "--file",
+    "a.comments.tmp"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 3,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_name:invalid\",\"details\":{\"path\":\"target_name\",\"reason\":\"invalid\"}}}\n",
+    "final_fs": {
+      "entries": []
+    }
+  },
+  "env": []
+}

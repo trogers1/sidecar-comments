@@ -1,0 +1,1 @@
+{"case":"P8-LOCK-TIMEOUT","schedule":["holder acquires sibling advisory lock","waiter starts mutation","waiter timeout expires before holder release"],"expect":{"status":4,"error":"conflict:lock_timeout","details":{"kind":"lock_timeout"},"unchanged":["target","lock_identity"]}}

@@ -1,0 +1,1 @@
+{"case":"P10-INDEPENDENT-LOST-UPDATE-RACE","actors":["independent executable A","independent executable B"],"schedule":["both obtain stale working state","release commits"],"expect":{"accepted_updates":1,"stale_result":{"status":4,"kind":"revision"},"final":"accepted operation only"}}

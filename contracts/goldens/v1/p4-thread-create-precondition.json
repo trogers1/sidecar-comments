@@ -1,0 +1,71 @@
+{
+  "fixture_version": 1,
+  "id": "p4-thread-create-precondition",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "thread",
+    "create",
+    "--file",
+    "a.comments",
+    "--location",
+    "lost",
+    "--author-kind",
+    "human",
+    "--body-file",
+    "body",
+    "--id",
+    "018f0000-0000-7000-8000-000000000001",
+    "--message-id",
+    "018f0000-0000-7000-8000-000000000101"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [
+    "writer_platform"
+  ],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.comments",
+        "kind": "file",
+        "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlciA8IS0tIHNpZGVjYXItbWV0YTogeyJpZCI6IjAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDEwMSJ9IC0tPgpoZWxsbwpbL0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDFdCg==",
+        "mode": "0600"
+      },
+      {
+        "path": "body",
+        "kind": "file",
+        "bytes_b64": "Z29vZGJ5ZQo=",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 6,
+    "stdout_b64": "",
+    "stderr_b64": "ZXJyb3IgcHJlY29uZGl0aW9uIHByZWNvbmRpdGlvbjp0aHJlYWQtY3JlYXRlOnJldHJ5X21pc21hdGNoCg==",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "a.comments",
+          "kind": "file",
+          "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlciA8IS0tIHNpZGVjYXItbWV0YTogeyJpZCI6IjAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDEwMSJ9IC0tPgpoZWxsbwpbL0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDFdCg==",
+          "mode": "0600"
+        },
+        {
+          "path": ".a.comments.sidecar.lock",
+          "kind": "file",
+          "bytes_b64": "",
+          "mode": "0600"
+        },
+        {
+          "path": "body",
+          "kind": "file",
+          "bytes_b64": "Z29vZGJ5ZQo=",
+          "mode": "0600"
+        }
+      ]
+    }
+  }
+}

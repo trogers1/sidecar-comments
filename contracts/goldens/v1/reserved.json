@@ -1,0 +1,43 @@
+{
+  "fixture_version": 1,
+  "id": "reserved",
+  "requirements": [
+    "V1-FMT-GRAMMAR",
+    "V1-FMT-FRAMING"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "validate",
+    "--file",
+    "a.txt.comments"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.txt.comments",
+        "kind": "file",
+        "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlciA8IS0tIHNpZGVjYXItbWV0YTogeyJpZCI6IjAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDEwMSJ9IC0tPgotLS1ib3QgYmFkClsvQHRoXzAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDAwMV0K",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 3,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\"}}}\n",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "a.txt.comments",
+          "kind": "file",
+          "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlciA8IS0tIHNpZGVjYXItbWV0YTogeyJpZCI6IjAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDEwMSJ9IC0tPgotLS1ib3QgYmFkClsvQHRoXzAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDAwMV0K",
+          "mode": "0600"
+        }
+      ]
+    }
+  },
+  "env": []
+}

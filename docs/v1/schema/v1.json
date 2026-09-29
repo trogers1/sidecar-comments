@@ -1,0 +1,2149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/trogers1/sidecar-comments/schema/v1.json",
+  "title": "Sidecar Comments v1 public JSON protocol",
+  "description": "The top-level instance is exactly one v1 response envelope or an apply request. Duplicate JSON member detection, lexical number rules, byte limits, UTF-8/NFC, UUID non-nilness, base64 decoding, and cross-field semantics are normative prose requirements in docs/v1/protocol.md.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/SuccessEnvelope"
+    },
+    {
+      "$ref": "#/$defs/ErrorEnvelope"
+    },
+    {
+      "$ref": "#/$defs/ApplyRequest"
+    }
+  ],
+  "$defs": {
+    "UUIDv7": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "Revision": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "RevisionOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Revision"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "RevisionGuard": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Revision"
+        },
+        {
+          "const": "missing"
+        }
+      ]
+    },
+    "PositiveInt": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9223372036854775807
+    },
+    "Index": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "ExternalIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "Body": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 65536
+    },
+    "Base64Anchor": {
+      "type": "string",
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+      "contentEncoding": "base64",
+      "minLength": 1
+    },
+    "LocationDTO": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "file"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "line"
+            },
+            "line": {
+              "$ref": "#/$defs/PositiveInt"
+            }
+          },
+          "required": [
+            "kind",
+            "line"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "range"
+            },
+            "start_line": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "start_column": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "end_line": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "end_column": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "anchor": {
+              "$ref": "#/$defs/Base64Anchor"
+            }
+          },
+          "required": [
+            "kind",
+            "start_line",
+            "start_column",
+            "end_line",
+            "end_column"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "lost"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ExternalAuthorDTO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ExternalIdentity"
+        },
+        "name": {
+          "$ref": "#/$defs/Name"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "AuthorDTO": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "human"
+            },
+            "name": {
+              "$ref": "#/$defs/Name"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "agent"
+            },
+            "name": {
+              "$ref": "#/$defs/Name"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "external"
+            },
+            "external_author": {
+              "$ref": "#/$defs/ExternalAuthorDTO"
+            }
+          },
+          "required": [
+            "kind",
+            "external_author"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "GitLabDTO": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "note"
+            },
+            "project_id": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "discussion_id": {
+              "$ref": "#/$defs/ExternalIdentity"
+            },
+            "note_id": {
+              "$ref": "#/$defs/PositiveInt"
+            }
+          },
+          "required": [
+            "kind",
+            "project_id",
+            "discussion_id",
+            "note_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "system_note"
+            },
+            "project_id": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "note_id": {
+              "$ref": "#/$defs/PositiveInt"
+            }
+          },
+          "required": [
+            "kind",
+            "project_id",
+            "note_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "MessageDTO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/MessageID"
+        },
+        "author": {
+          "$ref": "#/$defs/AuthorDTO"
+        },
+        "body": {
+          "$ref": "#/$defs/Body"
+        },
+        "gitlab": {
+          "$ref": "#/$defs/GitLabDTO"
+        }
+      },
+      "required": [
+        "id",
+        "author",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "ThreadDTO": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ThreadID"
+        },
+        "location": {
+          "$ref": "#/$defs/LocationDTO"
+        },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/MessageDTO"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "location",
+        "messages"
+      ],
+      "additionalProperties": false
+    },
+    "WarningDTO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "const": "noncanonical_empty"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "additionalProperties": false
+    },
+    "RepairDiagnostic": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "const": "missing_message_id"
+        },
+        "byte_offset": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "line": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "thread_id": {
+          "$ref": "#/$defs/ThreadID"
+        },
+        "message_ordinal": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "code",
+        "byte_offset",
+        "line",
+        "thread_id",
+        "message_ordinal"
+      ],
+      "additionalProperties": false
+    },
+    "RepairDTO": {
+      "type": "object",
+      "properties": {
+        "diagnostics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/RepairDiagnostic"
+          }
+        }
+      },
+      "required": [
+        "diagnostics"
+      ],
+      "additionalProperties": false
+    },
+    "GeneratedIDsDTO": {
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "$ref": "#/$defs/ThreadID"
+        },
+        "message_id": {
+          "$ref": "#/$defs/MessageID"
+        }
+      },
+      "required": [
+        "thread_id",
+        "message_id"
+      ],
+      "additionalProperties": false
+    },
+    "FixAssignmentDTO": {
+      "type": "object",
+      "properties": {
+        "thread_id": {
+          "$ref": "#/$defs/ThreadID"
+        },
+        "message_ordinal": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "line": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "byte_offset": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "message_id": {
+          "$ref": "#/$defs/MessageID"
+        }
+      },
+      "required": [
+        "thread_id",
+        "message_ordinal",
+        "line",
+        "byte_offset",
+        "message_id"
+      ],
+      "additionalProperties": false
+    },
+    "Operation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "thread_create"
+            },
+            "thread_id": {
+              "$ref": "#/$defs/ThreadID"
+            },
+            "message_id": {
+              "$ref": "#/$defs/MessageID"
+            },
+            "location": {
+              "$ref": "#/$defs/LocationDTO"
+            },
+            "author": {
+              "$ref": "#/$defs/AuthorDTO"
+            },
+            "body": {
+              "$ref": "#/$defs/Body"
+            },
+            "gitlab": {
+              "$ref": "#/$defs/GitLabDTO"
+            }
+          },
+          "required": [
+            "op",
+            "thread_id",
+            "message_id",
+            "location",
+            "author",
+            "body"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "thread_move"
+            },
+            "thread_id": {
+              "$ref": "#/$defs/ThreadID"
+            },
+            "location": {
+              "$ref": "#/$defs/LocationDTO"
+            }
+          },
+          "required": [
+            "op",
+            "thread_id",
+            "location"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "thread_delete"
+            },
+            "thread_id": {
+              "$ref": "#/$defs/ThreadID"
+            }
+          },
+          "required": [
+            "op",
+            "thread_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "message_add"
+            },
+            "thread_id": {
+              "$ref": "#/$defs/ThreadID"
+            },
+            "message_id": {
+              "$ref": "#/$defs/MessageID"
+            },
+            "author": {
+              "$ref": "#/$defs/AuthorDTO"
+            },
+            "body": {
+              "$ref": "#/$defs/Body"
+            },
+            "gitlab": {
+              "$ref": "#/$defs/GitLabDTO"
+            },
+            "if_last_author_kind": {
+              "enum": [
+                "human",
+                "agent",
+                "external"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "thread_id",
+            "message_id",
+            "author",
+            "body"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "message_update"
+            },
+            "thread_id": {
+              "$ref": "#/$defs/ThreadID"
+            },
+            "message_id": {
+              "$ref": "#/$defs/MessageID"
+            },
+            "body": {
+              "$ref": "#/$defs/Body"
+            }
+          },
+          "required": [
+            "op",
+            "thread_id",
+            "message_id",
+            "body"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "const": "message_delete"
+            },
+            "thread_id": {
+              "$ref": "#/$defs/ThreadID"
+            },
+            "message_id": {
+              "$ref": "#/$defs/MessageID"
+            }
+          },
+          "required": [
+            "op",
+            "thread_id",
+            "message_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ApplyRequest": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": 1
+        },
+        "if_revision": {
+          "$ref": "#/$defs/RevisionGuard"
+        },
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/Operation"
+          }
+        }
+      },
+      "required": [
+        "protocol",
+        "operations"
+      ],
+      "additionalProperties": false
+    },
+    "VersionResult": {
+      "type": "object",
+      "properties": {
+        "cli_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format_version": {
+          "const": 1
+        },
+        "protocol": {
+          "const": 1
+        }
+      },
+      "required": [
+        "cli_version",
+        "format_version",
+        "protocol"
+      ],
+      "additionalProperties": false
+    },
+    "ValidateNormalResult": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "const": true
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WarningDTO"
+          }
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "valid",
+        "warnings",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "ValidateRepairResult": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "const": false
+        },
+        "repair": {
+          "$ref": "#/$defs/RepairDTO"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "canonical_revision": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "valid",
+        "repair",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "FormatResult": {
+      "type": "object",
+      "properties": {
+        "formatted": {
+          "type": "boolean"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "formatted",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "ListResult": {
+      "type": "object",
+      "properties": {
+        "threads": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "$ref": "#/$defs/ThreadDTO"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WarningDTO"
+          }
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "threads",
+        "warnings",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "GetResult": {
+      "type": "object",
+      "properties": {
+        "thread": {
+          "$ref": "#/$defs/ThreadDTO"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "thread",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "CreateResult": {
+      "type": "object",
+      "properties": {
+        "thread": {
+          "$ref": "#/$defs/ThreadDTO"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "generated_ids": {
+          "$ref": "#/$defs/GeneratedIDsDTO"
+        }
+      },
+      "required": [
+        "thread",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "MoveResult": {
+      "type": "object",
+      "properties": {
+        "thread": {
+          "$ref": "#/$defs/ThreadDTO"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "thread",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "AddResult": {
+      "type": "object",
+      "properties": {
+        "thread": {
+          "$ref": "#/$defs/ThreadDTO"
+        },
+        "message": {
+          "$ref": "#/$defs/MessageDTO"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "generated_id": {
+          "$ref": "#/$defs/MessageID"
+        }
+      },
+      "required": [
+        "thread",
+        "message",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "UpdateResult": {
+      "type": "object",
+      "properties": {
+        "thread": {
+          "$ref": "#/$defs/ThreadDTO"
+        },
+        "message": {
+          "$ref": "#/$defs/MessageDTO"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "thread",
+        "message",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "ThreadDeleteResult": {
+      "type": "object",
+      "properties": {
+        "deleted_thread_id": {
+          "$ref": "#/$defs/ThreadID"
+        },
+        "previous_storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "deleted_thread_id",
+        "previous_storage_revision",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "MessageDeleteResult": {
+      "type": "object",
+      "properties": {
+        "deleted_thread_id": {
+          "$ref": "#/$defs/ThreadID"
+        },
+        "deleted_message_id": {
+          "$ref": "#/$defs/MessageID"
+        },
+        "previous_storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "deleted_message_id",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "storage_revision": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "storage_revision"
+            ]
+          },
+          "then": {
+            "required": [
+              "deleted_thread_id",
+              "previous_storage_revision"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "previous_storage_revision"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "FixResult": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/FixNormalResult"
+        },
+        {
+          "$ref": "#/$defs/FixRepairCheckResult"
+        }
+      ]
+    },
+    "OperationResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "index": {
+              "$ref": "#/$defs/Index"
+            },
+            "op": {
+              "const": "thread_create"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "type": "object",
+              "properties": {
+                "thread": {
+                  "$ref": "#/$defs/ThreadDTO"
+                }
+              },
+              "required": [
+                "thread"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "index",
+            "op",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "index": {
+              "$ref": "#/$defs/Index"
+            },
+            "op": {
+              "const": "thread_move"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "type": "object",
+              "properties": {
+                "thread": {
+                  "$ref": "#/$defs/ThreadDTO"
+                }
+              },
+              "required": [
+                "thread"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "index",
+            "op",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "index": {
+              "$ref": "#/$defs/Index"
+            },
+            "op": {
+              "const": "thread_delete"
+            },
+            "changed": {
+              "const": true
+            },
+            "result": {
+              "type": "object",
+              "properties": {
+                "deleted_thread_id": {
+                  "$ref": "#/$defs/ThreadID"
+                }
+              },
+              "required": [
+                "deleted_thread_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "index",
+            "op",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "index": {
+              "$ref": "#/$defs/Index"
+            },
+            "op": {
+              "const": "message_add"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "type": "object",
+              "properties": {
+                "thread": {
+                  "$ref": "#/$defs/ThreadDTO"
+                },
+                "message": {
+                  "$ref": "#/$defs/MessageDTO"
+                }
+              },
+              "required": [
+                "thread",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "index",
+            "op",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "index": {
+              "$ref": "#/$defs/Index"
+            },
+            "op": {
+              "const": "message_update"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "type": "object",
+              "properties": {
+                "thread": {
+                  "$ref": "#/$defs/ThreadDTO"
+                },
+                "message": {
+                  "$ref": "#/$defs/MessageDTO"
+                }
+              },
+              "required": [
+                "thread",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "index",
+            "op",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "index": {
+              "$ref": "#/$defs/Index"
+            },
+            "op": {
+              "const": "message_delete"
+            },
+            "changed": {
+              "const": true
+            },
+            "result": {
+              "type": "object",
+              "properties": {
+                "deleted_thread_id": {
+                  "$ref": "#/$defs/ThreadID"
+                },
+                "deleted_message_id": {
+                  "$ref": "#/$defs/MessageID"
+                }
+              },
+              "required": [
+                "deleted_message_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "index",
+            "op",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ApplyResult": {
+      "type": "object",
+      "properties": {
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/OperationResult"
+          }
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "operations",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "SuccessEnvelope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "version"
+            },
+            "changed": {
+              "const": false
+            },
+            "result": {
+              "$ref": "#/$defs/VersionResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "validate"
+            },
+            "changed": {
+              "const": false
+            },
+            "result": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ValidateNormalResult"
+                },
+                {
+                  "$ref": "#/$defs/ValidateRepairResult"
+                }
+              ]
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "format"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "$ref": "#/$defs/FormatResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "fix"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "$ref": "#/$defs/FixResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "thread-list"
+            },
+            "changed": {
+              "const": false
+            },
+            "result": {
+              "$ref": "#/$defs/ListResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "thread-get"
+            },
+            "changed": {
+              "const": false
+            },
+            "result": {
+              "$ref": "#/$defs/GetResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "thread-create"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "$ref": "#/$defs/CreateResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "thread-move"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "$ref": "#/$defs/MoveResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "thread-delete"
+            },
+            "changed": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/ThreadDeleteResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "message-add"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "$ref": "#/$defs/AddResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "message-update"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "$ref": "#/$defs/UpdateResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "message-delete"
+            },
+            "changed": {
+              "const": true
+            },
+            "result": {
+              "$ref": "#/$defs/MessageDeleteResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "command": {
+              "const": "apply"
+            },
+            "changed": {
+              "type": "boolean"
+            },
+            "result": {
+              "$ref": "#/$defs/ApplyResult"
+            }
+          },
+          "required": [
+            "protocol",
+            "command",
+            "changed",
+            "result"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "UsageDetails": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "enum": [
+            "argv",
+            "output",
+            "body",
+            "metadata",
+            "operations",
+            "revision",
+            "stdin"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "missing",
+            "required",
+            "repeated",
+            "malformed",
+            "incompatible",
+            "too_large",
+            "stdin_multiple"
+          ]
+        }
+      },
+      "required": [
+        "field",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "ValidationDetails": {
+      "description": "Location grammar failures use target_content/location; source coordinate and anchor resolution failures use source_coordinate/location and source_anchor/location respectively.",
+      "type": "object",
+      "properties": {
+        "path": {
+          "enum": [
+            "target_name",
+            "target_type",
+            "target_size",
+            "target_encoding",
+            "target_endings",
+            "target_content",
+            "source_type",
+            "source_size",
+            "source_encoding",
+            "source_endings",
+            "source_coordinate",
+            "source_anchor",
+            "lock_type"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "invalid",
+            "symlink",
+            "nonregular",
+            "multilink",
+            "directory",
+            "too_large",
+            "bom",
+            "nul",
+            "utf8",
+            "endings",
+            "location"
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "ConflictDetails": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/RevisionConflictDetails"
+        },
+        {
+          "$ref": "#/$defs/LockTimeoutConflictDetails"
+        },
+        {
+          "$ref": "#/$defs/IdentityConflictDetails"
+        }
+      ]
+    },
+    "NotFoundDetails": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "entity": {
+              "const": "thread"
+            },
+            "id": {
+              "$ref": "#/$defs/ThreadID"
+            },
+            "index": {
+              "$ref": "#/$defs/Index"
+            }
+          },
+          "required": [
+            "entity",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entity": {
+              "const": "message"
+            },
+            "id": {
+              "$ref": "#/$defs/MessageID"
+            },
+            "index": {
+              "$ref": "#/$defs/Index"
+            }
+          },
+          "required": [
+            "entity",
+            "id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PreconditionDetails": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "enum": [
+            "thread_create",
+            "thread_move",
+            "thread_delete",
+            "message_add",
+            "message_update",
+            "message_delete",
+            "thread-create",
+            "thread-move",
+            "thread-delete",
+            "message-add",
+            "message-update",
+            "message-delete",
+            "format",
+            "fix",
+            "apply"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "id_collision",
+            "retry_mismatch",
+            "if_last_author_kind",
+            "limit_threads",
+            "limit_messages_thread",
+            "limit_messages_document"
+          ]
+        },
+        "index": {
+          "$ref": "#/$defs/Index"
+        }
+      },
+      "required": [
+        "operation",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "IODetails": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "enum": [
+            "open",
+            "read",
+            "lock",
+            "write",
+            "rename",
+            "unlink",
+            "fsync_parent",
+            "unsupported_secure_filesystem",
+            "randomness_exhausted",
+            "close",
+            "unlock",
+            "identity",
+            "cleanup",
+            "clock",
+            "csprng"
+          ]
+        },
+        "path": {
+          "enum": [
+            "target",
+            "source",
+            "parent",
+            "lock",
+            "temp",
+            "generator"
+          ]
+        },
+        "commit_may_have_succeeded": {
+          "const": true
+        }
+      },
+      "required": [
+        "operation",
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "UnsupportedDetails": {
+      "type": "object",
+      "properties": {
+        "received": {
+          "enum": [
+            "protocol",
+            "format",
+            "platform"
+          ]
+        }
+      },
+      "required": [
+        "received"
+      ],
+      "additionalProperties": false
+    },
+    "ErrorEnvelope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "usage"
+                },
+                "message": {
+                  "type": "string",
+                  "pattern": "^usage:[a-z_]+:[a-z_]+$"
+                },
+                "details": {
+                  "$ref": "#/$defs/UsageDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "validation"
+                },
+                "message": {
+                  "type": "string",
+                  "pattern": "^validation:[a-z_]+:[a-z_]+$"
+                },
+                "details": {
+                  "$ref": "#/$defs/ValidationDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "repair"
+                },
+                "message": {
+                  "const": "repair:document"
+                },
+                "details": {
+                  "$ref": "#/$defs/RepairDTO"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "conflict"
+                },
+                "message": {
+                  "const": "conflict:revision"
+                },
+                "details": {
+                  "$ref": "#/$defs/RevisionConflictDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "conflict"
+                },
+                "message": {
+                  "const": "conflict:lock_timeout"
+                },
+                "details": {
+                  "$ref": "#/$defs/LockTimeoutConflictDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "conflict"
+                },
+                "message": {
+                  "const": "conflict:identity_changed"
+                },
+                "details": {
+                  "$ref": "#/$defs/IdentityConflictDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "not_found"
+                },
+                "message": {
+                  "type": "string",
+                  "pattern": "^not_found:(thread|message)$"
+                },
+                "details": {
+                  "$ref": "#/$defs/NotFoundDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "precondition"
+                },
+                "message": {
+                  "type": "string",
+                  "pattern": "^precondition:[a-z_-]+:[a-z_]+$"
+                },
+                "details": {
+                  "$ref": "#/$defs/PreconditionDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "io"
+                },
+                "message": {
+                  "type": "string",
+                  "pattern": "^io:[a-z_]+$"
+                },
+                "details": {
+                  "$ref": "#/$defs/IODetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": 1
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "const": "unsupported"
+                },
+                "message": {
+                  "type": "string",
+                  "pattern": "^unsupported:[a-z_]+$"
+                },
+                "details": {
+                  "$ref": "#/$defs/UnsupportedDetails"
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "details"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "protocol",
+            "error"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ThreadID": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "description": "A ThreadID is a UUIDv7 in the thread-ID namespace; it is not a MessageID."
+    },
+    "MessageID": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "description": "A MessageID is a UUIDv7 in the message-ID namespace; it is not a ThreadID."
+    },
+    "FixNormalResult": {
+      "type": "object",
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FixAssignmentDTO"
+          }
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        },
+        "canonical_revision": {
+          "$ref": "#/$defs/Revision"
+        }
+      },
+      "required": [
+        "assignments",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "FixRepairCheckResult": {
+      "type": "object",
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "storage_revision": {
+          "$ref": "#/$defs/Revision"
+        },
+        "canonical_revision": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "assignments",
+        "storage_revision",
+        "canonical_revision"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionConflictDetails": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "revision"
+        },
+        "expected": {
+          "$ref": "#/$defs/RevisionGuard"
+        },
+        "current_storage_revision": {
+          "$ref": "#/$defs/RevisionOrNull"
+        }
+      },
+      "required": [
+        "kind",
+        "expected",
+        "current_storage_revision"
+      ],
+      "additionalProperties": false
+    },
+    "LockTimeoutConflictDetails": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "lock_timeout"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "IdentityConflictDetails": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "identity_changed"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

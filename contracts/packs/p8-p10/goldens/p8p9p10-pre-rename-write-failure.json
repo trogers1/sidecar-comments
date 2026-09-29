@@ -1,0 +1,1 @@
+{"case":"P9-PRE-RENAME-WRITE-FAILURE","matrix":["temp write fails","temp fsync fails"],"expect":{"status":7,"error":"io","commit_may_have_succeeded":"omitted","old_bytes_preserved":true,"temp_survivors":0,"stdout":""}}

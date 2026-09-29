@@ -1,0 +1,1 @@
+{"case":"P9-POST-DURABILITY-CLEANUP","fault":{"operations":["close","unlock"],"when":"after successful parent fsync"},"expect":{"status":0,"durable_success":true,"output":"normal-success","no_protocol_error":true}}

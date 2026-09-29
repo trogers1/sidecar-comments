@@ -1,0 +1,45 @@
+{
+  "fixture_version": 1,
+  "id": "apply-protocol",
+  "requirements": [
+    "V1-CLI-APPLY",
+    "V1-PRO-APPLY"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "apply",
+    "--file",
+    "a.txt.comments",
+    "--operations-file",
+    "ops"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "ops",
+        "kind": "file",
+        "bytes_b64": "eyJwcm90b2NvbCI6IDIsICJvcGVyYXRpb25zIjogW119",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 8,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"unsupported\",\"message\":\"unsupported:protocol\",\"details\":{\"received\":\"protocol\"}}}\n",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "ops",
+          "kind": "file",
+          "bytes_b64": "eyJwcm90b2NvbCI6IDIsICJvcGVyYXRpb25zIjogW119",
+          "mode": "0600"
+        }
+      ]
+    }
+  },
+  "env": []
+}

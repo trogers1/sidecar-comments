@@ -1,0 +1,45 @@
+{
+  "fixture_version": 1,
+  "id": "zero-format",
+  "requirements": [
+    "V1-FMT-EMPTY",
+    "V1-STORE-TXN"
+  ],
+  "argv": [
+    "--output",
+    "none",
+    "format",
+    "--file",
+    "a.txt.comments"
+  ],
+  "stdin_b64": "",
+  "requires": [
+    "writer_platform"
+  ],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.txt.comments",
+        "kind": "file",
+        "bytes_b64": "",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 0,
+    "stdout_b64": "",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": [
+        {
+          "path": ".a.txt.comments.sidecar.lock",
+          "kind": "file",
+          "bytes_b64": "",
+          "mode": "0600"
+        }
+      ]
+    }
+  },
+  "env": []
+}

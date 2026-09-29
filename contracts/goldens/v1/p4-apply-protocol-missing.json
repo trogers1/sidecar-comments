@@ -1,0 +1,42 @@
+{
+  "fixture_version": 1,
+  "id": "p4-apply-protocol-missing",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "apply",
+    "--file",
+    "a.comments",
+    "--operations-file",
+    "ops"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "ops",
+        "kind": "file",
+        "bytes_b64": "eyJvcGVyYXRpb25zIjpbeyJvcCI6InRocmVhZF9jcmVhdGUiLCJ0aHJlYWRfaWQiOiIwMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJtZXNzYWdlX2lkIjoiMDE4ZjAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMTAxIiwibG9jYXRpb24iOnsia2luZCI6Imxvc3QifSwiYXV0aG9yIjp7ImtpbmQiOiJodW1hbiJ9LCJib2R5IjoiaGVsbG8ifV19",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6b3BlcmF0aW9uczpyZXF1aXJlZAo=",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "ops",
+          "kind": "file",
+          "bytes_b64": "eyJvcGVyYXRpb25zIjpbeyJvcCI6InRocmVhZF9jcmVhdGUiLCJ0aHJlYWRfaWQiOiIwMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEiLCJtZXNzYWdlX2lkIjoiMDE4ZjAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMTAxIiwibG9jYXRpb24iOnsia2luZCI6Imxvc3QifSwiYXV0aG9yIjp7ImtpbmQiOiJodW1hbiJ9LCJib2R5IjoiaGVsbG8ifV19",
+          "mode": "0600"
+        }
+      ]
+    }
+  }
+}

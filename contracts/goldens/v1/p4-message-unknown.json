@@ -1,0 +1,26 @@
+{
+  "fixture_version": 1,
+  "id": "p4-message-unknown",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "message",
+    "wat"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6YXJndjptYWxmb3JtZWQK",
+    "invocation_error": "argv",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

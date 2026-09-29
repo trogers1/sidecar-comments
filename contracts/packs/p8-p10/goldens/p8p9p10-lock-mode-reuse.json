@@ -1,0 +1,1 @@
+{"case":"P8-LOCK-MODE-AND-REUSE","matrix":[{"lock":"absent","expect_lock_mode":"0600"},{"lock":"regular-unlocked-0600","expect_reused":true}],"expect":{"persistent_lock":true,"target_write":"successful"}}

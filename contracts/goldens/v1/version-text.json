@@ -1,0 +1,25 @@
+{
+  "fixture_version": 1,
+  "id": "version-text",
+  "requirements": [
+    "V1-PRO-ENV",
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "version"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 0,
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": []
+    },
+    "stdout_template": "version changed=false result={\"cli_version\":\"{{CLI_VERSION}}\",\"format_version\":1,\"protocol\":1}\n"
+  },
+  "env": []
+}

@@ -1,0 +1,1 @@
+{"case":"P10-INDEPENDENT-LOCK-RACE","actors":["holder executable","waiter executable"],"schedule":["holder acquires lock","waiter attempts mutation","holder commits and releases","waiter rereads"],"expect":{"concurrent_commit":false,"waiter_observes_holder_revision":true}}

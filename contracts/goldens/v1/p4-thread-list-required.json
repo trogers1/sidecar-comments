@@ -1,0 +1,25 @@
+{
+  "fixture_version": 1,
+  "id": "p4-thread-list-required",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "thread",
+    "list"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6YXJndjpyZXF1aXJlZAo=",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

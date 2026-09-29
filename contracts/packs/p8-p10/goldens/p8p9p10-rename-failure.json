@@ -1,0 +1,1 @@
+{"case":"P9-RENAME-FAILURE","fault":{"operation":"rename","outcome":"error"},"expect":{"status":7,"error":"io","details":{"path":"target","operation":"rename"},"commit_may_have_succeeded":"omitted","old_bytes_preserved":true,"stdout":""}}

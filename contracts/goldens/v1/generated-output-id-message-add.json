@@ -1,0 +1,23 @@
+{
+  "fixture_version": 1,
+  "id": "generated-output-id-message-add",
+  "requirements": ["V1-CLI-SURFACE", "V1-CLI-MUTATE", "V1-DOM-ID"],
+  "argv": ["--output", "id", "message", "add", "--file", "a.txt.comments", "--thread", "018f0000-0000-7000-8000-000000000001", "--author-kind", "agent", "--body-file", "body"],
+  "env": [],
+  "stdin_b64": "",
+  "requires": ["writer_platform"],
+  "initial_fs": {"entries": [
+    {"path":"a.txt.comments","kind":"file","bytes_b64":"W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbGluZToxXQotLS11c2VyIDwhLS0gc2lkZWNhci1tZXRhOiB7ImlkIjoiMDE4ZjAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMTAxIn0gLS0+CmhlbGxvClsvQHRoXzAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDAwMV0K","mode":"0600"},
+    {"path":"body","kind":"file","bytes_b64":"cmVwbHkK","mode":"0600"}
+  ]},
+  "expect": {
+    "status": 0,
+    "stdout_template": "{{UUIDV7:bind:message}}\n",
+    "stderr_b64": "",
+    "final_fs": {"entries": [
+      {"path":"a.txt.comments","kind":"file","bytes_template":"[@th_018f0000-0000-7000-8000-000000000001 line:1]\n---user <!-- sidecar-meta: {\"id\":\"018f0000-0000-7000-8000-000000000101\"} -->\nhello\n\n---bot <!-- sidecar-meta: {\"id\":\"{{UUIDV7:ref:message}}\"} -->\nreply\n[/@th_018f0000-0000-7000-8000-000000000001]\n","mode":"0600"},
+      {"path":"body","kind":"file","bytes_b64":"cmVwbHkK","mode":"0600"},
+      {"path":".a.txt.comments.sidecar.lock","kind":"file","bytes_b64":"","mode":"0600"}
+    ]}
+  }
+}

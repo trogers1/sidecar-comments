@@ -1,0 +1,1 @@
+{"case":"P8-IDENTITY-CHANGED","matrix":["replace target after verification","replace lock after acquisition"],"barrier":"after final validation before commit","expect":{"status":4,"error":"conflict:identity_changed","details":{"kind":"identity_changed"},"substitute_preserved":true}}

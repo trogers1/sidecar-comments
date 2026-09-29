@@ -1,0 +1,35 @@
+{
+  "fixture_version": 1,
+  "id": "p4-format-default",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "format",
+    "--file",
+    "a.comments"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [
+    "writer_platform"
+  ],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 0,
+    "stdout_b64": "Zm9ybWF0IGNoYW5nZWQ9ZmFsc2UgcmVzdWx0PXsiZm9ybWF0dGVkIjpmYWxzZSwic3RvcmFnZV9yZXZpc2lvbiI6bnVsbCwiY2Fub25pY2FsX3JldmlzaW9uIjoic2hhMjU2OmUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQo=",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": [
+        {
+          "path": ".a.comments.sidecar.lock",
+          "kind": "file",
+          "bytes_b64": "",
+          "mode": "0600"
+        }
+      ]
+    }
+  }
+}

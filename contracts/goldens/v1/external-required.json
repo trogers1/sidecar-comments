@@ -1,0 +1,37 @@
+{
+  "fixture_version": 1,
+  "id": "external-required",
+  "requirements": [
+    "V1-DOM-ID",
+    "V1-DOM-AUTH",
+    "V1-CLI-INPUT"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "thread",
+    "create",
+    "--file",
+    "a.txt.comments",
+    "--location",
+    "lost",
+    "--author-kind",
+    "external",
+    "--body-file",
+    "body"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [{"path":"body","kind":"file","bytes_b64":"aGVsbG8=","mode":"0600"}]
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"usage\",\"message\":\"usage:argv:required\",\"details\":{\"field\":\"argv\",\"reason\":\"required\"}}}\n",
+    "final_fs": {
+      "entries": [{"path":"body","kind":"file","bytes_b64":"aGVsbG8=","mode":"0600"}]
+    }
+  },
+  "env": []
+}

@@ -1,0 +1,39 @@
+{
+  "fixture_version": 1,
+  "id": "id-pair",
+  "requirements": [
+    "V1-DOM-ID",
+    "V1-DOM-AUTH",
+    "V1-CLI-INPUT"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "thread",
+    "create",
+    "--file",
+    "a.txt.comments",
+    "--location",
+    "lost",
+    "--author-kind",
+    "human",
+    "--body-file",
+    "body",
+    "--id",
+    "018f0000-0000-7000-8000-000000000001"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [{"path":"body","kind":"file","bytes_b64":"aGVsbG8=","mode":"0600"}]
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"usage\",\"message\":\"usage:argv:incompatible\",\"details\":{\"field\":\"argv\",\"reason\":\"incompatible\"}}}\n",
+    "final_fs": {
+      "entries": [{"path":"body","kind":"file","bytes_b64":"aGVsbG8=","mode":"0600"}]
+    }
+  },
+  "env": []
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/trogers1/sidecar-comments/contracts/schema/corpus-v2.json",
+  "title": "Sidecar Comments v2 controlled-fixture capability design",
+  "description": "Declarative design only. This schema describes controlled-fixture requests and capability declarations; validating one neither executes it nor proves a capability.",
+  "$defs": {
+    "id": {"type":"string","pattern":"^[a-z][a-z0-9_]*$"},
+    "path": {"type":"string","pattern":"^[A-Za-z0-9._/-]+$"},
+    "base64": {"type":"string","pattern":"^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"},
+    "proof": {"type":"object","properties":{"method":{"type":"string","minLength":1},"artifact":{"type":"string","minLength":1}},"required":["method","artifact"],"additionalProperties":false},
+    "capability": {
+      "type":"object",
+      "properties": {
+        "id":{"$ref":"#/$defs/id"},
+        "input_kind":{"enum":["deterministic_blob","actors_barriers","lock_identity_replacement","fault_injection","platform_object_umask","editor"]},
+        "status":{"enum":["unavailable","proven"]},
+        "unavailable_reason":{"type":"string","minLength":1},
+        "proof":{"$ref":"#/$defs/proof"},
+        "guarantees":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}}
+      },
+      "required":["id","input_kind","status","guarantees"],
+      "oneOf":[
+        {"properties":{"status":{"const":"unavailable"}},"required":["unavailable_reason"],"not":{"required":["proof"]}},
+        {"properties":{"status":{"const":"proven"}},"required":["proof"],"not":{"required":["unavailable_reason"]}}
+      ],
+      "additionalProperties":false
+    },
+    "deterministic_blob": {"type":"object","properties":{"kind":{"const":"deterministic_blob"},"name":{"$ref":"#/$defs/id"},"algorithm":{"const":"sha256-counter-v1"},"seed_b64":{"$ref":"#/$defs/base64"},"byte_length":{"type":"integer","minimum":0},"limit":{"type":"integer","minimum":0}},"required":["kind","name","algorithm","seed_b64","byte_length","limit"],"additionalProperties":false},
+    "actors_barriers": {"type":"object","properties":{"kind":{"const":"actors_barriers"},"actors":{"type":"array","minItems":2,"items":{"type":"object","properties":{"id":{"$ref":"#/$defs/id"},"argv":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}},"ready_barrier":{"$ref":"#/$defs/id"},"release_barrier":{"$ref":"#/$defs/id"}},"required":["id","argv","ready_barrier","release_barrier"],"additionalProperties":false}},"barriers":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/id"},"uniqueItems":true},"release_order":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/id"}},"timeout_ms":{"type":"integer","minimum":1}},"required":["kind","actors","barriers","release_order","timeout_ms"],"additionalProperties":false},
+    "lock_identity_replacement": {"type":"object","properties":{"kind":{"const":"lock_identity_replacement"},"lock_path":{"$ref":"#/$defs/path"},"holder_actor":{"$ref":"#/$defs/id"},"at_barrier":{"$ref":"#/$defs/id"},"replacement":{"oneOf":[{"type":"object","properties":{"kind":{"const":"replace_target"},"object_kind":{"enum":["file","directory","symlink"]}},"required":["kind","object_kind"],"additionalProperties":false},{"type":"object","properties":{"kind":{"const":"replace_lock"},"object_kind":{"enum":["file","directory","symlink"]}},"required":["kind","object_kind"],"additionalProperties":false}]}},"required":["kind","lock_path","holder_actor","at_barrier","replacement"],"additionalProperties":false},
+    "fault_injection": {"type":"object","properties":{"kind":{"const":"fault_injection"},"scope":{"enum":["filesystem","clock","randomness"]},"operation":{"enum":["open","write","fsync","rename","close","now","random"]},"occurrence":{"type":"integer","minimum":1},"outcome":{"oneOf":[{"type":"object","properties":{"kind":{"const":"errno"},"errno":{"enum":["EACCES","EEXIST","EIO","ENOSPC","EPERM"]}},"required":["kind","errno"],"additionalProperties":false},{"type":"object","properties":{"kind":{"const":"short_write"},"bytes":{"type":"integer","minimum":0}},"required":["kind","bytes"],"additionalProperties":false}]}},"required":["kind","scope","operation","occurrence","outcome"],"additionalProperties":false},
+    "platform_object_umask": {"type":"object","properties":{"kind":{"const":"platform_object_umask"},"platform":{"type":"object","properties":{"goos":{"enum":["darwin","linux","windows"]},"goarch":{"enum":["amd64","arm64"]}},"required":["goos","goarch"],"additionalProperties":false},"object_kind":{"enum":["file","directory","symlink","hardlink"]},"umask":{"pattern":"^0[0-7]{3}$","type":"string"}},"required":["kind","platform","object_kind","umask"],"additionalProperties":false},
+    "editor": {"type":"object","properties":{"kind":{"const":"editor"},"argv":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}},"protocol":{"const":"file-argument-v1"},"exit_status":{"type":"integer","minimum":0,"maximum":255}},"required":["kind","argv","protocol","exit_status"],"additionalProperties":false},
+    "input": {"oneOf":[{"$ref":"#/$defs/deterministic_blob"},{"$ref":"#/$defs/actors_barriers"},{"$ref":"#/$defs/lock_identity_replacement"},{"$ref":"#/$defs/fault_injection"},{"$ref":"#/$defs/platform_object_umask"},{"$ref":"#/$defs/editor"}]},
+    "fixture": {"type":"object","properties":{"fixture_version":{"const":2},"id":{"$ref":"#/$defs/id"},"capability":{"$ref":"#/$defs/id"},"input":{"$ref":"#/$defs/input"}},"required":["fixture_version","id","capability","input"],"additionalProperties":false},
+    "catalog": {"type":"object","properties":{"capability_version":{"const":2},"schema":{"const":"contracts/schema/corpus-v2.json"},"design_state":{"const":"declarative-only"},"unavailable_outcome":{"type":"object","properties":{"result":{"const":"UNAVAILABLE"},"failure_class":{"const":"capability"},"nonzero":{"const":true},"never":{"type":"array","items":{"enum":["skip","pass","proven"]},"minItems":3,"uniqueItems":true}},"required":["result","failure_class","nonzero","never"],"additionalProperties":false},"capabilities":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/capability"}}},"required":["capability_version","schema","design_state","unavailable_outcome","capabilities"],"additionalProperties":false}
+  },
+  "oneOf":[{"$ref":"#/$defs/catalog"},{"$ref":"#/$defs/fixture"}]
+}

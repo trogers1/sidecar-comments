@@ -1,0 +1,31 @@
+{
+  "fixture_version": 1,
+  "id": "get-missing",
+  "requirements": [
+    "V1-CLI-READ"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "thread",
+    "get",
+    "--file",
+    "a.txt.comments",
+    "--id",
+    "018f0000-0000-7000-8000-000000000001"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 5,
+    "stdout_b64": "",
+    "stderr_b64": "eyJwcm90b2NvbCI6MSwiZXJyb3IiOnsiY29kZSI6Im5vdF9mb3VuZCIsIm1lc3NhZ2UiOiJub3RfZm91bmQ6dGhyZWFkIiwiZGV0YWlscyI6eyJlbnRpdHkiOiJ0aHJlYWQiLCJpZCI6IjAxOGYwMDAwLTAwMDAtNzAwMC04MDAwLTAwMDAwMDAwMDAwMSJ9fX0K",
+    "final_fs": {
+      "entries": []
+    }
+  },
+  "env": []
+}

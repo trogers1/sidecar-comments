@@ -1,0 +1,56 @@
+{
+  "fixture_version": 1,
+  "id": "source-cr",
+  "requirements": [
+    "V1-SRC-VAL"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "validate",
+    "--file",
+    "a.txt.comments",
+    "--source",
+    "a.txt"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.txt",
+        "kind": "file",
+        "bytes_b64": "YQ1i",
+        "mode": "0600"
+      },
+      {
+        "path": "a.txt.comments",
+        "kind": "file",
+        "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgcmFuZ2U6MToxLTE6MyB8IHc2az1dCi0tLXVzZXIgPCEtLSBzaWRlY2FyLW1ldGE6IHsiaWQiOiIwMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAxMDEifSAtLT4KaGVsbG8KWy9AdGhfMDE4ZjAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMDAxXQo=",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 3,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"validation\",\"message\":\"validation:source_endings:endings\",\"details\":{\"path\":\"source_endings\",\"reason\":\"endings\"}}}\n",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "a.txt",
+          "kind": "file",
+          "bytes_b64": "YQ1i",
+          "mode": "0600"
+        },
+        {
+          "path": "a.txt.comments",
+          "kind": "file",
+          "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgcmFuZ2U6MToxLTE6MyB8IHc2az1dCi0tLXVzZXIgPCEtLSBzaWRlY2FyLW1ldGE6IHsiaWQiOiIwMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAxMDEifSAtLT4KaGVsbG8KWy9AdGhfMDE4ZjAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMDAxXQo=",
+          "mode": "0600"
+        }
+      ]
+    }
+  },
+  "env": []
+}

@@ -1,0 +1,24 @@
+{
+  "fixture_version": 1,
+  "id": "p4-version-default",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "version"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 0,
+    "stdout_template": "version changed=false result={\"cli_version\":\"{{CLI_VERSION}}\",\"format_version\":1,\"protocol\":1}\n",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

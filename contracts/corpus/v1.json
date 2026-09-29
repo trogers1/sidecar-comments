@@ -1,0 +1,1273 @@
+{
+  "corpus_version": 1,
+  "schema": "contracts/schema/corpus-v1.json",
+  "protocol_schema": "contracts/schema/v1.json",
+  "runner": {
+    "default_bin": "./bin/sidecar",
+    "env_bin": "SIDECAR_BIN",
+    "cli_version_env": "SIDECAR_CLI_VERSION",
+    "comparison": "byte-exact after approved template expansion",
+    "template_version": 1,
+    "templates": {
+      "sha256:initial:PATH": "SHA-256 of initial regular file bytes",
+      "sha256:final:PATH": "SHA-256 of expected final regular file bytes",
+      "CLI_VERSION": "literal SIDECAR_CLI_VERSION",
+      "UUIDV7:bind:NAME": "bind one runtime canonical lowercase UUIDv7 in an expected stream",
+      "UUIDV7:ref:NAME": "refer to an earlier UUIDV7 binding in an expected stream or final regular-file bytes"
+    }
+  },
+  "requirements": {
+    "V1-IDX": {
+      "source": "docs/v1/index.md",
+      "subject": "target naming, normalized values, deterministic decisions"
+    },
+    "V1-PRO-ENV": {
+      "source": "docs/v1/protocol.md",
+      "subject": "envelopes and streams"
+    },
+    "V1-PRO-DTO": {
+      "source": "docs/v1/protocol.md",
+      "subject": "all DTOs and revisions"
+    },
+    "V1-PRO-APPLY": {
+      "source": "docs/v1/protocol.md",
+      "subject": "Apply request"
+    },
+    "V1-CLI-SURFACE": {
+      "source": "docs/v1/cli.md",
+      "subject": "all command surface/output"
+    },
+    "V1-CLI-INPUT": {
+      "source": "docs/v1/cli.md",
+      "subject": "inputs/stdin"
+    },
+    "V1-CLI-READ": {
+      "source": "docs/v1/cli.md",
+      "subject": "reads"
+    },
+    "V1-CLI-FORMAT": {
+      "source": "docs/v1/cli.md",
+      "subject": "format/fix"
+    },
+    "V1-CLI-MUTATE": {
+      "source": "docs/v1/cli.md",
+      "subject": "single mutations"
+    },
+    "V1-CLI-APPLY": {
+      "source": "docs/v1/cli.md",
+      "subject": "apply"
+    },
+    "V1-CLI-PRECEDENCE": {
+      "source": "docs/v1/cli.md",
+      "subject": "precedence"
+    },
+    "V1-FMT-GRAMMAR": {
+      "source": "docs/v1/format.md",
+      "subject": "grammar terminals/roles"
+    },
+    "V1-FMT-FRAMING": {
+      "source": "docs/v1/format.md",
+      "subject": "body framing"
+    },
+    "V1-FMT-META": {
+      "source": "docs/v1/format.md",
+      "subject": "metadata"
+    },
+    "V1-FMT-EMPTY": {
+      "source": "docs/v1/format.md",
+      "subject": "empty/noncanonical"
+    },
+    "V1-FMT-REPAIR": {
+      "source": "docs/v1/format.md",
+      "subject": "repair"
+    },
+    "V1-DOM-ID": {
+      "source": "docs/v1/domain-and-unicode.md",
+      "subject": "UUID"
+    },
+    "V1-DOM-AUTH": {
+      "source": "docs/v1/domain-and-unicode.md",
+      "subject": "authors/gitlab"
+    },
+    "V1-SRC-LOC": {
+      "source": "docs/v1/source-and-location.md",
+      "subject": "locations"
+    },
+    "V1-SRC-VAL": {
+      "source": "docs/v1/source-and-location.md",
+      "subject": "sources"
+    },
+    "V1-SRC-MUT": {
+      "source": "docs/v1/source-and-location.md",
+      "subject": "implicit source"
+    },
+    "V1-STORE-OBJECT": {
+      "source": "docs/v1/storage-security.md",
+      "subject": "secure objects"
+    },
+    "V1-STORE-TXN": {
+      "source": "docs/v1/storage-security.md",
+      "subject": "transaction"
+    }
+  },
+  "fixtures": [
+    {
+      "id": "version-json",
+      "golden": "contracts/goldens/v1/version-json.json",
+      "requirements": [
+        "V1-PRO-ENV",
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-PRO-VERSION-JSON-ENVELOPE"
+      ]
+    },
+    {
+      "id": "version-text",
+      "golden": "contracts/goldens/v1/version-text.json",
+      "requirements": [
+        "V1-PRO-ENV",
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-CLI-VERSION-TEXT"
+      ]
+    },
+    {
+      "id": "validate-missing",
+      "golden": "contracts/goldens/v1/validate-missing.json",
+      "requirements": [
+        "V1-CLI-READ",
+        "V1-FMT-EMPTY",
+        "V1-IDX"
+      ],
+      "coverage": [
+        "BHV-READ-MISSING-VALIDATE"
+      ]
+    },
+    {
+      "id": "list-missing",
+      "golden": "contracts/goldens/v1/list-missing.json",
+      "requirements": [
+        "V1-CLI-READ",
+        "V1-PRO-DTO"
+      ],
+      "coverage": [
+        "BHV-READ-MISSING-LIST"
+      ]
+    },
+    {
+      "id": "get-missing",
+      "golden": "contracts/goldens/v1/get-missing.json",
+      "requirements": [
+        "V1-CLI-READ"
+      ],
+      "coverage": [
+        "BHV-READ-MISSING-GET"
+      ]
+    },
+    {
+      "id": "zero-validate",
+      "golden": "contracts/goldens/v1/zero-validate.json",
+      "requirements": [
+        "V1-FMT-EMPTY"
+      ],
+      "coverage": [
+        "BHV-EMPTY-ZERO-VALIDATE"
+      ]
+    },
+    {
+      "id": "zero-format-check",
+      "golden": "contracts/goldens/v1/zero-format-check.json",
+      "requirements": [
+        "V1-FMT-EMPTY",
+        "V1-CLI-FORMAT"
+      ],
+      "coverage": [
+        "BHV-EMPTY-ZERO-FORMAT-CHECK"
+      ]
+    },
+    {
+      "id": "zero-format",
+      "golden": "contracts/goldens/v1/zero-format.json",
+      "requirements": [
+        "V1-FMT-EMPTY",
+        "V1-STORE-TXN"
+      ],
+      "coverage": [
+        "BHV-EMPTY-ZERO-FORMAT"
+      ]
+    },
+    {
+      "id": "target-no-suffix",
+      "golden": "contracts/goldens/v1/target-no-suffix.json",
+      "requirements": [
+        "V1-IDX"
+      ],
+      "coverage": [
+        "BHV-TARGET-NO-SUFFIX"
+      ]
+    },
+    {
+      "id": "target-dot",
+      "golden": "contracts/goldens/v1/target-dot.json",
+      "requirements": [
+        "V1-IDX"
+      ],
+      "coverage": [
+        "BHV-TARGET-DOT-NAME"
+      ]
+    },
+    {
+      "id": "target-temp",
+      "golden": "contracts/goldens/v1/target-temp.json",
+      "requirements": [
+        "V1-IDX"
+      ],
+      "coverage": [
+        "BHV-TARGET-TEMP-SUFFIX"
+      ]
+    },
+    {
+      "id": "canonical-validate",
+      "golden": "contracts/goldens/v1/canonical-validate.json",
+      "requirements": [
+        "V1-FMT-GRAMMAR"
+      ],
+      "coverage": [
+        "BHV-FORMAT-CANONICAL-VALIDATE"
+      ]
+    },
+    {
+      "id": "whitespace",
+      "golden": "contracts/goldens/v1/whitespace.json",
+      "requirements": [
+        "V1-FMT-GRAMMAR",
+        "V1-FMT-FRAMING"
+      ],
+      "coverage": [
+        "BHV-FORMAT-WHITESPACE"
+      ]
+    },
+    {
+      "id": "bom",
+      "golden": "contracts/goldens/v1/bom.json",
+      "requirements": [
+        "V1-FMT-GRAMMAR",
+        "V1-FMT-FRAMING"
+      ],
+      "coverage": [
+        "BHV-FORMAT-BOM"
+      ]
+    },
+    {
+      "id": "reserved",
+      "golden": "contracts/goldens/v1/reserved.json",
+      "requirements": [
+        "V1-FMT-GRAMMAR",
+        "V1-FMT-FRAMING"
+      ],
+      "coverage": [
+        "BHV-FORMAT-RESERVED-PREFIX"
+      ]
+    },
+    {
+      "id": "bad-end",
+      "golden": "contracts/goldens/v1/bad-end.json",
+      "requirements": [
+        "V1-FMT-GRAMMAR",
+        "V1-FMT-FRAMING"
+      ],
+      "coverage": [
+        "BHV-FORMAT-THREAD-END"
+      ]
+    },
+    {
+      "id": "meta-duplicate",
+      "golden": "contracts/goldens/v1/meta-duplicate.json",
+      "requirements": [
+        "V1-FMT-META"
+      ],
+      "coverage": [
+        "BHV-META-DUPLICATE-KEY"
+      ]
+    },
+    {
+      "id": "meta-unknown",
+      "golden": "contracts/goldens/v1/meta-unknown.json",
+      "requirements": [
+        "V1-FMT-META"
+      ],
+      "coverage": [
+        "BHV-META-UNKNOWN-KEY"
+      ]
+    },
+    {
+      "id": "meta-surrogate",
+      "golden": "contracts/goldens/v1/meta-surrogate.json",
+      "requirements": [
+        "V1-FMT-META"
+      ],
+      "coverage": [
+        "BHV-META-SURROGATE-ESCAPE"
+      ]
+    },
+    {
+      "id": "format-crlf",
+      "golden": "contracts/goldens/v1/format-crlf.json",
+      "requirements": [
+        "V1-FMT-EMPTY",
+        "V1-CLI-FORMAT"
+      ],
+      "coverage": [
+        "BHV-FORMAT-CRLF-CANONICALIZE"
+      ]
+    },
+    {
+      "id": "repair-validate",
+      "golden": "contracts/goldens/v1/repair-validate.json",
+      "requirements": [
+        "V1-FMT-REPAIR",
+        "V1-PRO-DTO"
+      ],
+      "coverage": [
+        "BHV-REPAIR-VALIDATE"
+      ]
+    },
+    {
+      "id": "repair-fix-check",
+      "golden": "contracts/goldens/v1/repair-fix-check.json",
+      "requirements": [
+        "V1-FMT-REPAIR",
+        "V1-CLI-FORMAT"
+      ],
+      "coverage": [
+        "BHV-REPAIR-FIX-CHECK"
+      ]
+    },
+    {
+      "id": "source-anchor",
+      "golden": "contracts/goldens/v1/source-anchor.json",
+      "requirements": [
+        "V1-SRC-LOC",
+        "V1-SRC-VAL"
+      ],
+      "coverage": [
+        "BHV-SOURCE-ANCHOR"
+      ]
+    },
+    {
+      "id": "source-bom",
+      "golden": "contracts/goldens/v1/source-bom.json",
+      "requirements": [
+        "V1-SRC-VAL"
+      ],
+      "coverage": [
+        "BHV-SOURCE-BOM"
+      ]
+    },
+    {
+      "id": "source-cr",
+      "golden": "contracts/goldens/v1/source-cr.json",
+      "requirements": [
+        "V1-SRC-VAL"
+      ],
+      "coverage": [
+        "BHV-SOURCE-BARE-CR"
+      ]
+    },
+    {
+      "id": "source-anchor-bad",
+      "golden": "contracts/goldens/v1/source-anchor-bad.json",
+      "requirements": [
+        "V1-SRC-VAL"
+      ],
+      "coverage": [
+        "BHV-SOURCE-ANCHOR-MISMATCH"
+      ]
+    },
+    {
+      "id": "thread-create",
+      "golden": "contracts/goldens/v1/thread-create.json",
+      "requirements": [
+        "V1-CLI-SURFACE",
+        "V1-CLI-MUTATE",
+        "V1-SRC-MUT"
+      ],
+      "coverage": [
+        "BHV-THREAD-CREATE"
+      ]
+    },
+    {
+      "id": "thread-move",
+      "golden": "contracts/goldens/v1/thread-move.json",
+      "requirements": [
+        "V1-CLI-SURFACE",
+        "V1-CLI-MUTATE"
+      ],
+      "coverage": [
+        "BHV-THREAD-MOVE"
+      ]
+    },
+    {
+      "id": "message-add",
+      "golden": "contracts/goldens/v1/message-add.json",
+      "requirements": [
+        "V1-CLI-SURFACE",
+        "V1-CLI-MUTATE"
+      ],
+      "coverage": [
+        "BHV-MESSAGE-ADD"
+      ]
+    },
+    {
+      "id": "message-update-noop",
+      "golden": "contracts/goldens/v1/message-update-noop.json",
+      "requirements": [
+        "V1-CLI-MUTATE"
+      ],
+      "coverage": [
+        "BHV-MESSAGE-UPDATE-NOOP"
+      ]
+    },
+    {
+      "id": "message-delete-last",
+      "golden": "contracts/goldens/v1/message-delete-last.json",
+      "requirements": [
+        "V1-CLI-MUTATE"
+      ],
+      "coverage": [
+        "BHV-MESSAGE-DELETE-LAST"
+      ]
+    },
+    {
+      "id": "id-pair",
+      "golden": "contracts/goldens/v1/id-pair.json",
+      "requirements": [
+        "V1-DOM-ID",
+        "V1-DOM-AUTH",
+        "V1-CLI-INPUT"
+      ],
+      "coverage": [
+        "BHV-DOMAIN-ID-PAIR"
+      ]
+    },
+    {
+      "id": "external-required",
+      "golden": "contracts/goldens/v1/external-required.json",
+      "requirements": [
+        "V1-DOM-ID",
+        "V1-DOM-AUTH",
+        "V1-CLI-INPUT"
+      ],
+      "coverage": [
+        "BHV-DOMAIN-EXTERNAL-AUTHOR"
+      ]
+    },
+    {
+      "id": "apply-create",
+      "golden": "contracts/goldens/v1/apply-create.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-APPLY-CREATE"
+      ]
+    },
+    {
+      "id": "apply-protocol",
+      "golden": "contracts/goldens/v1/apply-protocol.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-APPLY-PROTOCOL-VERSION"
+      ]
+    },
+    {
+      "id": "apply-unknown",
+      "golden": "contracts/goldens/v1/apply-unknown.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-APPLY-UNKNOWN-OP"
+      ]
+    },
+    {
+      "id": "apply-empty",
+      "golden": "contracts/goldens/v1/apply-empty.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-APPLY-EMPTY"
+      ]
+    },
+    {
+      "id": "revision-conflict",
+      "golden": "contracts/goldens/v1/revision-conflict.json",
+      "requirements": [
+        "V1-CLI-PRECEDENCE",
+        "V1-STORE-TXN"
+      ],
+      "coverage": [
+        "BHV-WRITER-REVISION-CONFLICT"
+      ]
+    },
+    {
+      "id": "target-symlink",
+      "golden": "contracts/goldens/v1/target-symlink.json",
+      "requirements": [
+        "V1-STORE-OBJECT"
+      ],
+      "coverage": [
+        "BHV-STORE-SYMLINK"
+      ]
+    },
+    {
+      "id": "target-directory",
+      "golden": "contracts/goldens/v1/target-directory.json",
+      "requirements": [
+        "V1-STORE-OBJECT"
+      ],
+      "coverage": [
+        "BHV-STORE-DIRECTORY"
+      ]
+    },
+    {
+      "id": "target-hardlink",
+      "golden": "contracts/goldens/v1/target-hardlink.json",
+      "requirements": [
+        "V1-STORE-OBJECT"
+      ],
+      "coverage": [
+        "BHV-STORE-HARDLINK"
+      ]
+    },
+    {
+      "id": "p3-command-missing",
+      "golden": "contracts/goldens/v1/p3-command-missing.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-CLI-P3-COMMAND-MISSING"
+      ]
+    },
+    {
+      "id": "p3-command-unknown",
+      "golden": "contracts/goldens/v1/p3-command-unknown.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-CLI-P3-COMMAND-UNKNOWN"
+      ]
+    },
+    {
+      "id": "p3-output-after-command",
+      "golden": "contracts/goldens/v1/p3-output-after-command.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-CLI-P3-GLOBAL-ORDER"
+      ]
+    },
+    {
+      "id": "p3-output-none-read",
+      "golden": "contracts/goldens/v1/p3-output-none-read.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-CLI-P3-FORBID-NONE-READ"
+      ]
+    },
+    {
+      "id": "p3-stdin-arbitration",
+      "golden": "contracts/goldens/v1/p3-stdin-arbitration.json",
+      "requirements": [
+        "V1-CLI-INPUT"
+      ],
+      "coverage": [
+        "BHV-CLI-P3-STDIN-ARBITRATION"
+      ]
+    },
+    {
+      "id": "p3-apply-stdin-duplicate",
+      "golden": "contracts/goldens/v1/p3-apply-stdin-duplicate.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-PRO-P3-APPLY-DUPLICATE"
+      ]
+    },
+    {
+      "id": "p3-apply-stdin-surrogate",
+      "golden": "contracts/goldens/v1/p3-apply-stdin-surrogate.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-PRO-P3-APPLY-SURROGATE"
+      ]
+    },
+    {
+      "id": "p3-apply-stdin-unknown-field",
+      "golden": "contracts/goldens/v1/p3-apply-stdin-unknown-field.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-PRO-P3-APPLY-UNKNOWN-FIELD"
+      ]
+    },
+    {
+      "id": "p4-output-before-command",
+      "golden": "contracts/goldens/v1/p4-output-before-command.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-BEFORE-COMMAND"
+      ]
+    },
+    {
+      "id": "p4-output-repeated",
+      "golden": "contracts/goldens/v1/p4-output-repeated.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-REPEATED"
+      ]
+    },
+    {
+      "id": "p4-output-missing",
+      "golden": "contracts/goldens/v1/p4-output-missing.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-MISSING"
+      ]
+    },
+    {
+      "id": "p4-output-invalid",
+      "golden": "contracts/goldens/v1/p4-output-invalid.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-INVALID"
+      ]
+    },
+    {
+      "id": "p4-thread-missing",
+      "golden": "contracts/goldens/v1/p4-thread-missing.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-MISSING"
+      ]
+    },
+    {
+      "id": "p4-thread-unknown",
+      "golden": "contracts/goldens/v1/p4-thread-unknown.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-UNKNOWN"
+      ]
+    },
+    {
+      "id": "p4-message-missing",
+      "golden": "contracts/goldens/v1/p4-message-missing.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-MISSING"
+      ]
+    },
+    {
+      "id": "p4-message-unknown",
+      "golden": "contracts/goldens/v1/p4-message-unknown.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-UNKNOWN"
+      ]
+    },
+    {
+      "id": "p4-unknown-flag",
+      "golden": "contracts/goldens/v1/p4-unknown-flag.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-UNKNOWN-FLAG"
+      ]
+    },
+    {
+      "id": "p4-positional",
+      "golden": "contracts/goldens/v1/p4-positional.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-POSITIONAL"
+      ]
+    },
+    {
+      "id": "p4-validate-required",
+      "golden": "contracts/goldens/v1/p4-validate-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-VALIDATE-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-format-required",
+      "golden": "contracts/goldens/v1/p4-format-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FORMAT-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-fix-required",
+      "golden": "contracts/goldens/v1/p4-fix-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FIX-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-thread-list-required",
+      "golden": "contracts/goldens/v1/p4-thread-list-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-LIST-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-thread-get-required",
+      "golden": "contracts/goldens/v1/p4-thread-get-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-GET-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-thread-create-required",
+      "golden": "contracts/goldens/v1/p4-thread-create-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-CREATE-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-thread-move-required",
+      "golden": "contracts/goldens/v1/p4-thread-move-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-MOVE-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-thread-delete-required",
+      "golden": "contracts/goldens/v1/p4-thread-delete-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-DELETE-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-message-add-required",
+      "golden": "contracts/goldens/v1/p4-message-add-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-ADD-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-message-update-required",
+      "golden": "contracts/goldens/v1/p4-message-update-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-UPDATE-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-message-delete-required",
+      "golden": "contracts/goldens/v1/p4-message-delete-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-DELETE-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-apply-required",
+      "golden": "contracts/goldens/v1/p4-apply-required.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-APPLY-REQUIRED"
+      ]
+    },
+    {
+      "id": "p4-output-id-version",
+      "golden": "contracts/goldens/v1/p4-output-id-version.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-VERSION"
+      ]
+    },
+    {
+      "id": "p4-output-id-validate",
+      "golden": "contracts/goldens/v1/p4-output-id-validate.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-VALIDATE"
+      ]
+    },
+    {
+      "id": "p4-output-id-format",
+      "golden": "contracts/goldens/v1/p4-output-id-format.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-FORMAT"
+      ]
+    },
+    {
+      "id": "p4-output-id-thread-list",
+      "golden": "contracts/goldens/v1/p4-output-id-thread-list.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-THREAD-LIST"
+      ]
+    },
+    {
+      "id": "p4-output-id-thread-get",
+      "golden": "contracts/goldens/v1/p4-output-id-thread-get.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-THREAD-GET"
+      ]
+    },
+    {
+      "id": "p4-output-id-thread-move",
+      "golden": "contracts/goldens/v1/p4-output-id-thread-move.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-THREAD-MOVE"
+      ]
+    },
+    {
+      "id": "p4-output-id-thread-delete",
+      "golden": "contracts/goldens/v1/p4-output-id-thread-delete.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-THREAD-DELETE"
+      ]
+    },
+    {
+      "id": "p4-output-id-message-update",
+      "golden": "contracts/goldens/v1/p4-output-id-message-update.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-MESSAGE-UPDATE"
+      ]
+    },
+    {
+      "id": "p4-output-id-message-delete",
+      "golden": "contracts/goldens/v1/p4-output-id-message-delete.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-MESSAGE-DELETE"
+      ]
+    },
+    {
+      "id": "p4-output-id-apply",
+      "golden": "contracts/goldens/v1/p4-output-id-apply.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-ID-APPLY"
+      ]
+    },
+    {
+      "id": "p4-output-none-version",
+      "golden": "contracts/goldens/v1/p4-output-none-version.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-NONE-VERSION"
+      ]
+    },
+    {
+      "id": "p4-output-none-validate",
+      "golden": "contracts/goldens/v1/p4-output-none-validate.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-NONE-VALIDATE"
+      ]
+    },
+    {
+      "id": "p4-output-none-thread-list",
+      "golden": "contracts/goldens/v1/p4-output-none-thread-list.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-NONE-THREAD-LIST"
+      ]
+    },
+    {
+      "id": "p4-output-none-thread-get",
+      "golden": "contracts/goldens/v1/p4-output-none-thread-get.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-OUTPUT-NONE-THREAD-GET"
+      ]
+    },
+    {
+      "id": "p4-validate-text",
+      "golden": "contracts/goldens/v1/p4-validate-text.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-VALIDATE-TEXT"
+      ]
+    },
+    {
+      "id": "p4-validate-json",
+      "golden": "contracts/goldens/v1/p4-validate-json.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-VALIDATE-JSON"
+      ]
+    },
+    {
+      "id": "p4-validate-default",
+      "golden": "contracts/goldens/v1/p4-validate-default.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-VALIDATE-DEFAULT"
+      ]
+    },
+    {
+      "id": "p4-format-text",
+      "golden": "contracts/goldens/v1/p4-format-text.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FORMAT-TEXT"
+      ]
+    },
+    {
+      "id": "p4-format-json",
+      "golden": "contracts/goldens/v1/p4-format-json.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FORMAT-JSON"
+      ]
+    },
+    {
+      "id": "p4-format-default",
+      "golden": "contracts/goldens/v1/p4-format-default.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FORMAT-DEFAULT"
+      ]
+    },
+    {
+      "id": "p4-fix-text",
+      "golden": "contracts/goldens/v1/p4-fix-text.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FIX-TEXT"
+      ]
+    },
+    {
+      "id": "p4-fix-json",
+      "golden": "contracts/goldens/v1/p4-fix-json.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FIX-JSON"
+      ]
+    },
+    {
+      "id": "p4-fix-default",
+      "golden": "contracts/goldens/v1/p4-fix-default.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-FIX-DEFAULT"
+      ]
+    },
+    {
+      "id": "p4-thread-list-text",
+      "golden": "contracts/goldens/v1/p4-thread-list-text.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-LIST-TEXT"
+      ]
+    },
+    {
+      "id": "p4-thread-list-json",
+      "golden": "contracts/goldens/v1/p4-thread-list-json.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-LIST-JSON"
+      ]
+    },
+    {
+      "id": "p4-thread-list-default",
+      "golden": "contracts/goldens/v1/p4-thread-list-default.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-LIST-DEFAULT"
+      ]
+    },
+    {
+      "id": "p4-version-default",
+      "golden": "contracts/goldens/v1/p4-version-default.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-VERSION-DEFAULT"
+      ]
+    },
+    {
+      "id": "p4-version-text",
+      "golden": "contracts/goldens/v1/p4-version-text.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-VERSION-TEXT"
+      ]
+    },
+    {
+      "id": "p4-version-json",
+      "golden": "contracts/goldens/v1/p4-version-json.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-VERSION-JSON"
+      ]
+    },
+    {
+      "id": "p4-apply-protocol-missing",
+      "golden": "contracts/goldens/v1/p4-apply-protocol-missing.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-APPLY-PROTOCOL-MISSING"
+      ]
+    },
+    {
+      "id": "p4-thread-get-not-found",
+      "golden": "contracts/goldens/v1/p4-thread-get-not-found.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-GET-NOT-FOUND"
+      ]
+    },
+    {
+      "id": "p4-thread-move-not-found",
+      "golden": "contracts/goldens/v1/p4-thread-move-not-found.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-MOVE-NOT-FOUND"
+      ]
+    },
+    {
+      "id": "p4-thread-delete-not-found",
+      "golden": "contracts/goldens/v1/p4-thread-delete-not-found.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-DELETE-NOT-FOUND"
+      ]
+    },
+    {
+      "id": "p4-message-add-not-found",
+      "golden": "contracts/goldens/v1/p4-message-add-not-found.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-ADD-NOT-FOUND"
+      ]
+    },
+    {
+      "id": "p4-message-update-not-found",
+      "golden": "contracts/goldens/v1/p4-message-update-not-found.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-UPDATE-NOT-FOUND"
+      ]
+    },
+    {
+      "id": "p4-message-delete-not-found",
+      "golden": "contracts/goldens/v1/p4-message-delete-not-found.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-DELETE-NOT-FOUND"
+      ]
+    },
+    {
+      "id": "p4-thread-create-precondition",
+      "golden": "contracts/goldens/v1/p4-thread-create-precondition.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-THREAD-CREATE-PRECONDITION"
+      ]
+    },
+    {
+      "id": "p4-message-add-precondition",
+      "golden": "contracts/goldens/v1/p4-message-add-precondition.json",
+      "requirements": [
+        "V1-CLI-SURFACE"
+      ],
+      "coverage": [
+        "BHV-P4-MESSAGE-ADD-PRECONDITION"
+      ]
+    },
+    {
+      "id": "generated-output-id-thread-create",
+      "golden": "contracts/goldens/v1/generated-output-id-thread-create.json",
+      "requirements": [
+        "V1-CLI-SURFACE",
+        "V1-CLI-MUTATE",
+        "V1-SRC-MUT",
+        "V1-DOM-ID"
+      ],
+      "coverage": [
+        "BHV-CLI-GENERATED-OUTPUT-ID-THREAD-CREATE"
+      ]
+    },
+    {
+      "id": "generated-output-id-message-add",
+      "golden": "contracts/goldens/v1/generated-output-id-message-add.json",
+      "requirements": [
+        "V1-CLI-SURFACE",
+        "V1-CLI-MUTATE",
+        "V1-DOM-ID"
+      ],
+      "coverage": [
+        "BHV-CLI-GENERATED-OUTPUT-ID-MESSAGE-ADD"
+      ]
+    },
+    {
+      "id": "repair-fix-write-generated-id",
+      "golden": "contracts/goldens/v1/repair-fix-write-generated-id.json",
+      "requirements": [
+        "V1-FMT-REPAIR",
+        "V1-CLI-FORMAT",
+        "V1-DOM-ID"
+      ],
+      "coverage": [
+        "BHV-FMT-REPAIR-FIX-WRITE-GENERATED-ID"
+      ]
+    }
+  ]
+}

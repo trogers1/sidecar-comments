@@ -1,0 +1,45 @@
+{
+  "fixture_version": 1,
+  "id": "repair-fix-check",
+  "requirements": [
+    "V1-FMT-REPAIR",
+    "V1-CLI-FORMAT"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "fix",
+    "--add-missing-message-ids",
+    "--file",
+    "a.txt.comments",
+    "--check"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.txt.comments",
+        "kind": "file",
+        "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlcgpQbGVhc2UgZXhwbGFpbiB0aGlzLgpbL0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDFdCg==",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 3,
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "a.txt.comments",
+          "kind": "file",
+          "bytes_b64": "W0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDEgbG9zdF0KLS0tdXNlcgpQbGVhc2UgZXhwbGFpbiB0aGlzLgpbL0B0aF8wMThmMDAwMC0wMDAwLTcwMDAtODAwMC0wMDAwMDAwMDAwMDFdCg==",
+          "mode": "0600"
+        }
+      ]
+    },
+    "stdout_template": "{\"protocol\":1,\"command\":\"fix\",\"changed\":false,\"result\":{\"assignments\":[],\"storage_revision\":\"{{sha256:initial:a.txt.comments}}\",\"canonical_revision\":null}}\n"
+  },
+  "env": []
+}

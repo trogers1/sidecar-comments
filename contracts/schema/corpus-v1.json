@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/trogers1/sidecar-comments/contracts/schema/corpus-v1.json",
+  "title": "Sidecar Comments v1 executable black-box corpus",
+  "description": "Fixtures are declarative filesystem/process cases. stdout_template and stderr_template are expanded only by runner.templates before byte comparison and JSON protocol validation. UUIDV7 bind/ref templates are permitted only in expected streams and expected final regular-file bytes_template; they are never fixture inputs.",
+  "$defs": {
+    "base64": {
+      "type": "string",
+      "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._/-]+$"
+    },
+    "entry": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {"path":{"$ref":"#/$defs/path"},"kind":{"const":"file"},"bytes_b64":{"$ref":"#/$defs/base64"},"bytes_template":{"type":"string"},"mode":{"enum":["0000","0600","0644","0755"]}},
+          "required": ["path","kind","mode"],
+          "oneOf":[{"required":["bytes_b64"]},{"required":["bytes_template"]}],
+          "not":{"required":["bytes_b64","bytes_template"]},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {"path":{"$ref":"#/$defs/path"},"kind":{"const":"directory"},"mode":{"enum":["0000","0600","0644","0755"]}},
+          "required": ["path","kind","mode"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {"path":{"$ref":"#/$defs/path"},"kind":{"const":"symlink"},"target":{"$ref":"#/$defs/path"}},
+          "required": ["path","kind","target"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {"path":{"$ref":"#/$defs/path"},"kind":{"const":"hardlink"},"target":{"$ref":"#/$defs/path"}},
+          "required": ["path","kind","target"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "fs": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entry"
+          }
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "additionalProperties": false
+    },
+    "expected": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "stdout_b64": {
+          "$ref": "#/$defs/base64"
+        },
+        "stdout_template": {
+          "type": "string"
+        },
+        "stderr_b64": {
+          "$ref": "#/$defs/base64"
+        },
+        "stderr_template": {
+          "type": "string"
+        },
+        "invocation_error": {
+          "const": "argv"
+        },
+        "final_fs": {
+          "$ref": "#/$defs/fs"
+        }
+      },
+      "required": [
+        "status",
+        "final_fs"
+      ],
+      "allOf": [
+        {"oneOf":[{"required":["stdout_b64"]},{"required":["stdout_template"]}]},
+        {"not":{"required":["stdout_b64","stdout_template"]}},
+        {"oneOf":[{"required":["stderr_b64"]},{"required":["stderr_template"]}]},
+        {"not":{"required":["stderr_b64","stderr_template"]}}
+      ],
+      "additionalProperties": false
+    },
+    "golden": {
+      "type": "object",
+      "properties": {
+        "fixture_version": {
+          "const": 1
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^V1-[A-Z0-9-]+$"
+          }
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stdin_b64": {
+          "$ref": "#/$defs/base64"
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "writer_platform",
+              "symlink",
+              "directory",
+              "hardlink",
+              "permission",
+              "stdin",
+              "process",
+              "fault_injection",
+              "large_input"
+            ]
+          }
+        },
+        "initial_fs": {
+          "$ref": "#/$defs/fs"
+        },
+        "expect": {
+          "$ref": "#/$defs/expected"
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[^=]+$"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "fixture_version",
+        "id",
+        "requirements",
+        "argv",
+        "env",
+        "stdin_b64",
+        "requires",
+        "initial_fs",
+        "expect"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "corpus_version": {
+      "const": 1
+    },
+    "schema": {
+      "const": "contracts/schema/corpus-v1.json"
+    },
+    "protocol_schema": {
+      "const": "contracts/schema/v1.json"
+    },
+    "runner": {
+      "type": "object",
+      "properties": {
+        "default_bin": {
+          "type": "string"
+        },
+        "env_bin": {
+          "const": "SIDECAR_BIN"
+        },
+        "cli_version_env": {
+          "const": "SIDECAR_CLI_VERSION"
+        },
+        "comparison": {
+          "const": "byte-exact after approved template expansion"
+        },
+        "template_version": {
+          "const": 1
+        },
+        "templates": {
+          "type": "object",
+          "properties": {
+            "sha256:initial:PATH": {
+              "type": "string"
+            },
+            "sha256:final:PATH": {
+              "type": "string"
+            },
+            "CLI_VERSION": {
+              "type": "string"
+            },
+            "UUIDV7:bind:NAME": {
+              "type": "string"
+            },
+            "UUIDV7:ref:NAME": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "CLI_VERSION",
+            "sha256:initial:PATH",
+            "sha256:final:PATH",
+            "UUIDV7:bind:NAME",
+            "UUIDV7:ref:NAME"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "default_bin",
+        "env_bin",
+        "cli_version_env",
+        "comparison",
+        "template_version",
+        "templates"
+      ],
+      "additionalProperties": false
+    },
+    "requirements": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "pattern": "^docs/v1/"
+          },
+          "subject": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "source",
+          "subject"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "fixtures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "golden": {
+            "type": "string",
+            "pattern": "^contracts/goldens/v1/[a-z0-9-]+\\.json$"
+          },
+          "requirements": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "coverage": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^BHV-[A-Z0-9-]+$"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "golden",
+          "requirements",
+          "coverage"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "corpus_version",
+    "schema",
+    "protocol_schema",
+    "runner",
+    "requirements",
+    "fixtures"
+  ],
+  "additionalProperties": false
+}

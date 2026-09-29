@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/trogers1/sidecar-comments/contracts/schema/obligations-v2.json",
+  "title": "Sidecar Comments SHADOW v2 obligation ledger",
+  "description": "Traceability-only ledger. A status records planning review and is not evidence of conformance, execution, or proof.",
+  "type": "object",
+  "properties": {
+    "ledger_version": {"const": 2},
+    "mode": {"const": "shadow_traceability_only"},
+    "v1_inventory": {"const": "contracts/behavior-inventory-v1.json"},
+    "required_red_registry": {"const": "contracts/packs/required-red-v1.json"},
+    "obligations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/obligation"}
+    }
+  },
+  "required": ["ledger_version", "mode", "v1_inventory", "required_red_registry", "obligations"],
+  "additionalProperties": false,
+  "$defs": {
+    "id": {"type": "string", "pattern": "^(?:SHADOW-V2|BHV-RED)-[A-Z0-9-]+$"},
+    "legacy": {"type": "string", "pattern": "^(?:BHV-[A-Z0-9-]+|P(?:6|8|9|10|11|12)-[A-Z0-9-]+)$"},
+    "source": {"type": "string", "pattern": "^(?:docs/v1|contracts/packs)/[A-Za-z0-9._/-]+(?:#[A-Za-z0-9._/-]+)?$"},
+    "obligation": {
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["v1_required_red", "registered_pack_scenario", "omission"]},
+        "legacy_id": {"$ref": "#/$defs/legacy"},
+        "aliases": {"type": "array", "items": {"$ref": "#/$defs/legacy"}},
+        "status": {"enum": ["pending", "not_applicable"]},
+        "reviewed": {"type": "boolean"},
+        "rationale": {"type": "string", "minLength": 1},
+        "normative_source": {"$ref": "#/$defs/source"},
+        "coverage_category": {"enum": ["architecture", "compatibility", "neovim", "body_transport", "output_results", "storage", "source"]}
+      },
+      "required": ["id", "kind", "aliases", "status", "reviewed", "rationale", "normative_source"],
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "omission"}}, "required": ["kind"]},
+          "then": {"required": ["coverage_category"]},
+          "else": {"not": {"required": ["coverage_category"]}}
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

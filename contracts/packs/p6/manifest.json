@@ -1,0 +1,36 @@
+{
+  "pack_version": 1,
+  "id": "p6-source-location-red",
+  "kind": "red",
+  "schema": "contracts/schema/corpus-v1.json",
+  "integration": "registered as granular REQUIRED_RED scenarios in contracts/packs/required-red-v1.json; not a direct corpus fixture until its complete fixture contract is registered",
+  "requirements": ["V1-SRC-LOC", "V1-SRC-VAL", "V1-SRC-MUT", "V1-CLI-MUTATE", "V1-CLI-APPLY", "V1-STORE-TXN"],
+  "goldens": [
+    "contracts/packs/p6/goldens/p6-location-file.json",
+    "contracts/packs/p6/goldens/p6-location-line-rune-boundary.json",
+    "contracts/packs/p6/goldens/p6-location-range-crlf-anchor.json",
+    "contracts/packs/p6/goldens/p6-location-lost-no-source.json",
+    "contracts/packs/p6/goldens/p6-source-missing.json",
+    "contracts/packs/p6/goldens/p6-source-directory.json",
+    "contracts/packs/p6/goldens/p6-source-symlink.json",
+    "contracts/packs/p6/goldens/p6-source-bom.json",
+    "contracts/packs/p6/goldens/p6-source-invalid-utf8.json",
+    "contracts/packs/p6/goldens/p6-source-nul.json",
+    "contracts/packs/p6/goldens/p6-source-mixed-endings.json",
+    "contracts/packs/p6/goldens/p6-source-implicit-prelock.json"
+  ],
+  "planned_coverage": {
+    "location_union": ["file", "line", "range", "lost"],
+    "location_malformed": ["unknown-kind", "zero-line", "zero-column", "reversed-range", "malformed-anchor", "empty-anchor", "invalid-anchor-utf8", "anchor-over-4096"],
+    "coordinates": ["one-based-byte", "multibyte-rune-boundary", "end-column", "out-of-line", "out-of-column", "empty-source-line", "unterminated-final-line", "multiline-logical-lf"],
+    "source": ["missing", "directory", "symlink", "bom", "nul", "invalid-utf8", "bare-cr", "mixed-lf-crlf", "lf", "crlf", "no-terminator", "empty", "size-at-limit", "size-plus-one"],
+    "anchor": ["single-line", "multiline", "crlf-normalized", "mismatch"],
+    "mutation_validation": ["implicit-pre-lock", "implicit-post-lock", "explicit-pre-lock", "explicit-post-lock", "apply-implicit-pre-lock", "apply-implicit-post-lock"]
+  },
+  "known_gaps": [
+    "The current corpus fixture schema has no mutation/interleaving primitive. Post-lock source replacement cannot be expressed or executed without a controlled actor; it remains a required fault-injection case rather than a falsely passing fixture.",
+    "The schema permits only inline base64 initial bytes. Exact 16 MiB and 16 MiB+1 source fixtures would add more than 44 MiB of duplicated JSON to this contribution. They are specified obligations but intentionally not materialized here until the runner supports deterministic fixture blobs.",
+    "Malformed locations, coordinate failures, and anchor mismatch remain REQUIRED_RED until direct fixtures are added. Their public symbols are now normative in docs/v1/source-and-location.md and docs/v1/schema/v1.json; this pack does not invent alternate outputs.",
+    "The checked-in executable fixture subset below is deliberately independent of the central corpus and inventory, as required; it is not automatically run by the current runner."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "fixture_version": 1,
+  "id": "zero-format-check",
+  "requirements": [
+    "V1-FMT-EMPTY",
+    "V1-CLI-FORMAT"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "format",
+    "--file",
+    "a.txt.comments",
+    "--check"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": [
+      {
+        "path": "a.txt.comments",
+        "kind": "file",
+        "bytes_b64": "",
+        "mode": "0600"
+      }
+    ]
+  },
+  "expect": {
+    "status": 3,
+    "stdout_b64": "eyJwcm90b2NvbCI6MSwiY29tbWFuZCI6ImZvcm1hdCIsImNoYW5nZWQiOmZhbHNlLCJyZXN1bHQiOnsiZm9ybWF0dGVkIjpmYWxzZSwic3RvcmFnZV9yZXZpc2lvbiI6InNoYTI1NjplM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiY2Fub25pY2FsX3JldmlzaW9uIjoic2hhMjU2OmUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifX0K",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": [
+        {
+          "path": "a.txt.comments",
+          "kind": "file",
+          "bytes_b64": "",
+          "mode": "0600"
+        }
+      ]
+    }
+  },
+  "env": []
+}

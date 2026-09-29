@@ -1,0 +1,1 @@
+{"case":"P8-TARGET-HARDLINK","setup":{"target":"regular-hardlink","peer":"a.txt.comments.peer"},"command":"format --file a.txt.comments","expect":{"status":3,"error":"validation:target_type","details":{"path":"target_type","reason":"hardlink"},"unchanged":["target","peer"]}}

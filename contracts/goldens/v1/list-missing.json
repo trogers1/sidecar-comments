@@ -1,0 +1,30 @@
+{
+  "fixture_version": 1,
+  "id": "list-missing",
+  "requirements": [
+    "V1-CLI-READ",
+    "V1-PRO-DTO"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "thread",
+    "list",
+    "--file",
+    "a.txt.comments"
+  ],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 0,
+    "stdout_b64": "eyJwcm90b2NvbCI6MSwiY29tbWFuZCI6InRocmVhZC1saXN0IiwiY2hhbmdlZCI6ZmFsc2UsInJlc3VsdCI6eyJ0aHJlYWRzIjpbXSwid2FybmluZ3MiOltdLCJzdG9yYWdlX3JldmlzaW9uIjpudWxsLCJjYW5vbmljYWxfcmV2aXNpb24iOiJzaGEyNTY6ZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9fQo=",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": []
+    }
+  },
+  "env": []
+}
