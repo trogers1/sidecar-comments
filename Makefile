@@ -22,19 +22,19 @@ test-cli-subject:
 contracts-check contract-artifacts:
 	@$(GO) run ./contracts/schema/check.go
 
-# Pre-implementation build: only the independent black-box harness and its
-# intentionally nonconformant subject are buildable; no Sidecar is produced.
+# Build the production CLI alongside the independent contract harness.
 build: contracts-check
 	@set -e; out="$$(mktemp -d "$${TMPDIR:-/tmp}/sidecar-build.XXXXXX")"; trap 'rm -rf "$$out"' EXIT; \
+		$(GO) build -o "$$out/sidecar" ./cmd/sidecar; \
 		$(GO) build -o "$$out/sidecar-contract" ./contracts/runner/cmd; \
 		$(GO) build -o "$$out/conforming" ./contracts/testbin/conforming; \
 		$(GO) build -o "$$out/nonconformant" ./contracts/testbin/nonconformant; \
-		mkdir -p bin; cp "$$out/sidecar-contract" bin/sidecar-contract; cp "$$out/conforming" bin/conforming; cp "$$out/nonconformant" bin/nonconformant
+		mkdir -p bin; cp "$$out/sidecar" bin/sidecar; cp "$$out/sidecar-contract" bin/sidecar-contract; cp "$$out/conforming" bin/conforming; cp "$$out/nonconformant" bin/nonconformant
 
 # This is a real external-binary gate. It never substitutes the test binary.
 test-contract: contracts-check
-	@test -n "$(SIDECAR_BIN)" || (printf '%s\n' 'SIDECAR_BIN is required: no production Sidecar exists in this pre-implementation repository.' >&2; exit 2)
-	@SIDECAR_BIN="$(SIDECAR_BIN)" $(GO) run ./contracts/runner/cmd
+	@test -n "$(SIDECAR_BIN)" || (printf '%s\n' 'SIDECAR_BIN is required: supply the production executable to verify.' >&2; exit 2)
+	@SIDECAR_BIN="$(SIDECAR_BIN)" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) run ./contracts/runner/cmd
 
 # Green means the harness successfully rejected the deliberately bad subject.
 # It is a runner self-test, not a release or complete-red-suite claim.
@@ -79,14 +79,14 @@ test-neovim:
 	@exit 2
 
 gofmt-check:
-	@files="$$(find contracts -name '*.go' -type f -print)"; test -z "$$($(GO)fmt -d $$files)" || (printf '%s\n' 'gofmt required; check is non-mutating' >&2; exit 1)
+	@files="$$(find cmd internal contracts tests -name '*.go' -type f -print)"; test -z "$$($(GO)fmt -d $$files)" || (printf '%s\n' 'gofmt required; check is non-mutating' >&2; exit 1)
 
 vet: contracts-check
 	@$(GO) vet ./...
 
 mod-tidy-check:
 	@set -e; dir="$$(mktemp -d "$${TMPDIR:-/tmp}/sidecar-tidy.XXXXXX")"; trap 'rm -rf "$$dir"' EXIT; \
-		cp go.mod go.sum "$$dir"/; cp -R contracts "$$dir"/contracts; \
+		cp go.mod go.sum "$$dir"/; cp -R contracts "$$dir"/contracts; cp -R cmd internal "$$dir"/; \
 		(cd "$$dir" && $(GO) mod tidy); \
 		cmp -s go.mod "$$dir/go.mod" && cmp -s go.sum "$$dir/go.sum" || (printf '%s\n' 'go.mod/go.sum are not tidy; tracked files were not modified' >&2; exit 1)
 

@@ -1,8 +1,33 @@
 # Sidecar Comments
 
-> **Status: v1 normative specification only.** This checkout intentionally contains no production CLI, parser, storage layer, or Neovim implementation.
+> **Status: v1 CLI implementation in progress.** The normative specification remains authoritative. CLI verification results must be assessed separately from the independent contract harness; the Neovim adapter is not implemented.
 
 Sidecar Comments stores structured review threads in a colocated Markdown-like sidecar. A source file `a.go` maps to `a.go.comments`; the format is deliberately strict, deterministic, and independently implementable.
+
+## Build and CLI verification
+
+Go **1.27.1** is required (see `mise.toml`). Build the production CLI with:
+
+```sh
+make build
+./bin/sidecar --output json version
+```
+
+Run the public-process CLI suite against that executable:
+
+```sh
+SIDECAR_BIN="$PWD/bin/sidecar" go test ./tests/cli -run '^(TestSubject.*|TestFormatLifecycle)$' -count=1 -timeout=120s
+```
+
+Run the separate contract corpus with an independently supplied expected build version (`1.0.0` for the current CLI):
+
+```sh
+SIDECAR_BIN="$PWD/bin/sidecar" SIDECAR_CLI_VERSION=1.0.0 make test-contract
+```
+
+The runner's `{{CLI_VERSION}}` templates use `SIDECAR_CLI_VERSION` (or its `-cli-version` option); without either, the runner defaults the expected version to `dev`. Do not obtain the expected value from the subject's output or make production read this harness-only setting.
+
+This focused suite is not a claim that all v1 release gates, platforms, or fault scenarios are covered. The broader release targets remain fail-closed for capabilities that have not been implemented.
 
 ## v1 documents
 
@@ -32,9 +57,9 @@ GitLab fields are immutable descriptive metadata; v1 provides no GitLab client, 
 
 **Toolchain amendment:** this v1 contract supersedes the Go 1.26 reference in `plans/initial.md`; all v1 implementation and conformance work uses the committed Go **1.27.1** toolchain below.
 
-The future implementation uses module `github.com/trogers1/sidecar-comments`, Go **1.27.1** provisioned through `mise`, and Neovim **0.12**. Mutation support is limited to `darwin/arm64` and `linux/amd64`; other platforms have documented read-only reduced support. `golang.org/x/text` is currently a tidy-resolved **indirect** dependency of the contracts harness through `github.com/santhosh-tekuri/jsonschema/v6`; its version and checksums are therefore tracked in `go.mod`/`go.sum`. It is not a production dependency and must not be imported by production code merely because it is present transitively. A future implementation may promote `golang.org/x/text/unicode/norm` to an exact-pinned **direct** dependency only when implementing the normative NFC verifier; that change must document the version, checksums, and Unicode data version.
+The future implementation uses module `github.com/trogers1/sidecar-comments`, Go **1.27.1** provisioned through `mise`, and Neovim **0.12**. Mutation support is limited to `darwin/arm64` and `linux/amd64`; other platforms have documented read-only reduced support. `golang.org/x/text` **v0.14.0** is an exact-pinned direct dependency, used by production exclusively through `unicode/norm` for NFC verification. Its module and checksum entries remain in `go.mod` and `go.sum`; promotion from indirect did not change the pinned version or checksums. This version's normalization tables report Unicode **15.0.0**. That table version is distinct from the specification's Unicode 16.0.0 control/whitespace property requirement; the dependency promotion does not amend that requirement.
 
-The sole current direct third-party dependency is `github.com/santhosh-tekuri/jsonschema/v6` at the version and checksums in `go.mod`/`go.sum`. It is user-authorized for contracts only: `contracts/runner` uses it to validate Draft 2020-12 schemas, fixtures, and observed child JSON. Its `golang.org/x/text` dependency is likewise harness-only. Neither library may be imported by production `cmd/sidecar`, `internal/`, or Lua code.
+The contracts-only third-party dependency is `github.com/santhosh-tekuri/jsonschema/v6` at the version and checksums in `go.mod`/`go.sum`. It is user-authorized for contracts only: `contracts/runner` uses it to validate Draft 2020-12 schemas, fixtures, and observed child JSON. Its transitive use of `golang.org/x/text` is separate from production's narrowly authorized NFC-verifier import. `jsonschema` may not be imported by production `cmd/sidecar`, `internal/`, or Lua code; `x/text/unicode/norm` has only the NFC-verifier exception described above.
 
 ## Implementation posture
 

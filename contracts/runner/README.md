@@ -48,11 +48,17 @@ path:
 
 ```sh
 make test-contract-red
-make test-contract SIDECAR_BIN=/absolute/path/to/sidecar
+make test-contract SIDECAR_BIN=/absolute/path/to/sidecar SIDECAR_CLI_VERSION=1.0.0
 ```
 
-This repository is pre-implementation. `make build` builds only the harness;
-`make preimplementation-check` is the green harness-only gate. `make full-red`,
+Supply the independently known expected build version through `SIDECAR_CLI_VERSION`
+or the runner's `-cli-version` option. The `{{CLI_VERSION}}` template defaults to
+`dev` if neither is provided; the current production CLI reports `1.0.0`.
+This setting belongs to the harness, not the production process.
+
+`make build` builds the production CLI and contract harness binaries.
+`make preimplementation-check` retains its historical name; it does not establish
+complete production conformance. `make full-red`,
 `make release`, and the legacy `make check` release alias intentionally remain
 non-green while the inventory's explicit `required_red` fixture packs are
 unavailable; none claims that the partial seed corpus is full coverage.
