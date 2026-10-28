@@ -14,6 +14,14 @@ import (
 	"time"
 )
 
+type failureStream uint8
+
+const (
+	noStreamFailure failureStream = iota
+	stdoutFailure
+	stderrFailure
+)
+
 type runRequest struct {
 	Binary      string
 	Args        []string
@@ -21,6 +29,7 @@ type runRequest struct {
 	Stdin       []byte
 	Timeout     time.Duration
 	OutputLimit int
+	FailOutput  failureStream
 }
 
 type processResult struct {
@@ -69,22 +78,52 @@ func runProcess(r runRequest) (processResult, error) {
 	stdout := &boundedOutput{limit: r.OutputLimit, overflow: overflow}
 	stderr := &boundedOutput{limit: r.OutputLimit, overflow: overflow}
 	cmd.Stdout, cmd.Stderr = stdout, stderr
+	// A valid pipe with no reader deterministically fails writes with EPIPE.
+	// Closing descriptor 1/2 instead is unreliable: runtimes may repair them.
+	var failedOutput *os.File
+	switch r.FailOutput {
+	case noStreamFailure:
+	case stdoutFailure, stderrFailure:
+		reader, writer, err := os.Pipe()
+		if err != nil {
+			return processResult{}, fmt.Errorf("create failed output pipe: %w", err)
+		}
+		if err := reader.Close(); err != nil {
+			return processResult{}, errors.Join(fmt.Errorf("close failed output reader: %w", err), writer.Close())
+		}
+		failedOutput = writer
+		if r.FailOutput == stdoutFailure {
+			cmd.Stdout = writer
+		} else {
+			cmd.Stderr = writer
+		}
+	default:
+		return processResult{}, errors.New("unknown output failure stream")
+	}
 	if err := cmd.Start(); err != nil {
+		if failedOutput != nil {
+			err = errors.Join(err, failedOutput.Close())
+		}
 		return processResult{}, fmt.Errorf("start process: %w", err)
+	}
+	var pipeCloseErr error
+	if failedOutput != nil {
+		pipeCloseErr = failedOutput.Close()
 	}
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait() }()
 	timer := time.NewTimer(r.Timeout)
 	defer timer.Stop()
-	var waitErr, boundaryErr error
+	var waitErr error
+	boundaryErr := pipeCloseErr
 	waited := false
 	select {
 	case waitErr = <-done:
 		waited = true
 	case <-timer.C:
-		boundaryErr = errors.New("process timeout")
+		boundaryErr = errors.Join(boundaryErr, errors.New("process timeout"))
 	case <-overflow:
-		boundaryErr = errors.New("process output exceeds limit")
+		boundaryErr = errors.Join(boundaryErr, errors.New("process output exceeds limit"))
 	}
 	// Also kill lingering descendants after an ordinary parent exit. Always
 	// reap the direct child and join stream copies before observing output.
