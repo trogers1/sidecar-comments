@@ -487,6 +487,17 @@
       ]
     },
     {
+      "id": "apply-protocol-empty",
+      "golden": "contracts/goldens/v1/apply-protocol-empty.json",
+      "requirements": [
+        "V1-CLI-APPLY",
+        "V1-PRO-APPLY"
+      ],
+      "coverage": [
+        "BHV-APPLY-PROTOCOL-EMPTY-PRECEDENCE"
+      ]
+    },
+    {
       "id": "apply-unknown",
       "golden": "contracts/goldens/v1/apply-unknown.json",
       "requirements": [

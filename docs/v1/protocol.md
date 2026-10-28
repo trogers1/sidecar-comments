@@ -68,6 +68,27 @@ The string enums for every field in that table are normative in the schema. `ind
 
 Error precedence is: (1) argv and bounded request/body/metadata input syntax and DTO tokens (`usage`); (2) target/source secure classification and bounded reads (`validation` for target name, symlink/type/size/content; `io {operation:"open",path:"source"}` for a missing or unreadable required source and `io` for other open/read failure); (3) lock setup (timeout `conflict:lock_timeout`, invalid lock object `validation:lock_type`, other failure `io`); (4) locked reread and revision (`conflict:revision` before content semantics); (5) locked structural/repair state; (6) required source revalidation; (7) single or indexed sequential operation semantics; (8) precommit identity conflict (`conflict:identity_changed`); (9) commit/durability outcome.
 
+### Delivery and unexpected internal failures
+
+A failure to write any stdout or stderr bytes, or an unexpected internal error that has no truthful representation in the public error schema, terminates with exit 7. The CLI checks delivery errors, makes no further public-output attempts after such a failure, and emits no new or second protocol envelope. Already delivered partial bytes cannot be retracted. This policy applies before mutation, after a durable commit, and while delivering an error diagnostic. It does not imply rollback: after an uncertain delivery outcome, callers must reread state before deciding whether to retry, and must never blindly replay a generated-ID mutation.
+
+Expected boundary failures retain their existing typed error mappings. Unexpected error details may be recorded through an explicitly configured private diagnostic sink, never stdout or stderr; diagnostic recording must be bounded and nonrecursive, and its failure cannot trigger public output. Post-durability best-effort storage cleanup remains governed by the durable-success rule in [storage-security](storage-security.md), not reclassified as a delivery failure.
+
+### Specific input diagnostics
+
+The following mappings are normative; text mode renders the same code and message using its error-line grammar.
+
+| Input failure | Code / exit | Details |
+|---|---|---|
+| Repeated global `--output` selector before the command | `usage` / 2 | `{field:"output",reason:"repeated"}` |
+| Missing required command flag, including `--operations-file` for apply | `usage` / 2 | `{field:"argv",reason:"required"}` |
+| Malformed or incomplete apply request DTO, including an absent `protocol` member | `usage` / 2 | `{field:"operations",reason:"malformed"}` |
+| Leading UTF-8 BOM in target bytes | `validation` / 3 | `{path:"target_encoding",reason:"bom"}` |
+
+For repeated global output selectors, the first selector determines error rendering; a later selector does not override it. These specific mappings do not change error precedence or authorize filesystem access for an invalid request.
+
 ## Apply request
+
+Request syntax, token kinds, required members, and the closed operation shapes (including the 1–256 operation bound) are validated before unsupported-version dispatch. A missing, null, or incorrectly typed `protocol` is usage exit 2. An explicitly supplied positive integer protocol other than 1 returns `unsupported:protocol` exit 8 only when the rest of the request satisfies the v1 request shape; operations are not executed. Thus `{"protocol":2,"operations":[]}` is usage exit 2, while protocol 2 with an otherwise valid nonempty operation array is unsupported exit 8.
 
 `ApplyRequest` is exactly `{protocol:1,if_revision?:Revision|"missing",operations:[Operation,...]}`. It is token-validated before locking, bounded to 1 MiB and 1–256 operations, and a top-level request revision must equal a CLI revision if both are supplied. Apply `body` is already logical UTF-8: it has no CR or NUL, is not line-ending-normalized, and never loses a final LF. Operations are the six closed schema variants and all explicit IDs are required. They execute sequentially against one working copy; failure returns its typed indexed error and commits nothing.

@@ -41,6 +41,7 @@ func TestSchemaBoundary(t *testing.T) {
 	}{
 		{"version", `{"protocol":1,"command":"version","changed":false,"result":{"cli_version":"test","format_version":1,"protocol":1}}`, true},
 		{"error", `{"protocol":1,"error":{"code":"usage","message":"usage:argv:missing","details":{"field":"argv","reason":"missing"}}}`, true},
+		{name: "utf8_error", json: `{"protocol":1,"error":{"code":"validation","message":"validation:target_encoding:utf8","details":{"path":"target_encoding","reason":"utf8"}}}`, valid: true},
 		{"unknown_member", `{"protocol":1,"command":"version","changed":false,"extra":true,"result":{"cli_version":"test","format_version":1,"protocol":1}}`, false},
 		{"wrong_protocol", `{"protocol":2,"command":"version","changed":false,"result":{"cli_version":"test","format_version":1,"protocol":1}}`, false},
 		{"wrong_result", `{"protocol":1,"command":"version","changed":false,"result":{}}`, false},

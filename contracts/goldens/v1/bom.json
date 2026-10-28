@@ -27,7 +27,7 @@
   "expect": {
     "status": 3,
     "stdout_b64": "",
-    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\"}}}\n",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_encoding:bom\",\"details\":{\"path\":\"target_encoding\",\"reason\":\"bom\"}}}\n",
     "final_fs": {
       "entries": [
         {

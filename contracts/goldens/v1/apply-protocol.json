@@ -21,7 +21,7 @@
       {
         "path": "ops",
         "kind": "file",
-        "bytes_b64": "eyJwcm90b2NvbCI6IDIsICJvcGVyYXRpb25zIjogW119",
+        "bytes_b64": "eyJwcm90b2NvbCI6IDIsICJvcGVyYXRpb25zIjogW3sib3AiOiAidGhyZWFkX2RlbGV0ZSIsICJ0aHJlYWRfaWQiOiAiMDE4ZjAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn1dfQ==",
         "mode": "0600"
       }
     ]
@@ -35,7 +35,7 @@
         {
           "path": "ops",
           "kind": "file",
-          "bytes_b64": "eyJwcm90b2NvbCI6IDIsICJvcGVyYXRpb25zIjogW119",
+          "bytes_b64": "eyJwcm90b2NvbCI6IDIsICJvcGVyYXRpb25zIjogW3sib3AiOiAidGhyZWFkX2RlbGV0ZSIsICJ0aHJlYWRfaWQiOiAiMDE4ZjAwMDAtMDAwMC03MDAwLTgwMDAtMDAwMDAwMDAwMDAxIn1dfQ==",
           "mode": "0600"
         }
       ]

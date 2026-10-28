@@ -1757,7 +1757,7 @@
                 },
                 "message": {
                   "type": "string",
-                  "pattern": "^validation:[a-z_]+:[a-z_]+$"
+                  "pattern": "^validation:[a-z_]+:[a-z0-9_]+$"
                 },
                 "details": {
                   "$ref": "#/$defs/ValidationDetails"

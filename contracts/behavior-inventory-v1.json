@@ -227,6 +227,12 @@
       ]
     },
     {
+      "id": "BHV-APPLY-PROTOCOL-EMPTY-PRECEDENCE",
+      "fixtures": [
+        "apply-protocol-empty"
+      ]
+    },
+    {
       "id": "BHV-APPLY-UNKNOWN-OP",
       "fixtures": [
         "apply-unknown"

@@ -27,7 +27,7 @@
   "expect": {
     "status": 2,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6b3BlcmF0aW9uczpyZXF1aXJlZAo=",
+    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6b3BlcmF0aW9uczptYWxmb3JtZWQK",
     "final_fs": {
       "entries": [
         {
