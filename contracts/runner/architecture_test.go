@@ -29,7 +29,7 @@ func TestArchitectureBoundaries(t *testing.T) {
 	// Deliberately visit only source roots owned by this module. In particular,
 	// do not descend through ignored caches (such as .tmp/module-cache), Go
 	// toolchain testdata, or generated output that may happen to contain Go.
-	for _, sourceRoot := range []string{"contracts", "cmd", "internal"} {
+	for _, sourceRoot := range []string{"contracts", "cmd", "internal", "tests/cli"} {
 		directory := filepath.Join(root, sourceRoot)
 		if _, statErr := os.Stat(directory); os.IsNotExist(statErr) {
 			continue
@@ -98,8 +98,8 @@ func architectureViolations(rel string, data []byte, adapter string) ([]string, 
 	isProduction := !strings.HasSuffix(rel, "_test.go") && (strings.HasPrefix(rel, "cmd/") || strings.HasPrefix(rel, "internal/"))
 	for _, imported := range file.Imports {
 		importPath := strings.Trim(imported.Path.Value, "\"")
-		if importPath == "github.com/santhosh-tekuri/jsonschema/v6" && !isAdapter {
-			violations = append(violations, rel+": jsonschema import is reserved for "+adapter)
+		if importPath == "github.com/santhosh-tekuri/jsonschema/v6" && !isAdapter && rel != "tests/cli/schema_test.go" {
+			violations = append(violations, rel+": jsonschema import is reserved for "+adapter+" and tests/cli/schema_test.go")
 		}
 		if isContract && importsInternal(importPath) {
 			violations = append(violations, rel+": contracts must not import internal package "+importPath)

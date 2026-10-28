@@ -2,6 +2,23 @@
 
 GO := go
 
+.PHONY: test-cli-helpers test-cli-helpers-race vet-cli test-cli-subject
+
+# Stage A only: green helper/schema self-tests, no Sidecar behavior claim.
+test-cli-helpers:
+	@$(GO) test ./tests/cli -run '^(TestHelpers|TestHelper.*|TestSchemaBoundary)$$' -count=1 -timeout=30s
+
+test-cli-helpers-race:
+	@$(GO) test -race ./tests/cli -run '^(TestHelpers|TestHelper.*|TestSchemaBoundary)$$' -count=1 -timeout=30s
+
+vet-cli:
+	@$(GO) vet ./tests/cli
+
+# All simple real-public-CLI cases plus explicit availability gate.
+# No contracts runner, fake subject, fallback, or skip is used here.
+test-cli-subject:
+	@SIDECAR_BIN="$(SIDECAR_BIN)" $(GO) test ./tests/cli -run '^(TestSubject.*|TestFormatLifecycle)$$' -count=1 -timeout=120s
+
 contracts-check contract-artifacts:
 	@$(GO) run ./contracts/schema/check.go
 
