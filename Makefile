@@ -45,10 +45,12 @@ test: contracts-check require-sidecar-bin
 
 test-race: contracts-check require-sidecar-bin
 	@SIDECAR_BIN="$(SIDECAR_BIN)" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) test -race ./... -count=1 -timeout=240s
+	@bash scripts/race_subject_test.sh
 	@set -eu; out="$$(mktemp -d "$${TMPDIR:-/tmp}/sidecar-race.XXXXXX")"; trap 'rm -rf "$$out"' EXIT; \
 		$(GO) build -race -ldflags "-X github.com/trogers1/sidecar-comments/internal/cli.buildVersion=$(SIDECAR_CLI_VERSION)" -o "$$out/sidecar" ./cmd/sidecar; \
-		SIDECAR_BIN="$$out/sidecar" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) test ./tests/cli -count=1 -timeout=300s; \
-		SIDECAR_BIN="$$out/sidecar" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) run ./contracts/runner/cmd
+		cp scripts/race-subject.sh "$$out/subject"; chmod 700 "$$out/subject"; \
+		SIDECAR_BIN="$$out/subject" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) test ./tests/cli -count=1 -timeout=300s; \
+		SIDECAR_BIN="$$out/subject" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) run ./contracts/runner/cmd
 
 test-fuzz:
 	@$(GO) test ./internal/format -run '^$$' -fuzz '^FuzzParseDocument$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
@@ -76,7 +78,7 @@ test-release-scripts:
 	@bash scripts/release_test.sh
 
 gofmt-check:
-	@files="$$(find cmd internal contracts tests -name '*.go' -type f -print)"; test -z "$$($(GO)fmt -d $$files)" || (printf '%s\n' 'gofmt required; check is non-mutating' >&2; exit 1)
+	@files="$$(find cmd internal contracts tests scripts -name '*.go' -type f -print)"; test -z "$$($(GO)fmt -d $$files)" || (printf '%s\n' 'gofmt required; check is non-mutating' >&2; exit 1)
 
 vet: contracts-check
 	@$(GO) vet ./...

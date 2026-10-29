@@ -68,7 +68,12 @@ tests against the staged binary; the independent external executable corpus;
 all Go tests with the race detector; a separate race-instrumented CLI through
 all CLI tests and the independent corpus; and four production fuzz targets
 with one worker and five seconds each (override `FUZZ_TIME` explicitly for longer
-local runs). The race binary supplements, never replaces, staged-byte testing.
+local runs). The race binary supplements, never replaces, staged-byte testing. Its subprocess
+launcher sets only `atexit_sleep_ms=0`, removing the race detector's default
+one-second exit delay per CLI invocation while preserving other `GORACE` options.
+This also works for corpus children with exact environments. Package-level race
+checks are unchanged. A deliberately racy smoke fixture confirms the launcher
+still emits race diagnostics and propagates failing exit codes.
 The two format targets cover parsing and body round trips; the two domain
 targets cover location round trips and deterministic revisions.
 
