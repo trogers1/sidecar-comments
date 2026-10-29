@@ -22,6 +22,9 @@ type Request struct {
 	Args           []string
 	Stdin          io.Reader
 	Stdout, Stderr io.Writer
+	// A per-request constructor keeps transaction ordering tests deterministic
+	// without changing the real store or installing a global override.
+	begin func(store.BeginRequest) (*store.Transaction, error)
 }
 type config struct {
 	command, output, file, source, id, messageID, thread, location, kind, name, external, bodyFile, metadata, operations, revision, lastKind string
@@ -91,7 +94,7 @@ func Run(r Request) (exit int) {
 	c, err := parse(parseRequest{Args: r.Args})
 	var out outcome
 	if err == nil {
-		out, err = execute(execRequest{Config: c, Stdin: r.Stdin})
+		out, err = execute(execRequest{Config: c, Stdin: r.Stdin, Begin: r.begin})
 	}
 	var text string
 	writer := r.Stdout
@@ -330,12 +333,13 @@ type transactionCleanupRequest struct{}
 type execRequest struct {
 	Config config
 	Stdin  io.Reader
+	Begin  func(store.BeginRequest) (*store.Transaction, error)
 }
 
 func execute(r execRequest) (out outcome, err error) {
 	c := r.Config
 	if c.command == "version" {
-		out.Bytes = raw(rawRequest[versionResult]{Value: versionResult{CLIVersion: "1.0.0", FormatVersion: domain.FormatVersion, Protocol: domain.ProtocolVersion}})
+		out.Bytes = raw(rawRequest[versionResult]{Value: versionResult{CLIVersion: Version(), FormatVersion: domain.FormatVersion, Protocol: domain.ProtocolVersion}})
 		return
 	}
 	op := operations.OperationDTO{Op: commandDefinitions[c.command].operation, ThreadID: c.id, MessageID: c.messageID, IfLastAuthorKind: c.lastKind}
@@ -458,7 +462,11 @@ func execute(r execRequest) (out outcome, err error) {
 	}
 	var tx *store.Transaction
 	if isMutation(mutationRequest{Command: c.command}) && !c.check {
-		tx, err = store.Begin(store.BeginRequest{Path: c.file, Timeout: c.timeout})
+		begin := r.Begin
+		if begin == nil {
+			begin = store.Begin
+		}
+		tx, err = begin(store.BeginRequest{Path: c.file, Timeout: c.timeout})
 		if err != nil {
 			return
 		}

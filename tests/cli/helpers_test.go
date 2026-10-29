@@ -60,11 +60,11 @@ func (w *boundedOutput) Write(p []byte) (int, error) {
 	return n, nil
 }
 
-// This boundary is intentionally macOS-only for Stage A. Process groups cover
+// Native Darwin and Linux process groups cover
 // ordinary descendants, not hostile children deliberately escaping the group.
 func runProcess(r runRequest) (processResult, error) {
-	if runtime.GOOS != "darwin" {
-		return processResult{}, errors.New("CLI helper currently requires macOS; Linux is deferred")
+	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+		return processResult{}, errors.New("CLI helper requires Darwin or Linux")
 	}
 	if r.Binary == "" || r.Dir == "" || r.Timeout <= 0 || r.Timeout > time.Minute || r.OutputLimit <= 0 || r.OutputLimit > 1<<20 {
 		return processResult{}, errors.New("binary and directory required; timeout must be within (0, 1m] and output limit within [1, 1048576]")

@@ -46,9 +46,17 @@ type Snapshot struct {
 	Exists   bool
 	Revision *string
 }
+
+// StorageOperation identifies a transaction syscall boundary for fault tests.
+// Close callbacks run after the real descriptor has been closed.
+type StorageOperation struct{ Operation, Path string }
+
 type BeginRequest struct {
 	Path    string
 	Timeout time.Duration
+	// Fault is optional and normally nil. It injects an error at a transaction
+	// syscall boundary without replacing the real transaction or filesystem.
+	Fault func(StorageOperation) error
 }
 type CommitRequest struct{ Bytes []byte }
 type CheckWriterCapabilityRequest struct{}

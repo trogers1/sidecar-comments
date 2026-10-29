@@ -70,6 +70,11 @@ type fixtureRef struct {
 	Requirements []string `json:"requirements"`
 	Coverage     []string `json:"coverage"`
 }
+
+// Golden exposes the existing fixture DTO for schema-validated test consumers.
+// It is an alias so parser fuzz seeds cannot drift to a parallel fixture shape.
+type Golden = golden
+
 type golden struct {
 	FixtureVersion int        `json:"fixture_version"`
 	ID             string     `json:"id"`

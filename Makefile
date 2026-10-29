@@ -1,10 +1,65 @@
-.PHONY: contracts-check contract-artifacts build test-contract test-contract-red preimplementation-check full-red require-sidecar-bin release test test-race test-fuzz test-neovim gofmt-check vet mod-tidy-check check
-
 GO := go
+FUZZ_TIME ?= 5s
 
-.PHONY: test-cli-helpers test-cli-helpers-race vet-cli test-cli-subject
+.PHONY: contracts-check contract-artifacts build test-contract test-contract-red preimplementation-check full-red require-sidecar-bin release test test-race test-fuzz test-neovim gofmt-check vet mod-tidy-check check cli-gate test-cli-helpers test-cli-helpers-race vet-cli test-cli-subject test-release-scripts
 
-# Stage A only: green helper/schema self-tests, no Sidecar behavior claim.
+contracts-check contract-artifacts:
+	@$(GO) run ./contracts/schema/check.go
+
+build: contracts-check
+	@mkdir -p bin
+	@$(GO) build -o bin/sidecar ./cmd/sidecar
+	@$(GO) build -o bin/sidecar-contract ./contracts/runner/cmd
+	@$(GO) build -o bin/conforming ./contracts/testbin/conforming
+	@$(GO) build -o bin/nonconformant ./contracts/testbin/nonconformant
+
+require-sidecar-bin:
+	@test -n "$(SIDECAR_BIN)" || (echo 'SIDECAR_BIN is required: supply the staged production executable.' >&2; exit 2)
+	@test -n "$(SIDECAR_CLI_VERSION)" || (echo 'SIDECAR_CLI_VERSION is required independently of the executable.' >&2; exit 2)
+
+test-contract: contracts-check require-sidecar-bin
+	@SIDECAR_BIN="$(SIDECAR_BIN)" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) run ./contracts/runner/cmd
+
+test-contract-red: contracts-check
+	@$(GO) test ./contracts/runner
+
+# Historical inventory gate, intentionally separate from the CLI-only release.
+full-red: contracts-check
+	@$(GO) run ./contracts/runner/cmd -required-red
+
+preimplementation-check: build test-cli-helpers test-cli-helpers-race gofmt-check vet mod-tidy-check
+
+# Verify the exact already-staged executable; never rebuild it here.
+cli-gate: require-sidecar-bin contracts-check gofmt-check vet mod-tidy-check test-release-scripts test test-contract test-race test-fuzz
+
+# Native staging, verification and packaging; refuses to reuse a stage.
+release:
+	@bash scripts/release.sh build
+	@bash scripts/release.sh verify
+	@bash scripts/release.sh package
+
+check: cli-gate
+
+test: contracts-check require-sidecar-bin
+	@SIDECAR_BIN="$(SIDECAR_BIN)" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) test ./... -count=1 -timeout=180s
+
+test-race: contracts-check require-sidecar-bin
+	@SIDECAR_BIN="$(SIDECAR_BIN)" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) test -race ./... -count=1 -timeout=240s
+	@set -eu; out="$$(mktemp -d "$${TMPDIR:-/tmp}/sidecar-race.XXXXXX")"; trap 'rm -rf "$$out"' EXIT; \
+		$(GO) build -race -ldflags "-X github.com/trogers1/sidecar-comments/internal/cli.buildVersion=$(SIDECAR_CLI_VERSION)" -o "$$out/sidecar" ./cmd/sidecar; \
+		SIDECAR_BIN="$$out/sidecar" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) test ./tests/cli -count=1 -timeout=300s; \
+		SIDECAR_BIN="$$out/sidecar" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) run ./contracts/runner/cmd
+
+test-fuzz:
+	@$(GO) test ./internal/format -run '^$$' -fuzz '^FuzzParseDocument$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
+	@$(GO) test ./internal/format -run '^$$' -fuzz '^FuzzDocumentBodyRoundTrip$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
+	@$(GO) test ./internal/domain -run '^$$' -fuzz '^FuzzLocationRoundTrip$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
+	@$(GO) test ./internal/domain -run '^$$' -fuzz '^FuzzRevisionDeterministic$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
+
+test-neovim:
+	@echo 'Neovim is deferred and is not part of the CLI-only release claim.' >&2
+	@exit 2
+
 test-cli-helpers:
 	@$(GO) test ./tests/cli -run '^(TestHelpers|TestHelper.*|TestSchemaBoundary)$$' -count=1 -timeout=30s
 
@@ -14,69 +69,11 @@ test-cli-helpers-race:
 vet-cli:
 	@$(GO) vet ./tests/cli
 
-# All simple real-public-CLI cases plus explicit availability gate.
-# No contracts runner, fake subject, fallback, or skip is used here.
-test-cli-subject:
-	@SIDECAR_BIN="$(SIDECAR_BIN)" $(GO) test ./tests/cli -run '^(TestSubject.*|TestFormatLifecycle)$$' -count=1 -timeout=120s
+test-cli-subject: require-sidecar-bin
+	@SIDECAR_BIN="$(SIDECAR_BIN)" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) test ./tests/cli -count=1 -timeout=180s
 
-contracts-check contract-artifacts:
-	@$(GO) run ./contracts/schema/check.go
-
-# Build the production CLI alongside the independent contract harness.
-build: contracts-check
-	@set -e; out="$$(mktemp -d "$${TMPDIR:-/tmp}/sidecar-build.XXXXXX")"; trap 'rm -rf "$$out"' EXIT; \
-		$(GO) build -o "$$out/sidecar" ./cmd/sidecar; \
-		$(GO) build -o "$$out/sidecar-contract" ./contracts/runner/cmd; \
-		$(GO) build -o "$$out/conforming" ./contracts/testbin/conforming; \
-		$(GO) build -o "$$out/nonconformant" ./contracts/testbin/nonconformant; \
-		mkdir -p bin; cp "$$out/sidecar" bin/sidecar; cp "$$out/sidecar-contract" bin/sidecar-contract; cp "$$out/conforming" bin/conforming; cp "$$out/nonconformant" bin/nonconformant
-
-# This is a real external-binary gate. It never substitutes the test binary.
-test-contract: contracts-check
-	@test -n "$(SIDECAR_BIN)" || (printf '%s\n' 'SIDECAR_BIN is required: supply the production executable to verify.' >&2; exit 2)
-	@SIDECAR_BIN="$(SIDECAR_BIN)" SIDECAR_CLI_VERSION="$(SIDECAR_CLI_VERSION)" $(GO) run ./contracts/runner/cmd
-
-# Green means the harness successfully rejected the deliberately bad subject.
-# It is a runner self-test, not a release or complete-red-suite claim.
-test-contract-red: contracts-check
-	@$(GO) test ./contracts/runner
-
-# This is the only green pre-implementation gate. It checks the independent
-# harness and artifacts, but deliberately does not claim executable coverage.
-preimplementation-check: build test test-race gofmt-check vet mod-tidy-check
-
-# A future release must clear every explicit required-red pack. This target is
-# intentionally non-green until their concrete fixtures exist; it never turns
-# the partial seed inventory into a coverage claim.
-full-red: preimplementation-check
-	@$(GO) run ./contracts/runner/cmd -required-red
-
-# Production releases require an explicitly supplied production executable;
-# reporting outstanding obligations is not a release gate success condition.
-require-sidecar-bin:
-	@test -n "$(SIDECAR_BIN)" || (printf '%s\n' 'SIDECAR_BIN is required for a production release.' >&2; exit 2)
-
-# This is a fail-closed production release gate. In addition to the required
-# red packs, it must run an external Sidecar contract and every listed quality
-# gate; no obligations report can make release or check pass by itself.
-release: full-red require-sidecar-bin test-contract test-fuzz test-neovim test-race vet gofmt-check mod-tidy-check
-
-test: contracts-check
-	@$(GO) test ./...
-
-test-race: contracts-check
-	@$(GO) test -race ./contracts/runner
-
-# There are no production fuzz targets. This target deliberately fails instead
-# of reporting a harness test as fuzz coverage.
-test-fuzz:
-	@printf '%s\n' 'test-fuzz unavailable: production parser/domain fuzz targets do not exist in this pre-implementation repository.' >&2
-	@exit 2
-
-# A required release capability must fail explicitly, never skip to green.
-test-neovim:
-	@printf '%s\n' 'test-neovim unavailable: the v1 Neovim adapter is not implemented in this pre-implementation repository.' >&2
-	@exit 2
+test-release-scripts:
+	@bash scripts/release_test.sh
 
 gofmt-check:
 	@files="$$(find cmd internal contracts tests -name '*.go' -type f -print)"; test -z "$$($(GO)fmt -d $$files)" || (printf '%s\n' 'gofmt required; check is non-mutating' >&2; exit 1)
@@ -86,10 +83,6 @@ vet: contracts-check
 
 mod-tidy-check:
 	@set -e; dir="$$(mktemp -d "$${TMPDIR:-/tmp}/sidecar-tidy.XXXXXX")"; trap 'rm -rf "$$dir"' EXIT; \
-		cp go.mod go.sum "$$dir"/; cp -R contracts "$$dir"/contracts; cp -R cmd internal "$$dir"/; \
+		cp go.mod go.sum "$$dir"/; cp -R contracts cmd internal tests "$$dir"/; \
 		(cd "$$dir" && $(GO) mod tidy); \
 		cmp -s go.mod "$$dir/go.mod" && cmp -s go.sum "$$dir/go.sum" || (printf '%s\n' 'go.mod/go.sum are not tidy; tracked files were not modified' >&2; exit 1)
-
-# Kept as the production release alias for callers that historically used
-# check. It inherits release's fail-closed executable and quality gates.
-check: release

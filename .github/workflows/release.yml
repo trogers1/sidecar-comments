@@ -1,0 +1,97 @@
+name: CLI verification and releases
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Stable version increment
+        required: true
+        type: choice
+        options: [patch, minor, major]
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      sha: ${{ steps.plan.outputs.sha }}
+      ref: ${{ steps.plan.outputs.ref }}
+      base: ${{ steps.plan.outputs.base }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - id: plan
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_BUMP: ${{ inputs.bump }}
+        run: python3 scripts/manual_release.py plan
+  verify:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            platform: darwin/arm64
+            artifact: darwin_arm64
+          - runner: ubuntu-24.04
+            platform: linux/amd64
+            artifact: linux_amd64
+    runs-on: ${{ matrix.runner }}
+    env:
+      RELEASE_REF: ${{ needs.plan.outputs.ref || (startsWith(github.ref, 'refs/tags/') && github.ref || 'refs/heads/main') }}
+      RELEASE_SHA: ${{ needs.plan.outputs.sha || github.sha }}
+      RELEASE_PLATFORM: ${{ matrix.platform }}
+      RELEASE_STAGE: .tmp/release-stage
+      RELEASE_OUT: .tmp/release-assets
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          ref: ${{ needs.plan.outputs.sha || github.sha }}
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+      - run: bash scripts/release.sh build
+      - run: bash scripts/release.sh verify
+      - run: bash scripts/release.sh package
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-${{ matrix.artifact }}
+          path: .tmp/release-assets/*
+          if-no-files-found: error
+  publish:
+    needs: [plan, verify]
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    concurrency:
+      group: release-publication
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_REF: ${{ needs.plan.outputs.ref || github.ref }}
+      RELEASE_SHA: ${{ needs.plan.outputs.sha || github.sha }}
+      RELEASE_BASE: ${{ needs.plan.outputs.base }}
+      RELEASE_BUMP: ${{ inputs.bump }}
+      RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || 'existing' }}
+      RELEASE_OUT: .tmp/release-assets
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          ref: ${{ needs.plan.outputs.sha || github.sha }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: .tmp/release-assets
+      - run: bash scripts/publish.sh

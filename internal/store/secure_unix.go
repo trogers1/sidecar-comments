@@ -21,6 +21,39 @@ type Transaction struct {
 	parent, lock, target       os.FileInfo
 	lockFile                   *os.File
 	durable, closed, read      bool
+	// Tests may inject individual syscall failures on a private transaction.
+	// Production transactions leave this nil; there is no external switch.
+	fault func(storageOperation) error
+}
+
+type storageOperation = StorageOperation
+
+type storageAction struct {
+	storageOperation
+	Action func() error
+}
+
+type fileClose struct {
+	storageOperation
+	File *os.File
+}
+
+func (t *Transaction) perform(r storageAction) error {
+	if t.fault != nil {
+		if err := t.fault(r.storageOperation); err != nil {
+			return err
+		}
+	}
+	return r.Action()
+}
+
+// Close faults are reported only after closing the real descriptor.
+func (t *Transaction) closeFile(r fileClose) error {
+	err := r.File.Close()
+	if err != nil {
+		return err
+	}
+	return t.perform(storageAction{storageOperation: r.storageOperation, Action: func() error { return nil }})
 }
 
 func CheckWriterCapability(r CheckWriterCapabilityRequest) error { return nil }
@@ -169,7 +202,17 @@ func Read(r ReadRequest) (s Snapshot, err error) {
 	s, _, err = readAt(readAtRequest{Root: root, Name: filepath.Base(r.Path), Kind: r.Kind})
 	return
 }
-func Begin(r BeginRequest) (tx *Transaction, err error) {
+func Begin(r BeginRequest) (*Transaction, error) {
+	return begin(beginRequest{BeginRequest: r})
+}
+
+type beginRequest struct {
+	BeginRequest
+	// A private test barrier, called only after flock observes contention.
+	waiting func()
+}
+
+func begin(r beginRequest) (tx *Transaction, err error) {
 	if e := CheckWriterCapability(CheckWriterCapabilityRequest{}); e != nil {
 		return nil, e
 	}
@@ -180,7 +223,7 @@ func Begin(r BeginRequest) (tx *Transaction, err error) {
 	if e != nil {
 		return nil, e
 	}
-	t := &Transaction{root: root, parentPath: filepath.Dir(r.Path), name: filepath.Base(r.Path)}
+	t := &Transaction{root: root, parentPath: filepath.Dir(r.Path), name: filepath.Base(r.Path), fault: r.Fault}
 	t.lockName = "." + t.name + ".sidecar.lock"
 	defer func(request cleanupRequest) {
 		if err != nil {
@@ -234,6 +277,10 @@ func Begin(r BeginRequest) (tx *Transaction, err error) {
 		}
 		if e != syscall.EWOULDBLOCK && e != syscall.EAGAIN && e != syscall.EINTR {
 			return nil, ioe(domain.IORequest{Operation: "lock", Path: "lock"})
+		}
+		if r.waiting != nil {
+			r.waiting()
+			r.waiting = nil
 		}
 		if !time.Now().Before(deadline) {
 			return nil, conflict(conflictRequest{Kind: "lock_timeout"})
@@ -344,7 +391,7 @@ func (t *Transaction) Commit(r CommitRequest) (err error) {
 		if t.target == nil {
 			return nil
 		}
-		if e := t.root.Remove(t.name); e != nil {
+		if e := t.perform(storageAction{storageOperation: storageOperation{"unlink", "target"}, Action: func() error { return t.root.Remove(t.name) }}); e != nil {
 			return ioe(domain.IORequest{Operation: "unlink", Path: "target"})
 		}
 	} else {
@@ -386,7 +433,7 @@ func (t *Transaction) Commit(r CommitRequest) (err error) {
 		if e != nil || statErr != nil || st.Nlink != 1 || !i.Mode().IsRegular() {
 			return ioe(domain.IORequest{Operation: "identity", Path: "temp"})
 		}
-		if _, e = f.Write(r.Bytes); e != nil {
+		if e = t.perform(storageAction{storageOperation: storageOperation{"write", "temp"}, Action: func() error { _, err := f.Write(r.Bytes); return err }}); e != nil {
 			return ioe(domain.IORequest{Operation: "write", Path: "temp"})
 		}
 		if t.target != nil {
@@ -394,10 +441,10 @@ func (t *Transaction) Commit(r CommitRequest) (err error) {
 				return ioe(domain.IORequest{Operation: "write", Path: "temp"})
 			}
 		}
-		if e = f.Sync(); e != nil {
+		if e = t.perform(storageAction{storageOperation: storageOperation{"sync", "temp"}, Action: f.Sync}); e != nil {
 			return ioe(domain.IORequest{Operation: "write", Path: "temp"})
 		}
-		if e = f.Close(); e != nil {
+		if e = t.closeFile(fileClose{storageOperation: storageOperation{"close", "temp"}, File: f}); e != nil {
 			f = nil
 			return ioe(domain.IORequest{Operation: "close", Path: "temp"})
 		}
@@ -409,7 +456,7 @@ func (t *Transaction) Commit(r CommitRequest) (err error) {
 		if e != nil || !os.SameFile(i, current) {
 			return ioe(domain.IORequest{Operation: "identity", Path: "temp"})
 		}
-		if e = t.root.Rename(name, t.name); e != nil {
+		if e = t.perform(storageAction{storageOperation: storageOperation{"rename", "target"}, Action: func() error { return t.root.Rename(name, t.name) }}); e != nil {
 			return ioe(domain.IORequest{Operation: "rename", Path: "target"})
 		}
 		name = ""
@@ -418,8 +465,8 @@ func (t *Transaction) Commit(r CommitRequest) (err error) {
 	if e != nil {
 		return uncertain(uncertainRequest{})
 	}
-	e = dir.Sync()
-	ce := dir.Close()
+	e = t.perform(storageAction{storageOperation: storageOperation{"sync", "parent"}, Action: dir.Sync})
+	ce := t.closeFile(fileClose{storageOperation: storageOperation{"close", "parent"}, File: dir})
 	if e != nil {
 		return uncertain(uncertainRequest{})
 	}
@@ -437,10 +484,10 @@ func (t *Transaction) Close(r TransactionCloseRequest) (err error) {
 	}
 	t.closed = true
 	if t.lockFile != nil {
-		if e := syscall.Flock(int(t.lockFile.Fd()), syscall.LOCK_UN); e != nil {
+		if e := t.perform(storageAction{storageOperation: storageOperation{"unlock", "lock"}, Action: func() error { return syscall.Flock(int(t.lockFile.Fd()), syscall.LOCK_UN) }}); e != nil {
 			err = ioe(domain.IORequest{Operation: "unlock", Path: "lock"})
 		}
-		if e := t.lockFile.Close(); e != nil && err == nil {
+		if e := t.closeFile(fileClose{storageOperation: storageOperation{"close", "lock"}, File: t.lockFile}); e != nil && err == nil {
 			err = ioe(domain.IORequest{Operation: "close", Path: "lock"})
 		}
 	}

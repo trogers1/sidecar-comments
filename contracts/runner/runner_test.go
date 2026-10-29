@@ -289,7 +289,7 @@ func TestFixtureMaterializationIsDeterministic(t *testing.T) {
 func TestControlledConformingProcessIsAcceptedForItsFixture(t *testing.T) {
 	root := repoRootForTest(t)
 	binary := filepath.Join(t.TempDir(), "conforming")
-	build := exec.Command("mise", "exec", "--", "go", "build", "-o", binary, "./contracts/testbin/conforming")
+	build := exec.Command("go", "build", "-o", binary, "./contracts/testbin/conforming")
 	build.Dir = root
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build conforming test subject: %v: %s", err, output)
@@ -306,7 +306,7 @@ func TestControlledConformingProcessIsAcceptedForItsFixture(t *testing.T) {
 func TestNonconformantExecutableIsRejected(t *testing.T) {
 	root := repoRootForTest(t)
 	binary := filepath.Join(t.TempDir(), "nonconformant")
-	build := exec.Command("mise", "exec", "--", "go", "build", "-o", binary, "./contracts/testbin/nonconformant")
+	build := exec.Command("go", "build", "-o", binary, "./contracts/testbin/nonconformant")
 	build.Dir = root
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build nonconformant binary: %v: %s", err, output)

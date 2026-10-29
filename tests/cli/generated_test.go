@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -23,17 +24,13 @@ func TestSubjectVersion(t *testing.T) {
 	if err := validateSchema(schemaRequest{JSON: got.Stdout}); err != nil {
 		t.Fatal(err)
 	}
-	var envelope struct {
-		Result struct {
-			CLIVersion string `json:"cli_version"`
-		} `json:"result"`
-	}
-	if err := json.Unmarshal(got.Stdout, &envelope); err != nil {
-		t.Fatal(err)
+	expectedVersion := os.Getenv("SIDECAR_CLI_VERSION")
+	if expectedVersion == "" {
+		expectedVersion = "dev"
 	}
 	var version strings.Builder
 	version.WriteByte('"')
-	for _, r := range envelope.Result.CLIVersion {
+	for _, r := range expectedVersion {
 		switch r {
 		case '"':
 			version.WriteString(`\"`)
