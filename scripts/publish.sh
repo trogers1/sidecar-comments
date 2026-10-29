@@ -15,8 +15,9 @@ if [[ $RELEASE_REF == refs/heads/main ]]; then
   # Serialized publishers must recheck freshness: an old queued run cannot win.
   head=$(gh api "repos/$GH_REPO/git/ref/heads/main" --jq .object.sha)
   [[ $head == "$RELEASE_SHA" ]] || { echo 'Refusing stale rolling publication' >&2; exit 1; }
-  # Fail on authentication/server errors instead of treating them as absence.
-  tags=$(gh api --paginate "repos/$GH_REPO/git/refs/tags" --jq '.[].ref')
+  # Matching refs returns [] for a repository with no tags; list refs returns
+  # 404. Still propagate authentication/server errors instead of hiding them.
+  tags=$(gh api --paginate "repos/$GH_REPO/git/matching-refs/tags/" --jq '.[].ref')
   if grep -Fxq refs/tags/latest <<< "$tags"; then
     gh api --method PATCH "repos/$GH_REPO/git/refs/tags/latest" -f sha="$RELEASE_SHA" -F force=true
   else

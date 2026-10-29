@@ -132,7 +132,10 @@ case "$*" in
   'api repos/example/repo/git/ref/heads/main --jq .object.sha') printf '%s\n' "${REMOTE_SHA:-stale}" ;;
   'api repos/example/repo/commits/v1.2.3 --jq .sha') printf '%s\n' "${REMOTE_SHA:-$RELEASE_SHA}" ;;
   'api --paginate repos/example/repo/releases --jq .[].tag_name') printf '%s\n' "${EXISTING_RELEASE:-}" ;;
-  'api --paginate repos/example/repo/git/refs/tags --jq .[].ref') printf '%s\n' "${EXISTING_TAGS:-}" ;;
+  'api --paginate repos/example/repo/git/refs/tags --jq .[].ref')
+    if [[ -z ${EXISTING_TAGS:-} ]]; then echo 'gh: Not Found (HTTP 404)' >&2; exit 1; fi
+    printf '%s\n' "$EXISTING_TAGS" ;;
+  'api --paginate repos/example/repo/git/matching-refs/tags/ --jq .[].ref') printf '%s\n' "${EXISTING_TAGS:-}" ;;
   'api --method PATCH repos/example/repo/git/refs/tags/latest -f sha='*' -F force=true') ;;
   'api --method POST repos/example/repo/git/refs -f ref=refs/tags/latest -f sha='*) ;;
   'release delete latest --yes') ;;
@@ -173,14 +176,16 @@ bash scripts/publish.sh > "$work/output"
 grep -Fq 'release create v1.2.3 --verify-tag' "$GH_CALLS"
 ! grep -Eq 'clobber|release delete|--method' "$GH_CALLS"
 # Main success traces assert the exact allowed mutations and asset arguments.
-for existing in absent present; do
+for existing in empty absent present; do
   : > "$GH_CALLS"
   if [[ $existing == present ]]; then
     tags=$'refs/tags/v1.2.3\nrefs/tags/latest'; releases=$'v1.2.3\nlatest'
-  else tags=refs/tags/v1.2.3; releases=v1.2.3; fi
+  elif [[ $existing == absent ]]; then
+    tags=refs/tags/v1.2.3; releases=v1.2.3
+  else tags=; releases=; fi
   RELEASE_REF=refs/heads/main REMOTE_SHA=$RELEASE_SHA EXISTING_TAGS="$tags" EXISTING_RELEASE="$releases" bash scripts/publish.sh > "$work/output"
   {
-    printf '%s\n' 'api repos/example/repo/git/ref/heads/main --jq .object.sha' 'api --paginate repos/example/repo/git/refs/tags --jq .[].ref'
+    printf '%s\n' 'api repos/example/repo/git/ref/heads/main --jq .object.sha' 'api --paginate repos/example/repo/git/matching-refs/tags/ --jq .[].ref'
     if [[ $existing == present ]]; then
       printf 'api --method PATCH repos/example/repo/git/refs/tags/latest -f sha=%s -F force=true\n' "$RELEASE_SHA"
     else printf 'api --method POST repos/example/repo/git/refs -f ref=refs/tags/latest -f sha=%s\n' "$RELEASE_SHA"; fi
@@ -190,7 +195,7 @@ for existing in absent present; do
   } > "$work/expected-calls"
   cmp "$work/expected-calls" "$GH_CALLS"
 done
-for failure in 'git/refs/tags --jq' 'releases --jq' 'api --method PATCH' 'release delete' 'release create'; do
+for failure in 'git/matching-refs/tags/ --jq' 'releases --jq' 'api --method PATCH' 'release delete' 'release create'; do
   : > "$GH_CALLS"
   RELEASE_REF=refs/heads/main REMOTE_SHA=$RELEASE_SHA EXISTING_TAGS=refs/tags/latest EXISTING_RELEASE=latest GH_FAIL_MATCH="$failure" reject bash scripts/publish.sh
   grep -Fq 'simulated GitHub API failure' "$work/output"
