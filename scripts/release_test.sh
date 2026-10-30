@@ -2,6 +2,7 @@
 # Offline negative-boundary tests. Fixture seals below are NOT verification claims.
 set -euo pipefail
 python3 scripts/manual_release_test.py
+python3 scripts/update_homebrew_test.py
 work=$(mktemp -d "${TMPDIR:-/tmp}/sidecar-release-test.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 export RELEASE_SHA=0123456789abcdef0123456789abcdef01234567

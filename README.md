@@ -19,6 +19,20 @@ No review server or account required. Keep the pair together locally, share them
 
 ## Install · hop aboard
 
+### Homebrew · stable releases
+
+On macOS Apple Silicon or Linux x86-64:
+
+```sh
+brew install trogers1/tap/sidecar
+sidecar --output json version
+```
+
+Update with `brew update && brew upgrade sidecar`. The public
+[Homebrew tap](https://github.com/trogers1/homebrew-tap) installs checked,
+versioned release binaries; no Go toolchain is needed. It does not follow the
+rolling `latest` build. The tap must be pushed before this installation is available.
+
 ### Download a checked binary · no Go required
 
 The release workflow publishes a rolling **[Latest build](https://github.com/trogers1/sidecar-comments/releases/tag/latest)** after passing checks on `main`. Its download URLs stay the same, but its contents move forward. The binary reports a commit-specific version so you can identify the build.
@@ -54,7 +68,7 @@ export PATH="$HOME/.local/bin:$PATH"
 sidecar --output json version
 ```
 
-Add the `PATH` export to your shell configuration to keep it for future sessions. To update, repeat the download and verification with `latest` or a newer pinned tag. Homebrew installation is not configured yet.
+Add the `PATH` export to your shell configuration to keep it for future sessions. To update, repeat the download and verification with `latest` or a newer pinned tag.
 
 ### With Go
 

@@ -7,6 +7,10 @@ on:
         required: true
         type: choice
         options: [patch, minor, major]
+      homebrew_tag:
+        description: 'Tap-only retry for an already published stable tag (leave empty for a release)'
+        required: false
+        type: string
   pull_request:
   push:
     branches: [main]
@@ -15,6 +19,7 @@ permissions:
   contents: read
 jobs:
   plan:
+    if: inputs.homebrew_tag == ''
     runs-on: ubuntu-24.04
     outputs:
       sha: ${{ steps.plan.outputs.sha }}
@@ -68,7 +73,9 @@ jobs:
           if-no-files-found: error
   publish:
     needs: [plan, verify]
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    outputs:
+      stable_tag: ${{ steps.homebrew.outputs.stable_tag }}
+    if: inputs.homebrew_tag == '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -95,3 +102,29 @@ jobs:
           merge-multiple: true
           path: .tmp/release-assets
       - run: bash scripts/publish.sh
+      - id: homebrew
+        run: |
+          if [[ "$RELEASE_REF" == refs/tags/v* ]]; then
+            printf 'stable_tag=%s\n' "${RELEASE_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          fi
+  homebrew:
+    needs: publish
+    if: >-
+      always() && !cancelled() &&
+      ((needs.publish.result == 'success' && needs.publish.outputs.stable_tag != '') ||
+       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.homebrew_tag != ''))
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: homebrew-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Update Homebrew tap from published stable release
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          HOMEBREW_TAG: ${{ needs.publish.outputs.stable_tag || inputs.homebrew_tag }}
+        run: |
+          test -n "$GH_TOKEN" || { echo 'HOMEBREW_TAP_TOKEN is required' >&2; exit 1; }
+          python3 scripts/update_homebrew.py "$HOMEBREW_TAG"

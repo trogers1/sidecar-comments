@@ -82,6 +82,51 @@ For an already staged binary, `make check` / `make cli-gate` requires both
 CLI tests never silently use a substitute. `make test-neovim` deliberately
 fails as deferred. `make full-red` is not an alias of the CLI gate.
 
+## Homebrew tap
+
+The public [`trogers1/homebrew-tap`](https://github.com/trogers1/homebrew-tap)
+repository holds `Formula/sidecar.rb`. Users install stable binaries with
+`brew install trogers1/tap/sidecar`; only macOS ARM64 and Linux AMD64 are
+supported. There is one release workflow, in this source repository, and no
+separate release action in the tap.
+
+### Setup
+
+1. Push the tap's initial README, MIT license, and formula to its default branch
+   before activating automation. Its initial formula uses the published `v0.1.0`
+   archives, checked against that release's `checksums.txt`.
+2. Create a fine-grained GitHub token owned by `trogers1`, restricted to
+   **only `homebrew-tap`**, with **Contents: read and write**. Metadata read is
+   automatic; no other repository or account permissions are needed.
+3. Store it in **sidecar-comments → Settings → Secrets and variables → Actions**
+   as the repository secret **`HOMEBREW_TAP_TOKEN`**. Never commit the token.
+   Choose an expiration and rotate the secret before it expires.
+
+### Publication and recovery
+
+After stable publication succeeds, the workflow's `homebrew` job downloads the
+published archives and checksum manifest, verifies their SHA-256 values, and
+updates the formula through GitHub's contents API. The tap token is exposed only
+to that job's update step, never to PR verification. Rolling `latest` builds do
+not touch the tap. Updates are serialized separately from release publication;
+the updater rejects downgrades and checksum changes for an existing version.
+An identical rerun makes no commit, and an optimistic file SHA prevents an
+intervening tap edit from being overwritten.
+
+A tap failure does **not** roll back the published stable release. Do not rerun
+stable publication to repair the tap: existing releases intentionally cannot be
+replaced. Instead open **Actions → CLI verification and releases → Run workflow**,
+select **main**, and enter the already published tag (for example `v0.1.0`) in
+**homebrew_tag**. The bump choice is ignored in this mode. Only the tap job runs;
+no builds, tags, or releases are created. A missing/expired token, API error,
+invalid tag, or checksum mismatch fails the job loudly.
+
+The same updater can be invoked explicitly with `gh` installed and the tap token
+in `GH_TOKEN`: `python3 scripts/update_homebrew.py v0.1.0`. This command writes to
+the remote tap. Offline tests use a fake GitHub CLI and never publish. After the
+initial tap push, validate installation and `brew test trogers1/tap/sidecar` on
+both supported native platforms; local macOS checks do not prove Linux behavior.
+
 ## GitHub publication
 
 The workflow runs read-only verification on pull requests, and on main/tag
