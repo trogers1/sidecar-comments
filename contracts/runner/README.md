@@ -13,10 +13,13 @@ base64, unexpanded templates, illegal command/output/status/stream combinations,
 duplicate behavior IDs, unreferenced goldens, uncovered normative requirements,
 and fixture/golden requirement drift. Fixtures whose argv is intentionally
 invalid declare `expect.invocation_error:"argv"`; those are executable
-exit-2/text-error cases rather than malformed harness artifacts. The seed inventory generates and validates
+exit-2 error cases rather than malformed harness artifacts. The seed inventory generates and validates
 the fixture-to-behavior mapping; it is not an exhaustive coverage claim. Before a subject starts it performs real
 Draft 2020-12 meta-schema, corpus/golden instance, `$ref`, and JSON-mode
 protocol-stream validation with the pinned harness-only JSON Schema library.
+Human text (including help) is not decoded as JSON or schema-validated: its
+wording is checked by exact golden bytes, with stream/status legality checked
+separately. JSON envelopes and id/none output retain strict machine validation.
 The library's generic-instance API is confined to `schema.go` as a harness-only
 adapter after concrete corpus/golden DTO decoding; it is not a production DTO
 boundary and is forbidden elsewhere. Only the manifest-declared templates are expanded: `{{CLI_VERSION}}`, SHA-256

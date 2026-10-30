@@ -16,7 +16,7 @@
   "expect": {
     "status": 2,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6b3V0cHV0Om1pc3NpbmcK",
+    "stderr_template": "error usage: Invalid --output: a value is missing.\nCheck the input and try again.\nFor usage, run: sidecar --help\n",
     "invocation_error": "argv",
     "final_fs": {
       "entries": []

@@ -32,7 +32,9 @@ func TestSubjectRepeatedOutput(t *testing.T) {
 			if tc.json {
 				want = failure
 			}
-			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 2, Stderr: []byte(want)}}); err != nil {
+			if !tc.json {
+				assertHumanOutput(humanOutputExpectation{T: t, Got: got, Status: 2, Error: true, Terms: []string{"--output", "--help"}})
+			} else if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 2, Stderr: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
 			if tc.json {

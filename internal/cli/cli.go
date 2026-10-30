@@ -28,7 +28,8 @@ type Request struct {
 }
 type config struct {
 	command, output, file, source, id, messageID, thread, location, kind, name, external, bodyFile, metadata, operations, revision, lastKind string
-	check, fix                                                                                                                               bool
+	check, fix, help                                                                                                                         bool
+	diagnostic                                                                                                                               string
 	timeout                                                                                                                                  time.Duration
 	seen                                                                                                                                     map[string]bool
 }
@@ -93,7 +94,7 @@ func Run(r Request) (exit int) {
 	}(runCleanupRequest{})
 	c, err := parse(parseRequest{Args: r.Args})
 	var out outcome
-	if err == nil {
+	if err == nil && !c.help {
 		out, err = execute(execRequest{Config: c, Stdin: r.Stdin, Begin: r.begin})
 	}
 	var text string
@@ -107,9 +108,13 @@ func Run(r Request) (exit int) {
 		exit = e.Exit
 		if c.output == "json" {
 			text = string(raw(rawRequest[errorEnvelope]{Value: errorEnvelope{Protocol: domain.ProtocolVersion, Error: errorValue{Code: e.Code, Message: e.Message, Details: e.Details}}})) + "\n"
+		} else if c.output == "text" {
+			text = humanError(humanErrorRequest{Config: c, Error: e})
 		} else {
 			text = fmt.Sprintf("error %s %s\n", e.Code, e.Message)
 		}
+	} else if c.help {
+		text = helpText(helpRequest{Command: c.command})
 	} else {
 		exit = out.Exit
 		switch c.output {
@@ -122,7 +127,7 @@ func Run(r Request) (exit int) {
 		case "json":
 			text = string(raw(rawRequest[successEnvelope]{Value: successEnvelope{Protocol: domain.ProtocolVersion, Command: c.command, Changed: out.Changed, Result: out.Bytes}})) + "\n"
 		default:
-			text = fmt.Sprintf("%s changed=%t result=%s\n", c.command, out.Changed, out.Bytes)
+			text = humanText(textRequest{Config: c, Outcome: out})
 		}
 	}
 	if text != "" {
@@ -155,24 +160,36 @@ func parse(r parseRequest) (config, error) {
 	if len(args) > 0 && (args[0] == "--output" || strings.HasPrefix(args[0], "--output=")) {
 		return c, usage(usageRequest{Field: "output", Reason: "repeated"})
 	}
-	if len(args) == 0 {
+	if len(args) == 0 && c.output != "text" {
 		return c, usage(usageRequest{Field: "argv", Reason: domain.UsageReasonMissing})
 	}
+	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
+		c.help = true
+		return c, nil
+	}
 	c.command = args[0]
+	if c.command == "--version" {
+		c.command = "version"
+	}
 	if strings.Contains(c.command, "-") {
 		return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 	}
 	args = args[1:]
 	if c.command == "thread" || c.command == "message" {
-		if len(args) == 0 {
+		if len(args) == 0 && c.output != "text" {
 			return c, usage(usageRequest{Field: "argv", Reason: domain.UsageReasonMissing})
+		}
+		if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
+			c.help = true
+			return c, nil
 		}
 		c.command += "-" + args[0]
 		args = args[1:]
 	}
 	definition, ok := commandDefinitions[c.command]
-	flags := definition.allowed
+	flags := commandFlags(commandFlagsRequest{Definition: definition})
 	if !ok {
+		c.diagnostic = fmt.Sprintf("Unknown command %q.", strings.ReplaceAll(c.command, "-", " "))
 		return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 	}
 	mutation := isMutation(mutationRequest{Command: c.command})
@@ -185,9 +202,6 @@ func parse(r parseRequest) (config, error) {
 	fs := flag.NewFlagSet(c.command, flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	values := map[string]*string{"file": &c.file, "source": &c.source, "id": &c.id, "message-id": &c.messageID, "thread": &c.thread, "location": &c.location, "author-kind": &c.kind, "author-name": &c.name, "external-author-id": &c.external, "body-file": &c.bodyFile, "gitlab-json": &c.metadata, "operations-file": &c.operations, "if-revision": &c.revision, "if-last-author-kind": &c.lastKind}
-	if mutation {
-		flags += " if-revision lock-timeout"
-	}
 	for _, name := range strings.Fields(flags) {
 		switch name {
 		case "check":
@@ -203,6 +217,10 @@ func parse(r parseRequest) (config, error) {
 	ordinary := false
 	for i := 0; i < len(args); i++ {
 		a := args[i]
+		if a == "--help" || a == "-h" {
+			c.help = true
+			return c, nil
+		}
 		if !strings.HasPrefix(a, "-") {
 			return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 		}
@@ -220,11 +238,13 @@ func parse(r parseRequest) (config, error) {
 		}
 		f := fs.Lookup(name)
 		if f == nil {
+			c.diagnostic = fmt.Sprintf("Unknown flag %q.", a)
 			return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 		}
 		if !strings.Contains(a, "=") && name != "check" && name != "add-missing-message-ids" {
 			i++
 			if i >= len(args) {
+				c.diagnostic = "Missing value for --" + name + "."
 				return c, usage(usageRequest{Field: "argv", Reason: domain.UsageReasonMissing})
 			}
 		}
@@ -232,7 +252,8 @@ func parse(r parseRequest) (config, error) {
 	if fs.Parse(args) != nil || fs.NArg() != 0 {
 		return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 	}
-	if c.command != "version" && c.file == "" {
+	if strings.Contains(" "+definition.allowed+" ", " file ") && c.file == "" {
+		c.diagnostic = "Missing required flag --file (the .comments sidecar path)."
 		return c, usage(usageRequest{Field: "argv", Reason: "required"})
 	}
 	if c.timeout < time.Millisecond || c.timeout > 60*time.Second {
@@ -243,6 +264,7 @@ func parse(r parseRequest) (config, error) {
 	}
 	for _, n := range strings.Fields(definition.required) {
 		if *values[n] == "" {
+			c.diagnostic = "Missing required flag --" + n + "."
 			return c, usage(usageRequest{Field: "argv", Reason: "required"})
 		}
 	}

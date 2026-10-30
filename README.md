@@ -19,19 +19,27 @@ No review server or account required. Keep the pair together locally, share them
 
 ## Install · hop aboard
 
-### Homebrew · stable releases
+### Homebrew · recommended
 
-On macOS Apple Silicon or Linux x86-64:
+Install the latest stable release on macOS Apple Silicon or Linux x86-64:
 
 ```sh
 brew install trogers1/tap/sidecar
-sidecar --output json version
+sidecar --version
 ```
 
-Update with `brew update && brew upgrade sidecar`. The public
-[Homebrew tap](https://github.com/trogers1/homebrew-tap) installs checked,
-versioned release binaries; no Go toolchain is needed. It does not follow the
-historical rolling `latest` build. The tap must be pushed before this installation is available.
+Already riding along? Update to the newest stable release:
+
+```sh
+brew update
+brew upgrade sidecar
+sidecar --version
+```
+
+The public [Homebrew tap](https://github.com/trogers1/homebrew-tap) installs
+SHA-256-checked, versioned release binaries; no Go toolchain or separate tap
+command is needed. Homebrew follows stable releases, not development snapshots
+or the historical rolling `latest` build.
 
 ### Download a checked binary · no Go required
 
@@ -68,7 +76,7 @@ tar -xzf "$ARCHIVE"
 mkdir -p "$HOME/.local/bin"
 install -m 755 sidecar "$HOME/.local/bin/sidecar"
 export PATH="$HOME/.local/bin:$PATH"
-sidecar --output json version
+sidecar --version
 ```
 
 Add the `PATH` export to your shell configuration to keep it for future sessions. To update, repeat the download and verification with a newer stable tag.
@@ -84,7 +92,7 @@ go install github.com/trogers1/sidecar-comments/cmd/sidecar@main
 Make sure `$(go env GOPATH)/bin` is on your `PATH` (or your `GOBIN` directory, if you set one), then check your passenger:
 
 ```sh
-sidecar --output json version
+sidecar --version
 ```
 
 `@main` follows development; for a pinned source install, replace it with an existing `@vX.Y.Z` tag. Source installs report `dev` because `go install` does not apply the release workflow's version linker flags. Use a release archive when you want the embedded release identity.
@@ -96,7 +104,7 @@ git clone https://github.com/trogers1/sidecar-comments.git
 cd sidecar-comments
 go build -o bin/sidecar ./cmd/sidecar
 export PATH="$PWD/bin:$PATH"
-sidecar --output json version
+sidecar --version
 ```
 
 The `PATH` change applies to your current shell, so `sidecar` remains available when you change directories.
@@ -212,6 +220,23 @@ sidecar fix --add-missing-message-ids --file proposal.md.comments
 
 The file is readable text, but its format is deliberately strict—not arbitrary Markdown. Invalid or pre-v1 files are rejected rather than guessed at or migrated. `fix` is a narrow repair tool, not a general recovery button. See the [format reference](docs/v1/format.md) before hand-editing.
 
+## Need directions?
+
+Comments ride alongside your text; the CLI should tell you where to go next.
+
+```sh
+sidecar                       # Overview and quick start
+sidecar --help                # Commands and common options
+sidecar thread --help         # Thread commands
+sidecar thread create --help  # Required flags, options, and examples
+```
+
+`-h` works too. Check the installed version with `sidecar --version`, or use
+`sidecar --output json --version` for structured version information. The original
+`sidecar version` command remains supported. Help never reads or changes your files. Normal output is meant
+for people: readable summaries, thread/message IDs, authors, and comment text.
+Use the explicit machine modes below when another program is in the driver's seat.
+
 ## For scripts and coding agents
 
 The output selector goes **before** the command:
@@ -220,7 +245,7 @@ The output selector goes **before** the command:
 sidecar [--output text|json|id|none] COMMAND ...
 ```
 
-- **`text`** (default): one line with the command, change status, and JSON result.
+- **`text`** (default): readable summaries and actionable errors. Prose is not a stable scripting interface.
 - **`json`**: a structured envelope with `protocol`, `command`, `changed`, and `result`. Errors go to stderr with `protocol` and `error`.
 - **`id`**: generated IDs, one per line; supported by `thread create`, `message add`, and `fix`. Creating a thread prints **two** IDs: thread first, message second.
 - **`none`**: suppress successful output for mutation commands; errors still go to stderr.

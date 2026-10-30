@@ -19,7 +19,7 @@
     "final_fs": {
       "entries": []
     },
-    "stdout_template": "version changed=false result={\"cli_version\":\"{{CLI_VERSION}}\",\"format_version\":1,\"protocol\":1}\n"
+    "stdout_template": "Sidecar {{CLI_VERSION}}\nFormat version: 1\nProtocol version: 1\n"
   },
   "env": []
 }

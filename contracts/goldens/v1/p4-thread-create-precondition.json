@@ -44,7 +44,7 @@
   "expect": {
     "status": 6,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3IgcHJlY29uZGl0aW9uIHByZWNvbmRpdGlvbjp0aHJlYWQtY3JlYXRlOnJldHJ5X21pc21hdGNoCg==",
+    "stderr_template": "error precondition: The requested operation's precondition was not met: \"precondition: thread create: retry mismatch\".\nSidecar: \"a.comments\"\nRead the current thread and check the operation's conditions before retrying.\nFor usage, run: sidecar thread create --help\n",
     "final_fs": {
       "entries": [
         {

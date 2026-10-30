@@ -21,7 +21,7 @@
   },
   "expect": {
     "status": 0,
-    "stdout_b64": "Zm9ybWF0IGNoYW5nZWQ9ZmFsc2UgcmVzdWx0PXsiZm9ybWF0dGVkIjpmYWxzZSwic3RvcmFnZV9yZXZpc2lvbiI6bnVsbCwiY2Fub25pY2FsX3JldmlzaW9uIjoic2hhMjU2OmUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQo=",
+    "stdout_template": "Already formatted: \"a.comments\"\n",
     "stderr_b64": "",
     "final_fs": {
       "entries": [

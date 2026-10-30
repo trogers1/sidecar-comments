@@ -33,10 +33,10 @@ func TestSubjectDeleteOutputModes(t *testing.T) {
 			want := ""
 			if mode == "json" {
 				want = envelope
-			} else if mode == "text" {
-				want = "thread-delete changed=true result=" + result + "\n"
 			}
-			if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
+			if mode == "text" {
+				assertHumanOutput(humanOutputExpectation{T: t, Got: got, Terms: []string{"deleted", threadID}})
+			} else if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
 			if mode == "json" {
@@ -59,7 +59,9 @@ func TestSubjectDeleteOutputModes(t *testing.T) {
 			if mode == "json" {
 				failure = `{"protocol":1,"error":{"code":"not_found","message":"not_found:thread","details":{"entity":"thread","id":"` + threadID + `"}}}` + "\n"
 			}
-			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 5, Stderr: []byte(failure)}}); err != nil {
+			if mode == "text" {
+				assertHumanOutput(humanOutputExpectation{T: t, Got: got, Status: 5, Error: true, Terms: []string{"thread", threadID}})
+			} else if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 5, Stderr: []byte(failure)}}); err != nil {
 				t.Fatal(err)
 			}
 			if mode == "json" {

@@ -17,7 +17,7 @@
   "expect": {
     "status": 2,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6YXJndjptYWxmb3JtZWQK",
+    "stderr_template": "error usage: Unknown command \"message wat\".\nCheck the input and try again.\nFor usage, run: sidecar --help\n",
     "invocation_error": "argv",
     "final_fs": {
       "entries": []

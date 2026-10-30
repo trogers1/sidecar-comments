@@ -113,9 +113,9 @@ func TestUnavailableMandatoryCapabilityIsNotSkipped(t *testing.T) {
 	}
 }
 
-func TestTextErrorRequiresSeparateCodeAndMessage(t *testing.T) {
+func TestIDNoneErrorRequiresSeparateCodeAndMessage(t *testing.T) {
 	if !textError([]byte("error usage usage:argv:malformed\n")) {
-		t.Fatal("normative text error rejected")
+		t.Fatal("normative id/none error rejected")
 	}
 	if textError([]byte("error usage:argv:malformed\n")) {
 		t.Fatal("legacy two-token text error accepted")

@@ -21,7 +21,7 @@ func TestExitThreeSuccessIsLimitedToChecks(t *testing.T) {
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
 			g := golden{Argv: test.argv}
-			err := validateEnvelopes(g, 3, []byte(parseCommand(test.argv)+" changed=false result={}\n"), nil)
+			err := validateEnvelopes(g, 3, []byte("Check complete.\nHuman-readable details follow.\n"), nil)
 			if (err == nil) != test.ok {
 				t.Fatalf("validateEnvelopes() error = %v, want success %t", err, test.ok)
 			}
@@ -48,8 +48,8 @@ func TestIDOutputRequiresLFAndSuccessfulExit(t *testing.T) {
 	}
 }
 
-func TestTextErrorCodeMustMatchExitStatus(t *testing.T) {
-	g := golden{Argv: []string{"apply"}}
+func TestMachineTextErrorCodeMustMatchExitStatus(t *testing.T) {
+	g := golden{Argv: []string{"--output", "none", "apply"}}
 	if err := validateEnvelopes(g, 3, nil, []byte("error io io:read\n")); err == nil {
 		t.Fatal("io error was accepted with validation exit status")
 	}

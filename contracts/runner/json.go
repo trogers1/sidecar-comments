@@ -282,40 +282,118 @@ type invocation struct {
 }
 
 func parseInvocation(argv []string) (invocation, error) {
-	output := "text"
-	commandAt := 0
-	if len(argv) >= 2 && argv[0] == "--output" {
-		output, commandAt = argv[1], 2
+	output, at := "text", 0
+	if len(argv) > 0 && strings.HasPrefix(argv[0], "--output=") {
+		output, at = strings.TrimPrefix(argv[0], "--output="), 1
+	} else if len(argv) >= 2 && argv[0] == "--output" {
+		output, at = argv[1], 2
 	}
-	if output != "text" && output != "json" && output != "id" && output != "none" {
-		return invocation{}, fmt.Errorf("invalid output mode %q", output)
+	if at < len(argv) && (argv[at] == "--output" || strings.HasPrefix(argv[at], "--output=")) {
+		return invocation{}, errors.New("repeated or missing --output")
 	}
-	if commandAt >= len(argv) {
+	help := invocation{command: "help", output: "text"}
+	if at == len(argv) {
+		if output == "text" {
+			return help, nil
+		}
 		return invocation{}, errors.New("missing command")
 	}
-	for _, argument := range argv[commandAt:] {
-		if argument == "--output" {
-			return invocation{}, errors.New("--output must precede the command")
-		}
+	command := argv[at]
+	at++
+	if oneOf(command, "--help", "-h") {
+		return help, nil
 	}
-	command := argv[commandAt]
+	if command == "--version" {
+		command = "version"
+	} else if strings.Contains(command, "-") {
+		return invocation{}, fmt.Errorf("unknown command %q", command)
+	}
 	if command == "thread" || command == "message" {
-		if commandAt+1 >= len(argv) {
+		if at == len(argv) {
+			if output == "text" {
+				return help, nil
+			}
 			return invocation{}, fmt.Errorf("missing %s subcommand", command)
 		}
-		command += "-" + argv[commandAt+1]
+		if oneOf(argv[at], "--help", "-h") {
+			return help, nil
+		}
+		command += "-" + argv[at]
+		at++
 	}
+	// Independent contract model of the public flags in docs/v1/cli.md.
+	// This only determines whether help is reached, not flag value validity.
+	flags := ""
 	switch command {
-	case "version", "validate", "format", "fix", "apply", "thread-list", "thread-get", "thread-create", "thread-move", "thread-delete", "message-add", "message-update", "message-delete":
-		return invocation{command: command, output: output}, nil
+	case "version":
+	case "validate":
+		flags = "file source"
+	case "format":
+		flags = "file check"
+	case "fix":
+		flags = "file check add-missing-message-ids"
+	case "thread-list":
+		flags = "file"
+	case "thread-get", "thread-delete":
+		flags = "file id"
+	case "thread-create":
+		flags = "file location author-kind author-name body-file external-author-id id message-id gitlab-json"
+	case "thread-move":
+		flags = "file id location"
+	case "message-add":
+		flags = "file thread author-kind author-name body-file external-author-id id gitlab-json if-last-author-kind"
+	case "message-update":
+		flags = "file thread id body-file"
+	case "message-delete":
+		flags = "file thread id"
+	case "apply":
+		flags = "file operations-file"
 	default:
 		return invocation{}, fmt.Errorf("unknown command %q", command)
 	}
+	if !oneOf(output, "text", "json", "id", "none") {
+		return invocation{}, fmt.Errorf("invalid output mode %q", output)
+	}
+	parsed := invocation{command: command, output: output}
+	if output == "none" && !mutationCommand(command) || output == "id" && !idCommand(command) {
+		return parsed, nil
+	}
+	if mutationCommand(command) {
+		flags += " if-revision lock-timeout"
+	}
+	seen := map[string]bool{}
+	ordinary := false
+	for ; at < len(argv); at++ {
+		argument := argv[at]
+		if oneOf(argument, "--help", "-h") {
+			return help, nil
+		}
+		if !strings.HasPrefix(argument, "-") {
+			return parsed, nil
+		}
+		name, _, hasValue := strings.Cut(strings.TrimLeft(argument, "-"), "=")
+		if name == "output" {
+			return invocation{}, errors.New("--output must precede the command")
+		}
+		guard := oneOf(name, "if-revision", "lock-timeout")
+		if seen[name] || guard && ordinary || !strings.Contains(" "+flags+" ", " "+name+" ") {
+			return parsed, nil
+		}
+		seen[name] = true
+		ordinary = ordinary || !guard
+		if !hasValue && !oneOf(name, "check", "add-missing-message-ids") {
+			at++ // Values named --help or -h are not help requests.
+		}
+	}
+	return parsed, nil
 }
 
 func jsonOutput(argv []string) bool {
 	invocation, err := parseInvocation(argv)
-	return err == nil && invocation.output == "json"
+	if err == nil {
+		return invocation.output == "json"
+	}
+	return len(argv) >= 2 && argv[0] == "--output" && argv[1] == "json" || len(argv) > 0 && argv[0] == "--output=json"
 }
 
 func mutationCommand(command string) bool {
@@ -360,7 +438,7 @@ func textError(b []byte) bool {
 	return err == nil
 }
 
-// textErrorStatus validates the text transport and binds its public error code
+// textErrorStatus validates the id/none error transport and binds its public error code
 // to the required process exit status, just as errorStatus does for JSON.
 func textErrorStatus(b []byte) (int, error) {
 	if bytes.Count(b, []byte("\n")) != 1 || !bytes.HasSuffix(b, []byte("\n")) {
@@ -422,47 +500,50 @@ func oneOf(value string, values ...string) bool {
 	return false
 }
 
-// textSuccessEnvelope turns the specified text transport into the same JSON
-// envelope used by JSON mode so result DTOs receive schema validation too.
-func textSuccessEnvelope(b []byte, command string) ([]byte, error) {
-	if !textSuccess(b, command) {
-		return nil, errors.New("invalid text success")
-	}
-	line := strings.TrimSuffix(string(b), "\n")
-	rest := strings.TrimPrefix(line, command+" changed=")
-	changedText, result, _ := strings.Cut(rest, " result=")
-	changed := changedText == "true"
-	return json.Marshal(envelope{Protocol: 1, Command: command, Changed: &changed, Result: json.RawMessage(result)})
-}
-
-func textSuccess(b []byte, command string) bool {
-	prefix := command + " changed="
-	line := strings.TrimSuffix(string(b), "\n")
-	if bytes.Count(b, []byte("\n")) != 1 || !strings.HasPrefix(line, prefix) {
-		return false
-	}
-	rest := strings.TrimPrefix(line, prefix)
-	changed, result, ok := strings.Cut(rest, " result=")
-	if !ok || (changed != "true" && changed != "false") || !isObject([]byte(result)) || uniqueJSON([]byte(result)) != nil {
-		return false
-	}
-	return true
-}
-
 // validateEnvelopes makes fixture artifacts state the command/output contract,
 // not just arbitrary matching bytes. Status 3 has both legal shapes: a check
 // result is success output, while an invalid target is an error.
 func validateEnvelopes(g golden, status int, out, err []byte) error {
 	invocation, parseErr := parseInvocation(g.Argv)
 	if g.Expect.InvocationError != "" {
-		textStatus, textErr := textErrorStatus(err)
-		if g.Expect.InvocationError != "argv" || parseErr == nil || status != 2 || len(out) != 0 || textErr != nil || textStatus != status {
+		if g.Expect.InvocationError != "argv" || parseErr == nil || status != 2 || len(out) != 0 {
 			return errors.New("invalid argv-error fixture declaration")
+		}
+		if jsonOutput(g.Argv) {
+			if decodeErr := decodeErrorEnvelope(err); decodeErr != nil {
+				return decodeErr
+			}
+			if errorStatus, statusErr := errorStatus(err); statusErr != nil || errorStatus != status {
+				return errors.New("argv JSON error must match usage exit status")
+			}
+			return nil
+		}
+		if len(g.Argv) >= 2 && g.Argv[0] == "--output" && oneOf(g.Argv[1], "id", "none") || len(g.Argv) > 0 && oneOf(g.Argv[0], "--output=id", "--output=none") {
+			machineStatus, machineErr := textErrorStatus(err)
+			if machineErr != nil || machineStatus != status {
+				return errors.New("argv id/none error must match usage exit status")
+			}
+			return nil
+		}
+		if !bytes.HasSuffix(err, []byte("\n")) {
+			return errors.New("argv error must write human stderr")
 		}
 		return nil
 	}
 	if parseErr != nil {
 		return parseErr
+	}
+	// Human prose is presentation, not a JSON transport. Exact golden byte
+	// matching checks its wording; only stream placement and status belong here.
+	if invocation.output == "text" {
+		if status == 0 || (status == 3 && len(err) == 0 && checkSuccessCommand(invocation.command, g.Argv)) {
+			if len(err) == 0 && bytes.HasSuffix(out, []byte("\n")) {
+				return nil
+			}
+		} else if status >= 2 && status <= 8 && len(out) == 0 && bytes.HasSuffix(err, []byte("\n")) {
+			return nil
+		}
+		return errors.New("human output used illegal streams or status")
 	}
 	if invocation.output == "none" && !mutationCommand(invocation.command) {
 		textStatus, textErr := textErrorStatus(err)
@@ -489,9 +570,6 @@ func validateEnvelopes(g golden, status int, out, err []byte) error {
 			// Explicit-ID create/add and an already-normal fix have no generated
 			// IDs to print. The public id mode therefore permits an empty success.
 			if invocation.output == "id" && len(out) == 0 && len(err) == 0 {
-				return nil
-			}
-			if len(err) == 0 && invocation.output == "text" && textSuccess(out, invocation.command) {
 				return nil
 			}
 			if len(err) == 0 && invocation.output == "id" && len(out) > 0 {

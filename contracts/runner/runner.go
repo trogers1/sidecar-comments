@@ -755,14 +755,6 @@ func execute(c Config, g golden) error {
 			if err := c.protocolValidator.validateActual(stdout.Bytes(), stderr.Bytes()); err != nil {
 				return err
 			}
-		} else if invocation, invocationErr := parseInvocation(g.Argv); invocationErr == nil && invocation.output == "text" && len(stdout.Bytes()) != 0 {
-			textEnvelope, textErr := textSuccessEnvelope(stdout.Bytes(), invocation.command)
-			if textErr != nil {
-				return textErr
-			}
-			if textErr = validateSchemaInstance(c.protocolValidator.schema, textEnvelope); textErr != nil {
-				return fmt.Errorf("child text result schema validation: %w", textErr)
-			}
 		}
 	}
 	return assertFS(assertFSRequest{Root: root, Want: g.Expect.Final, Bindings: bindings})

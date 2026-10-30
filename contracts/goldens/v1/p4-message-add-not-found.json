@@ -40,7 +40,7 @@
   "expect": {
     "status": 5,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3Igbm90X2ZvdW5kIG5vdF9mb3VuZDp0aHJlYWQK",
+    "stderr_template": "error not_found: The requested thread \"018f0000-0000-7000-8000-000000000102\" was not found.\nSidecar: \"a.comments\"\nList threads to find an existing ID.\nFor usage, run: sidecar message add --help\n",
     "final_fs": {
       "entries": [
         {

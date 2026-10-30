@@ -10,7 +10,7 @@ import (
 
 const (
 	jsonVersion = "{\"protocol\":1,\"command\":\"version\",\"changed\":false,\"result\":{\"cli_version\":\"test\",\"format_version\":1,\"protocol\":1}}\n"
-	textVersion = "version changed=false result={\"cli_version\":\"test\",\"format_version\":1,\"protocol\":1}\n"
+	textVersion = "Sidecar test\nFormat version: 1\nProtocol version: 1\n"
 )
 
 func main() {

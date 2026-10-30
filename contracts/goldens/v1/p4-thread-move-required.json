@@ -21,7 +21,7 @@
   "expect": {
     "status": 2,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6YXJndjpyZXF1aXJlZAo=",
+    "stderr_template": "error usage: Missing required flag --location.\nSidecar: \"a.comments\"\nCheck the input and try again.\nFor usage, run: sidecar thread move --help\n",
     "final_fs": {
       "entries": []
     }

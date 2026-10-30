@@ -329,13 +329,5 @@ func validateGoldenProtocolInstances(protocol *jsonschema.Schema, source []byte)
 	if jsonOutput(fixture.Argv) {
 		return validateActualProtocol(protocol, stdout, stderr)
 	}
-	invocation, invocationErr := parseInvocation(fixture.Argv)
-	if invocationErr != nil || invocation.output != "text" || len(stdout) == 0 {
-		return nil
-	}
-	textEnvelope, textErr := textSuccessEnvelope(stdout, invocation.command)
-	if textErr != nil {
-		return textErr
-	}
-	return validateSchemaInstance(protocol, textEnvelope)
+	return nil
 }

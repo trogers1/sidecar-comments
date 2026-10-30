@@ -27,7 +27,7 @@
   "expect": {
     "status": 2,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6b3BlcmF0aW9uczptYWxmb3JtZWQK",
+    "stderr_template": "error usage: Invalid operations: the value or flag syntax is invalid.\nSidecar: \"a.comments\"\nCheck the input and try again.\nFor usage, run: sidecar apply --help\n",
     "final_fs": {
       "entries": [
         {

@@ -5,6 +5,7 @@
     "V1-CLI-SURFACE"
   ],
   "argv": [
+    "--output", "json",
     "thread"
   ],
   "env": [],
@@ -16,7 +17,7 @@
   "expect": {
     "status": 2,
     "stdout_b64": "",
-    "stderr_b64": "ZXJyb3IgdXNhZ2UgdXNhZ2U6YXJndjptaXNzaW5nCg==",
+    "stderr_template": "{\"protocol\":1,\"error\":{\"code\":\"usage\",\"message\":\"usage:argv:missing\",\"details\":{\"field\":\"argv\",\"reason\":\"missing\"}}}\n",
     "invocation_error": "argv",
     "final_fs": {
       "entries": []
