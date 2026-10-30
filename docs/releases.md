@@ -9,11 +9,13 @@ See [v1 conformance](v1/conformance.md).
 ## Identity and assets
 
 `cli.Version()` defaults to `dev`. Release builds derive their identity from the
-checked-out full Git SHA and event ref, never from the executable under test:
-
-- `main`: `0.0.0-main.<40-character commit SHA>`;
-- stable tag `vMAJOR.MINOR.PATCH`: `MAJOR.MINOR.PATCH`, with canonical nonnegative
-  components, no leading zeroes, suffixes or prerelease identifiers.
+checked-out full Git SHA and committed `VERSION`, never from the executable under
+test. CI plans `refs/tags/v<VERSION>` before building; PR verification embeds the
+same prospective stable version without creating a tag. Versions are canonical
+`MAJOR.MINOR.PATCH`, with nonnegative components and no leading zeroes, suffixes,
+or prerelease identifiers. The staging helper also accepts `refs/heads/main` for
+local commit-specific snapshots (`0.0.0-main.<40-character commit SHA>`); these
+snapshots are not published.
 
 The linker target is
 `github.com/trogers1/sidecar-comments/internal/cli.buildVersion`. Malformed linker
@@ -46,7 +48,7 @@ a toolchain/configuration change requires a fresh notice audit, not an unchecked
 release override. For example, on Apple silicon macOS:
 
 ```sh
-export RELEASE_REF=refs/heads/main
+export RELEASE_REF="refs/tags/v$(tr -d '\n' < VERSION)"
 export RELEASE_SHA="$(git rev-parse HEAD)"
 export RELEASE_PLATFORM=darwin/arm64
 export RELEASE_STAGE=.tmp/release-stage
@@ -107,8 +109,8 @@ separate release action in the tap.
 After stable publication succeeds, the workflow's `homebrew` job downloads the
 published archives and checksum manifest, verifies their SHA-256 values, and
 updates the formula through GitHub's contents API. The tap token is exposed only
-to that job's update step, never to PR verification. Rolling `latest` builds do
-not touch the tap. Updates are serialized separately from release publication;
+to that job's update step, never to PR verification. Updates are serialized
+separately from release publication;
 the updater rejects downgrades and checksum changes for an existing version.
 An identical rerun makes no commit, and an optimistic file SHA prevents an
 intervening tap edit from being overwritten.
@@ -117,7 +119,7 @@ A tap failure does **not** roll back the published stable release. Do not rerun
 stable publication to repair the tap: existing releases intentionally cannot be
 replaced. Instead open **Actions → CLI verification and releases → Run workflow**,
 select **main**, and enter the already published tag (for example `v0.1.0`) in
-**homebrew_tag**. The bump choice is ignored in this mode. Only the tap job runs;
+**homebrew_tag**. This is the only manual dispatch mode. Only the tap job runs;
 no builds, tags, or releases are created. A missing/expired token, API error,
 invalid tag, or checksum mismatch fails the job loudly.
 
@@ -127,74 +129,92 @@ the remote tap. Offline tests use a fake GitHub CLI and never publish. After the
 initial tap push, validate installation and `brew test trogers1/tap/sidecar` on
 both supported native platforms; local macOS checks do not prove Linux behavior.
 
-## GitHub publication
+## Choose a version before pushing
 
-The workflow runs read-only verification on pull requests, and on main/tag
-pushes, and manual stable dispatches. It builds and executes natively on macOS ARM64 and Linux AMD64; an
-unexpected hosted-runner architecture fails rather than silently cross-building.
-Both platform jobs must finish all gates before publication receives write
-permission. Action references are pinned to commit SHAs; dependency updates
-must review and revalidate those pins.
+Every push to `main` is a stable release, including documentation and CI fixes.
+There is no rolling publication and no manual major/minor/patch release action.
+Existing historical `latest` assets are not updated.
 
-Push events and explicit manual dispatches publish. A single non-cancelling publication concurrency group
-serializes rolling and stable publication. A queued rolling run rechecks the
-current main SHA before writing, refusing stale overwrites. The movable `latest`
-tag and release titled **Latest build** are replaced only after both platforms
-pass. Explicit `v*` tag pushes require the existing tag to still resolve to the
-verified SHA and never create or move that tag. Manual dispatches create their
-prospective tag only after both native gates succeed and the serialized publisher
-rechecks that the highest stable base has not changed and the candidate is absent.
-Both paths reject an existing release and never replace stable assets. Configure
-repository tag rules to prevent deletion or retargeting of `v*`, while allowing
-the workflow token to create new tags; the workflow cannot enforce
-immutability against repository administrators. Rolling replacement is not
-transactional: an API failure can temporarily leave no rolling release, and a
-newer main commit may arrive during publication; subsequent successful runs
-advance it. No stale queued run can overwrite a newer published main build.
-
-### Operator activation
-
-Publication starts only after this workflow is pushed to GitHub. After local
-verification and review, pushing `main` triggers both native gates and, only on
-success, the rolling release.
-
-For automatic stable version selection, open **Actions → CLI verification and
-releases → Run workflow**, select **main**, choose **patch**, **minor**, or
-**major**, and run. Any other selected branch/tag is rejected. The read-only
-planning job snapshots remote main when it starts and selects the highest
-canonical stable `vMAJOR.MINOR.PATCH` tag using numeric component comparison.
-Noncanonical tags, `latest`, and prereleases are ignored. With no stable tags,
-the baseline is `v0.0.0`: patch yields `v0.0.1`, minor `v0.1.0`, major `v1.0.0`.
-There is no version bump commit. Both builds and publication check out the same
-immutable selected SHA; if main advances meanwhile, the old snapshot remains
-the intended release, not the new main. The prospective version is embedded in
-the exact staged binaries before native verification. Only then does publication
-create the new tag and release directly in this run: tags created with the
-standard `GITHUB_TOKEN` do not trigger another tag workflow. A base conflict
-requires a fresh dispatch. API errors fail loudly; if tag creation succeeds but
-release creation fails, the tag stays immutable and is not removed or reused by
-a later manual dispatch. To recover, dispatch a new version and leave the failed
-version reserved. Pushing the same existing remote tag is a no-op, not a retry.
-Publishing that exact reserved version would require a separately validated
-existing-tag recovery workflow; no such recovery entry point is provided here.
-
-Alternatively, create an annotated
-canonical version tag on the intended reviewed commit and push that tag, for
-example (operator commands; not executed by these scripts):
+Install the tracked hook once per clone (requires Python 3 and Git):
 
 ```sh
-git push origin main
-git tag -a v0.1.0 <reviewed-commit> -m 'Release v0.1.0'
-git push origin v0.1.0
+make install-hooks
 ```
 
-Configure repository rules protecting `v*` against updates/deletion before the
-first stable publication, allowing the Actions workflow token to create new
-`v*` tags without permission to move or delete existing ones. Never reuse a published stable version; fixes require
-a new version tag.
+This sets the repository-local `core.hooksPath` to `.githooks`, refusing to
+replace a different custom hooks path. The pre-push hook examines updates whose
+**destination** is `refs/heads/main`. It reads `VERSION` from the exact commit
+being pushed, queries that destination remote's tags, and requires the version
+to be numerically greater than every canonical stable tag. Uncommitted edits
+do not count. Branch pushes are not releases and are not version-gated. Deleting
+main is rejected. Remote/authentication failures block the push rather than
+silently using stale local tags.
 
-The scripts never push or publish locally unless `scripts/publish.sh` is invoked
-explicitly with GitHub credentials. No remote publication is part of local
-verification. Workflow behavior, hosted native runtime availability, and actual
-release API operations require validation after pushing; cross-compilation or
-emulation alone is not native Linux runtime proof.
+For each subsequent release, choose a bump, include it in your reviewed commit,
+then push:
+
+```sh
+make bump-patch              # or bump-minor / bump-major
+git add VERSION             # stage your code changes too
+git commit -m "fix(cli): describe the change"
+git push origin main
+```
+
+The bump commands edit only the working-tree `VERSION`; they do not commit,
+tag, or publish. They increment its existing value, not a cached remote version.
+If the remote has advanced, choose a newer version and recommit. This migration
+already selects `0.1.2`, following locally known `v0.1.1`; confirm that remote
+tags have not advanced before the first push.
+
+Hooks can be bypassed and are not installed automatically on clone. The same
+version policy is enforced independently by CI before builds. For server-side
+protection, require the `plan` and both native `verify` checks on PRs and protect
+main from unreviewed/direct pushes. CI cannot undo a push that bypassed the
+local hook; it can and does refuse to publish it.
+
+## GitHub publication
+
+Pushes to main and PRs run the same read-only planning and native verification.
+The plan reads `VERSION` at the event's checked-out SHA, requires it to exceed
+all remote canonical stable tags, and records that SHA, candidate tag, and
+highest stable base. Noncanonical tags, prereleases, and historical `latest`
+are ignored; an empty stable tag set uses `v0.0.0` as the baseline.
+
+Both macOS ARM64 and Linux AMD64 jobs build and test exactly that SHA and
+prospective version. An unexpected hosted-runner architecture fails rather
+than silently cross-building. PRs never publish or receive write credentials.
+Action references remain pinned to reviewed commit SHAs.
+
+Only successful main pushes proceed to the serialized publisher. It verifies
+downloaded archives, refuses an existing release, and rechecks the committed
+version, source SHA, highest stable base, and candidate absence before atomically
+creating the tag. It then verifies the tag's target and publishes the verified
+assets. The Homebrew job updates the tap in the same workflow run. Tag pushes
+do not trigger releases, and workflow-created tags do not require a second run.
+No script moves stable tags, replaces stable assets, or deletes releases.
+
+Concurrent pushes may select the same base; if the base changes while builds
+run, the later publisher fails closed. Push a reviewed commit with a newer
+version to release again; do not force a stale publisher through.
+
+### Activation and partial failures
+
+Push the initialized tap first, then this source workflow and its version commit.
+Pushing main starts the entire release; no subsequent manual bump is needed.
+Configure repository rules protecting `v*` against updates/deletion, while
+allowing the Actions token to create tags. Administrators must still preserve
+published tag/asset immutability.
+
+If verification fails before tag creation, fix the problem and push; the same
+unreserved version may be used if it still exceeds the remote tags. If tag
+creation succeeds but publication fails, leave that version reserved, bump
+`VERSION`, and push the fix. Neither a workflow rerun nor pushing an existing
+tag replaces a reserved/published version. If only the tap fails, use the
+tap-only recovery described above instead of making another release.
+
+No remote writes are part of local checks or bump commands. Explicitly invoking
+`scripts/publish.sh` or `scripts/version_release.py create` with publication
+credentials can write remote tags/releases; the Homebrew updater can write the
+remote tap. Offline tests use temporary Git repositories and fake GitHub API
+responses. Actual hosted execution and native Homebrew installation on both
+platforms still require validation after pushing.

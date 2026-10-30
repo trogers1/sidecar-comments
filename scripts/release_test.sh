@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Offline negative-boundary tests. Fixture seals below are NOT verification claims.
 set -euo pipefail
-python3 scripts/manual_release_test.py
+python3 scripts/version_release_test.py
 python3 scripts/update_homebrew_test.py
 work=$(mktemp -d "${TMPDIR:-/tmp}/sidecar-release-test.XXXXXX")
 trap 'rm -rf "$work"' EXIT
@@ -114,12 +114,21 @@ printf 'tamper\n' >> "$RELEASE_STAGE/sidecar"
 reject bash scripts/release.sh package
 reject bash scripts/release.sh verify
 [[ ! -e $RELEASE_STAGE/verified.sha256 ]] # failed verification revokes seal
-# Publication boundary fake: no GitHub requests, validate write refusal paths.
-mkdir "$work/tools" "$work/publish"
-printf 'darwin archive\n' > "$work/publish/sidecar_darwin_arm64.tar.gz"
-printf 'linux archive\n' > "$work/publish/sidecar_linux_amd64.tar.gz"
-for asset in sidecar_darwin_arm64.tar.gz sidecar_linux_amd64.tar.gz; do
-  (cd "$work/publish" && shasum -a 256 "$asset" > "$asset.sha256")
+# Publication tests run the actual publisher and version gate in a disposable
+# committed repository. Only gh is fake; no network or real remote writes.
+mkdir -p "$work/tools" "$work/publish" "$work/repo/scripts"
+cp scripts/publish.sh scripts/release.sh scripts/version_release.py "$work/repo/scripts/"
+printf '1.2.3\n' > "$work/repo/VERSION"
+git -C "$work/repo" init -q
+git -C "$work/repo" add VERSION scripts
+git -C "$work/repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm fixture
+export RELEASE_SHA
+RELEASE_SHA=$(git -C "$work/repo" rev-parse HEAD)
+export GITHUB_SHA="$RELEASE_SHA" GITHUB_EVENT_NAME=push GITHUB_REF=refs/heads/main
+export RELEASE_REF=refs/tags/v1.2.3 RELEASE_BASE=refs/tags/v1.2.2
+for platform in darwin_arm64 linux_amd64; do
+  printf '%s archive\n' "$platform" > "$work/publish/sidecar_$platform.tar.gz"
+  (cd "$work/publish" && shasum -a 256 "sidecar_$platform.tar.gz" > "sidecar_$platform.tar.gz.sha256")
 done
 cat > "$work/tools/gh" <<'GH'
 #!/usr/bin/env bash
@@ -130,81 +139,83 @@ if [[ -n ${GH_FAIL_MATCH:-} && $* == *"$GH_FAIL_MATCH"* ]]; then
   exit 1
 fi
 case "$*" in
-  'api repos/example/repo/git/ref/heads/main --jq .object.sha') printf '%s\n' "${REMOTE_SHA:-stale}" ;;
-  'api repos/example/repo/commits/v1.2.3 --jq .sha') printf '%s\n' "${REMOTE_SHA:-$RELEASE_SHA}" ;;
   'api --paginate repos/example/repo/releases --jq .[].tag_name') printf '%s\n' "${EXISTING_RELEASE:-}" ;;
-  'api --paginate repos/example/repo/git/refs/tags --jq .[].ref')
-    if [[ -z ${EXISTING_TAGS:-} ]]; then echo 'gh: Not Found (HTTP 404)' >&2; exit 1; fi
-    printf '%s\n' "$EXISTING_TAGS" ;;
-  'api --paginate repos/example/repo/git/matching-refs/tags/ --jq .[].ref') printf '%s\n' "${EXISTING_TAGS:-}" ;;
-  'api --method PATCH repos/example/repo/git/refs/tags/latest -f sha='*' -F force=true') ;;
-  'api --method POST repos/example/repo/git/refs -f ref=refs/tags/latest -f sha='*) ;;
-  'release delete latest --yes') ;;
-  'release create latest '*) ;;
-  'release create v1.2.3 '*) ;;
+  'api --paginate --slurp repos/example/repo/git/matching-refs/tags/')
+    printf '[[{"ref":"%s"}]]\n' "${REMOTE_BASE:-$RELEASE_BASE}" ;;
+  'api --method POST repos/example/repo/git/refs -f ref=refs/tags/v1.2.3 -f sha='*)
+    touch "$TAG_CREATED"
+    if [[ ${PARTIAL_TAG_FAILURE:-} == yes ]]; then echo 'tag created but response failed' >&2; exit 1; fi
+    printf '{"ref":"%s","object":{"sha":"%s"}}\n' "$RELEASE_REF" "$RELEASE_SHA" ;;
+  'api repos/example/repo/commits/v1.2.3 --jq .sha') printf '%s\n' "${REMOTE_SHA:-$RELEASE_SHA}" ;;
+  'release create v1.2.3 --verify-tag '*) touch "$RELEASE_CREATED" ;;
   *) echo "unexpected gh invocation: $*" >&2; exit 1 ;;
 esac
 GH
 chmod +x "$work/tools/gh"
-export PATH="$work/tools:$PATH" GH_CALLS="$work/calls" GH_REPO=example/repo RELEASE_OUT="$work/publish"
-RELEASE_REF=refs/heads/main reject bash scripts/publish.sh
-grep -Fq 'Refusing stale rolling publication' "$work/output"
-EXISTING_RELEASE=v1.2.3 reject bash scripts/publish.sh
-grep -Fq 'Stable release already exists' "$work/output"
-REMOTE_SHA=wrong reject bash scripts/publish.sh
-grep -Fq 'Stable tag changed' "$work/output"
-# API failures must not be mistaken for missing releases or refs.
-for endpoint in commits/v1.2.3 releases; do
-  : > "$GH_CALLS"
-  GH_FAIL_MATCH=$endpoint reject bash scripts/publish.sh
-  grep -Fq 'simulated GitHub API failure' "$work/output"
-  ! grep -Eq 'release create|release delete|--method' "$GH_CALLS"
-done
-: > "$GH_CALLS"
-RELEASE_REF=refs/heads/main GH_FAIL_MATCH=git/ref/heads/main reject bash scripts/publish.sh
-grep -Fq 'simulated GitHub API failure' "$work/output"
-! grep -Eq 'release create|release delete|--method' "$GH_CALLS"
-# A corrupted downloaded asset must fail before even contacting GitHub.
+export PATH="$work/tools:$PATH" GH_CALLS="$work/calls" GH_REPO=example/repo GH_TOKEN=offline-fixture
+export RELEASE_OUT="$work/publish" TAG_CREATED="$work/tag-created" RELEASE_CREATED="$work/release-created"
+cd "$work/repo"
+reset_publication() { : > "$GH_CALLS"; rm -f "$TAG_CREATED" "$RELEASE_CREATED"; }
+# Corrupt/missing checksums must stop before even read-only API requests.
 cp "$RELEASE_OUT/sidecar_linux_amd64.tar.gz" "$work/original-archive"
-printf 'tampered archive\n' >> "$RELEASE_OUT/sidecar_linux_amd64.tar.gz"
-: > "$GH_CALLS"
+printf 'tampered\n' >> "$RELEASE_OUT/sidecar_linux_amd64.tar.gz"
+reset_publication
+reject bash scripts/publish.sh
+[[ ! -s $GH_CALLS && ! -e $TAG_CREATED && ! -e $RELEASE_CREATED ]]
+cp "$work/original-archive" "$RELEASE_OUT/sidecar_linux_amd64.tar.gz"
+mv "$RELEASE_OUT/sidecar_linux_amd64.tar.gz.sha256" "$work/checksum"
+reset_publication
 reject bash scripts/publish.sh
 [[ ! -s $GH_CALLS ]]
-cp "$work/original-archive" "$RELEASE_OUT/sidecar_linux_amd64.tar.gz"
-# An absent stable release creates once, without clobber/delete/tag mutations.
-unset REMOTE_SHA
-bash scripts/publish.sh > "$work/output"
-grep -Fq 'release create v1.2.3 --verify-tag' "$GH_CALLS"
-! grep -Eq 'clobber|release delete|--method' "$GH_CALLS"
-# Main success traces assert the exact allowed mutations and asset arguments.
-for existing in empty absent present; do
-  : > "$GH_CALLS"
-  if [[ $existing == present ]]; then
-    tags=$'refs/tags/v1.2.3\nrefs/tags/latest'; releases=$'v1.2.3\nlatest'
-  elif [[ $existing == absent ]]; then
-    tags=refs/tags/v1.2.3; releases=v1.2.3
-  else tags=; releases=; fi
-  RELEASE_REF=refs/heads/main REMOTE_SHA=$RELEASE_SHA EXISTING_TAGS="$tags" EXISTING_RELEASE="$releases" bash scripts/publish.sh > "$work/output"
-  {
-    printf '%s\n' 'api repos/example/repo/git/ref/heads/main --jq .object.sha' 'api --paginate repos/example/repo/git/matching-refs/tags/ --jq .[].ref'
-    if [[ $existing == present ]]; then
-      printf 'api --method PATCH repos/example/repo/git/refs/tags/latest -f sha=%s -F force=true\n' "$RELEASE_SHA"
-    else printf 'api --method POST repos/example/repo/git/refs -f ref=refs/tags/latest -f sha=%s\n' "$RELEASE_SHA"; fi
-    printf '%s\n' 'api --paginate repos/example/repo/releases --jq .[].tag_name'
-    if [[ $existing == present ]]; then printf '%s\n' 'release delete latest --yes'; fi
-    printf 'release create latest --verify-tag --title Latest build --latest=false --notes CLI-only rolling build 0.0.0-main.%s (%s). Neovim is deferred. sidecar_darwin_arm64.tar.gz sidecar_linux_amd64.tar.gz checksums.txt\n' "$RELEASE_SHA" "$RELEASE_SHA"
-  } > "$work/expected-calls"
-  cmp "$work/expected-calls" "$GH_CALLS"
+mv "$work/checksum" "$RELEASE_OUT/sidecar_linux_amd64.tar.gz.sha256"
+# Unsupported triggers cannot publish, even when handed stable identities.
+for event in workflow_dispatch release; do
+  reset_publication
+  GITHUB_EVENT_NAME=$event reject bash scripts/publish.sh
+  [[ ! -s $GH_CALLS ]]
 done
-for failure in 'git/matching-refs/tags/ --jq' 'releases --jq' 'api --method PATCH' 'release delete' 'release create'; do
-  : > "$GH_CALLS"
-  RELEASE_REF=refs/heads/main REMOTE_SHA=$RELEASE_SHA EXISTING_TAGS=refs/tags/latest EXISTING_RELEASE=latest GH_FAIL_MATCH="$failure" reject bash scripts/publish.sh
+reset_publication
+GITHUB_REF=refs/tags/v1.2.3 reject bash scripts/publish.sh
+[[ ! -s $GH_CALLS ]]
+reset_publication
+EXISTING_RELEASE=v1.2.3 reject bash scripts/publish.sh
+grep -Fq 'Stable release already exists' "$work/output"
+[[ $(wc -l < "$GH_CALLS") -eq 1 && ! -e $TAG_CREATED ]]
+# A changed remote base or a VERSION/ref mismatch never creates a tag.
+reset_publication
+REMOTE_BASE=refs/tags/v1.2.4 reject bash scripts/publish.sh
+[[ ! -e $TAG_CREATED && ! -e $RELEASE_CREATED ]]
+reset_publication
+RELEASE_REF=refs/tags/v1.2.4 reject bash scripts/publish.sh
+[[ ! -e $TAG_CREATED && ! -e $RELEASE_CREATED ]]
+# Every API failure is terminal, including failures after atomic tag creation.
+for failure in 'releases --jq' 'git/matching-refs/tags/' 'api --method POST' 'commits/v1.2.3' 'release create'; do
+  reset_publication
+  GH_FAIL_MATCH="$failure" reject bash scripts/publish.sh
   grep -Fq 'simulated GitHub API failure' "$work/output"
-  # The failed command must be the last call: no mutation after any API error.
   [[ $(awk 'END {print}' "$GH_CALLS") == *"$failure"* ]]
+  [[ ! -e $RELEASE_CREATED ]]
+  case $failure in commits/*|'release create') [[ -e $TAG_CREATED ]] ;; *) [[ ! -e $TAG_CREATED ]] ;; esac
 done
-: > "$GH_CALLS"
-RELEASE_REF=refs/heads/main REMOTE_SHA=$RELEASE_SHA GH_FAIL_MATCH='api --method POST' reject bash scripts/publish.sh
-grep -Fq 'simulated GitHub API failure' "$work/output"
+reset_publication
+PARTIAL_TAG_FAILURE=yes reject bash scripts/publish.sh
+[[ -e $TAG_CREATED && ! -e $RELEASE_CREATED ]]
 [[ $(awk 'END {print}' "$GH_CALLS") == *'api --method POST'* ]]
+reset_publication
+REMOTE_SHA=0000000000000000000000000000000000000000 reject bash scripts/publish.sh
+grep -Fq 'Stable tag changed' "$work/output"
+[[ -e $TAG_CREATED && ! -e $RELEASE_CREATED ]]
+[[ $(awk 'END {print}' "$GH_CALLS") == *'commits/v1.2.3 --jq .sha' ]]
+# Successful trace permits exactly one create-only tag mutation and release.
+reset_publication
+bash scripts/publish.sh > "$work/output"
+{
+  printf '%s\n' 'api --paginate repos/example/repo/releases --jq .[].tag_name' 'api --paginate --slurp repos/example/repo/git/matching-refs/tags/'
+  printf 'api --method POST repos/example/repo/git/refs -f ref=refs/tags/v1.2.3 -f sha=%s\n' "$RELEASE_SHA"
+  printf '%s\n' 'api repos/example/repo/commits/v1.2.3 --jq .sha'
+  printf 'release create v1.2.3 --verify-tag --title v1.2.3 --latest --notes CLI-only stable build 1.2.3 (%s). Neovim is deferred. sidecar_darwin_arm64.tar.gz sidecar_linux_amd64.tar.gz checksums.txt\n' "$RELEASE_SHA"
+} > "$work/expected-calls"
+cmp "$work/expected-calls" "$GH_CALLS"
+[[ -e $TAG_CREATED && -e $RELEASE_CREATED ]]
+(cd "$RELEASE_OUT" && shasum -a 256 -c checksums.txt)
 printf '%s\n' 'release identity, gates, archive bytes, checksums, overwrite, tamper and publication checks passed'

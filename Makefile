@@ -1,6 +1,17 @@
 GO := go
 FUZZ_TIME ?= 5s
 
+.PHONY: install-hooks bump-patch bump-minor bump-major
+
+# Git does not install tracked hooks on clone. Refuse to replace custom hooks.
+install-hooks:
+	@set -eu; current="$$(git config --get core.hooksPath || test $$? -eq 1)"; \
+		case "$$current" in ''|.githooks) ;; *) echo "Refusing to replace core.hooksPath=$$current" >&2; exit 1 ;; esac; \
+		git config --local core.hooksPath .githooks
+
+bump-patch bump-minor bump-major:
+	@python3 scripts/version_release.py bump $(patsubst bump-%,%,$@)
+
 .PHONY: contracts-check contract-artifacts build test-contract test-contract-red preimplementation-check full-red require-sidecar-bin release test test-race test-fuzz test-neovim gofmt-check vet mod-tidy-check check cli-gate test-cli-helpers test-cli-helpers-race vet-cli test-cli-subject test-release-scripts
 
 contracts-check contract-artifacts:

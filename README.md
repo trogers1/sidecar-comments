@@ -31,15 +31,18 @@ sidecar --output json version
 Update with `brew update && brew upgrade sidecar`. The public
 [Homebrew tap](https://github.com/trogers1/homebrew-tap) installs checked,
 versioned release binaries; no Go toolchain is needed. It does not follow the
-rolling `latest` build. The tap must be pushed before this installation is available.
+historical rolling `latest` build. The tap must be pushed before this installation is available.
 
 ### Download a checked binary · no Go required
 
-The release workflow publishes a rolling **[Latest build](https://github.com/trogers1/sidecar-comments/releases/tag/latest)** after passing checks on `main`. Its download URLs stay the same, but its contents move forward. The binary reports a commit-specific version so you can identify the build.
+Every push to `main` verifies the committed `VERSION` on both supported platforms,
+then publishes that stable release and updates Homebrew in the same workflow.
+Maintainers install the pre-push guard with `make install-hooks`, choose a version
+with `make bump-patch` (or `bump-minor` / `bump-major`), and commit `VERSION` with
+their changes before pushing. CI independently enforces the version gate. See the
+[release runbook](docs/releases.md) for setup, protection rules, and recovery.
 
-Maintainers can publish a stable version from **Actions → CLI verification and releases → Run workflow** on **main**, choosing a **major**, **minor**, or **patch** bump; both native gates must pass before a new tag is created. See the [release runbook](docs/releases.md) for version selection and repository protection setup.
-
-For a pinned installation, choose an immutable **`vX.Y.Z` tag** from the [releases page](https://github.com/trogers1/sidecar-comments/releases). Replace `latest` below with that exact tag. A release link is available only after the workflow has successfully published it; this checkout does not itself publish a release.
+For a pinned installation, choose an immutable **`vX.Y.Z` tag** from the [releases page](https://github.com/trogers1/sidecar-comments/releases). Use that exact tag below (for example `v0.1.1`). A release link is available only after the workflow has successfully published it; this checkout does not itself publish a release.
 
 | Your machine | Archive |
 | --- | --- |
@@ -49,7 +52,7 @@ For a pinned installation, choose an immutable **`vX.Y.Z` tag** from the [releas
 For example, on macOS Apple Silicon, download into a fresh scratch directory:
 
 ```sh
-RELEASE=latest
+RELEASE=v0.1.1
 ARCHIVE=sidecar_darwin_arm64.tar.gz
 BASE="https://github.com/trogers1/sidecar-comments/releases/download/$RELEASE"
 curl -fLO "$BASE/$ARCHIVE"
@@ -68,7 +71,7 @@ export PATH="$HOME/.local/bin:$PATH"
 sidecar --output json version
 ```
 
-Add the `PATH` export to your shell configuration to keep it for future sessions. To update, repeat the download and verification with `latest` or a newer pinned tag.
+Add the `PATH` export to your shell configuration to keep it for future sessions. To update, repeat the download and verification with a newer stable tag.
 
 ### With Go
 
@@ -263,7 +266,26 @@ The [v1 specification](docs/v1/index.md) is authoritative. Useful stops:
 
 The CLI stores local conversations; it is not a GitLab client and does not import or synchronize remote reviews. GitLab fields, when supplied, are descriptive metadata only.
 
-For contributors, the toolchain is pinned in `mise.toml`. Build the CLI and independent contract harness, then run the focused public-process suite:
+### Contributor setup · once per clone
+
+CLI users do not need these development prerequisites. Contributors need Git,
+Python 3, Make, and the Go toolchain pinned in `mise.toml`.
+
+From the repository root, install the tracked Git hooks:
+
+```sh
+make install-hooks
+```
+
+This enables the pre-push version guard for pushes to `main`. It checks the
+committed `VERSION` against the destination remote's stable tags, so access to
+that remote is required when pushing. CI enforces the same version rule even if
+the hook is bypassed. Setup refuses to overwrite a different custom hooks path;
+see the [release runbook](docs/releases.md#choose-a-version-before-pushing).
+
+### Build and test
+
+Build the CLI and independent contract harness, then run the focused public-process suite:
 
 ```sh
 make build

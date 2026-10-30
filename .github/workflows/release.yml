@@ -2,24 +2,18 @@ name: CLI verification and releases
 on:
   workflow_dispatch:
     inputs:
-      bump:
-        description: Stable version increment
-        required: true
-        type: choice
-        options: [patch, minor, major]
       homebrew_tag:
-        description: 'Tap-only retry for an already published stable tag (leave empty for a release)'
-        required: false
+        description: 'Tap-only recovery for an already published stable tag'
+        required: true
         type: string
   pull_request:
   push:
     branches: [main]
-    tags: ['v*']
 permissions:
   contents: read
 jobs:
   plan:
-    if: inputs.homebrew_tag == ''
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-24.04
     outputs:
       sha: ${{ steps.plan.outputs.sha }}
@@ -29,13 +23,12 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
+          ref: ${{ github.sha }}
       - id: plan
-        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          RELEASE_BUMP: ${{ inputs.bump }}
-        run: python3 scripts/manual_release.py plan
+        run: python3 scripts/version_release.py plan
   verify:
     needs: plan
     strategy:
@@ -50,8 +43,8 @@ jobs:
             artifact: linux_amd64
     runs-on: ${{ matrix.runner }}
     env:
-      RELEASE_REF: ${{ needs.plan.outputs.ref || (startsWith(github.ref, 'refs/tags/') && github.ref || 'refs/heads/main') }}
-      RELEASE_SHA: ${{ needs.plan.outputs.sha || github.sha }}
+      RELEASE_REF: ${{ needs.plan.outputs.ref }}
+      RELEASE_SHA: ${{ needs.plan.outputs.sha }}
       RELEASE_PLATFORM: ${{ matrix.platform }}
       RELEASE_STAGE: .tmp/release-stage
       RELEASE_OUT: .tmp/release-assets
@@ -59,7 +52,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
-          ref: ${{ needs.plan.outputs.sha || github.sha }}
+          ref: ${{ needs.plan.outputs.sha }}
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
           go-version-file: go.mod
@@ -73,9 +66,7 @@ jobs:
           if-no-files-found: error
   publish:
     needs: [plan, verify]
-    outputs:
-      stable_tag: ${{ steps.homebrew.outputs.stable_tag }}
-    if: inputs.homebrew_tag == '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -85,33 +76,26 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
-      RELEASE_REF: ${{ needs.plan.outputs.ref || github.ref }}
-      RELEASE_SHA: ${{ needs.plan.outputs.sha || github.sha }}
+      RELEASE_REF: ${{ needs.plan.outputs.ref }}
+      RELEASE_SHA: ${{ needs.plan.outputs.sha }}
       RELEASE_BASE: ${{ needs.plan.outputs.base }}
-      RELEASE_BUMP: ${{ inputs.bump }}
-      RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || 'existing' }}
       RELEASE_OUT: .tmp/release-assets
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
-          ref: ${{ needs.plan.outputs.sha || github.sha }}
+          ref: ${{ needs.plan.outputs.sha }}
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           pattern: release-*
           merge-multiple: true
           path: .tmp/release-assets
       - run: bash scripts/publish.sh
-      - id: homebrew
-        run: |
-          if [[ "$RELEASE_REF" == refs/tags/v* ]]; then
-            printf 'stable_tag=%s\n' "${RELEASE_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          fi
   homebrew:
-    needs: publish
+    needs: [plan, publish]
     if: >-
       always() && !cancelled() &&
-      ((needs.publish.result == 'success' && needs.publish.outputs.stable_tag != '') ||
+      ((needs.publish.result == 'success') ||
        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.homebrew_tag != ''))
     runs-on: ubuntu-24.04
     concurrency:
@@ -121,10 +105,13 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
+          ref: ${{ needs.plan.outputs.sha || github.sha }}
       - name: Update Homebrew tap from published stable release
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          HOMEBREW_TAG: ${{ needs.publish.outputs.stable_tag || inputs.homebrew_tag }}
+          HOMEBREW_REF: ${{ needs.plan.outputs.ref }}
+          HOMEBREW_TAG: ${{ inputs.homebrew_tag }}
         run: |
           test -n "$GH_TOKEN" || { echo 'HOMEBREW_TAP_TOKEN is required' >&2; exit 1; }
-          python3 scripts/update_homebrew.py "$HOMEBREW_TAG"
+          tag="${HOMEBREW_TAG:-${HOMEBREW_REF#refs/tags/}}"
+          python3 scripts/update_homebrew.py "$tag"
