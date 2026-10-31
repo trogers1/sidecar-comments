@@ -44,7 +44,8 @@ case $command in
     mkdir -p "$stage"
     go build -trimpath -ldflags "-X github.com/trogers1/sidecar-comments/internal/cli.buildVersion=$version" -o "$stage/sidecar" ./cmd/sidecar
     cp README.md LICENSE THIRD_PARTY_NOTICES "$stage/"
-    printf 'version=%s\ncommit=%s\nplatform=%s\nformat=1\nprotocol=1\ngo=%s\ncorpus=%s\n' "$version" "$RELEASE_SHA" "$RELEASE_PLATFORM" "$(go env GOVERSION)" "$RELEASE_SHA" > "$stage/build-info.txt"
+    contract_versions=$(go run scripts/contract_definitions.go --versions) || fail 'cannot derive format/protocol metadata'
+    printf 'version=%s\ncommit=%s\nplatform=%s\n%s\ngo=%s\ncorpus=%s\n' "$version" "$RELEASE_SHA" "$RELEASE_PLATFORM" "$contract_versions" "$(go env GOVERSION)" "$RELEASE_SHA" > "$stage/build-info.txt"
     (cd "$stage" && shasum -a 256 sidecar README.md LICENSE THIRD_PARTY_NOTICES build-info.txt > staged.sha256)
     ;;
   verify)

@@ -1,0 +1,27 @@
+{
+  "fixture_version": 2,
+  "id": "p4-thread-missing",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "--output",
+    "json",
+    "thread"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"usage\",\"message\":\"usage:argv:missing\",\"details\":{\"field\":\"argv\",\"reason\":\"missing\"}}}\n",
+    "invocation_error": "argv",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

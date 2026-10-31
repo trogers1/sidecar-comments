@@ -22,7 +22,7 @@ func TestSubjectUpdateAndAuthorGuard(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := `{"protocol":1,"error":{"code":"precondition","message":"precondition:message-add:if_last_author_kind","details":{"operation":"message-add","reason":"if_last_author_kind"}}}` + "\n"
+	want := `{"protocol":2,"error":{"code":"precondition","message":"precondition:message-add:if_last_author_kind","details":{"operation":"message-add","reason":"if_last_author_kind"}}}` + "\n"
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 6, Stderr: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -45,7 +45,7 @@ func TestSubjectUpdateAndAuthorGuard(t *testing.T) {
 	updatedRevision := fmt.Sprintf("sha256:%x", sha256.Sum256(updated))
 	message := `{"id":"` + messageID + `","author":{"kind":"human"},"body":"y"}`
 	thread := `{"id":"` + threadID + `","location":{"kind":"file"},"messages":[` + message + `]}`
-	want = fmt.Sprintf(`{"protocol":1,"command":"message-update","changed":true,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, message, updatedRevision, updatedRevision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"message-update","changed":true,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, message, updatedRevision, updatedRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func TestSubjectDoubleSuffixSource(t *testing.T) {
 	}
 	revision := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(canonicalNote)))
 	thread := `{"id":"` + threadID + `","location":{"kind":"file"},"messages":[{"id":"` + messageID + `","author":{"kind":"human"},"body":"x"}]}`
-	want := fmt.Sprintf(`{"protocol":1,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

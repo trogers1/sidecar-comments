@@ -156,7 +156,13 @@ func parseDocument(r ParseRequest) (RepairDocument, error) {
 		offsets[i] = n
 		n += len(line) + 1
 	}
-	i := 0
+	if lines[0] != formatHeader {
+		if strings.HasPrefix(lines[0], domain.ThreadOpenPrefix) || unsupportedHeader(unsupportedHeaderRequest{Text: lines[0]}) {
+			return out, domain.Unsupported(domain.UnsupportedRequest{Received: "format"})
+		}
+		return out, invalid(invalidRequest{})
+	}
+	i := 1
 	seenT := map[string]bool{}
 	seenM := map[string]bool{}
 	total := 0
@@ -176,6 +182,14 @@ func parseDocument(r ParseRequest) (RepairDocument, error) {
 			return out, e
 		}
 		t := domain.Thread{ID: id, Location: l, Messages: []domain.Message{}}
+		i++
+		if i >= len(lines)-1 {
+			return out, invalid(invalidRequest{})
+		}
+		t.Tracking, e = parseTracking(parseTrackingRequest{Text: lines[i], Mode: r.Mode, Location: l})
+		if e != nil {
+			return out, e
+		}
 		i++
 		end := domain.ThreadClosePrefix + id + "]"
 		for {
@@ -252,6 +266,9 @@ func parseDocument(r ParseRequest) (RepairDocument, error) {
 	}
 	if len(out.Threads) == 0 {
 		return out, invalid(invalidRequest{})
+	}
+	if err := domain.ValidateDocumentTracking(domain.ValidateDocumentTrackingRequest{Threads: out.Threads}); err != nil {
+		return out, err
 	}
 	if r.Mode != "format" {
 		var canonical string

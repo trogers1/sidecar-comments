@@ -6,7 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
+	"unicode/utf16"
+	"unicode/utf8"
 )
 
 // scanJSON rejects duplicate object members without decoding untrusted values
@@ -41,6 +44,9 @@ type scanner struct {
 }
 
 func uniqueJSON(b []byte) error {
+	if !utf8.Valid(b) {
+		return errors.New("invalid JSON UTF-8")
+	}
 	s := scanner{b: b}
 	s.space()
 	if e := s.value(); e != nil {
@@ -107,6 +113,12 @@ func (s *scanner) str() (string, error) {
 			return v, nil
 		}
 		if c == '\\' {
+			if s.i+6 <= len(s.b) && s.b[s.i+1] == 'u' {
+				value, err := strconv.ParseUint(string(s.b[s.i+2:s.i+6]), 16, 16)
+				if err != nil || utf16.IsSurrogate(rune(value)) {
+					return "", errors.New("invalid JSON Unicode escape")
+				}
+			}
 			s.i += 2
 			if s.i > len(s.b) {
 				break
@@ -227,7 +239,8 @@ type publicError struct {
 	Details       json.RawMessage `json:"details"`
 }
 
-func decodeEnvelope(b []byte) error {
+func decodeEnvelope(b []byte) error { return decodeVersionedEnvelope(b, 1) }
+func decodeVersionedEnvelope(b []byte, protocol int) error {
 	if len(b) == 0 || b[len(b)-1] != '\n' || bytes.Count(b, []byte("\n")) != 1 {
 		return errors.New("JSON output must be one LF-terminated object")
 	}
@@ -244,12 +257,13 @@ func decodeEnvelope(b []byte) error {
 	if e := d.Decode(&x); e != nil {
 		return e
 	}
-	if x.Protocol != 1 || x.Command == "" || x.Changed == nil || !isObject(x.Result) {
+	if x.Protocol != protocol || x.Command == "" || x.Changed == nil || !isObject(x.Result) {
 		return errors.New("invalid success envelope")
 	}
 	return uniqueJSON(x.Result)
 }
-func decodeErrorEnvelope(b []byte) error {
+func decodeErrorEnvelope(b []byte) error { return decodeVersionedErrorEnvelope(b, 1) }
+func decodeVersionedErrorEnvelope(b []byte, protocol int) error {
 	if len(b) == 0 || b[len(b)-1] != '\n' || bytes.Count(b, []byte("\n")) != 1 {
 		return errors.New("JSON error must be one LF-terminated object")
 	}
@@ -266,7 +280,7 @@ func decodeErrorEnvelope(b []byte) error {
 	if e := d.Decode(&x); e != nil {
 		return e
 	}
-	if x.Protocol != 1 || x.Error.Code == "" || x.Error.Message == "" || !isObject(x.Error.Details) {
+	if x.Protocol != protocol || x.Error.Code == "" || x.Error.Message == "" || !isObject(x.Error.Details) {
 		return errors.New("invalid error envelope")
 	}
 	return uniqueJSON(x.Error.Details)
@@ -305,10 +319,10 @@ func parseInvocation(argv []string) (invocation, error) {
 	}
 	if command == "--version" {
 		command = "version"
-	} else if strings.Contains(command, "-") {
+	} else if strings.Contains(command, "-") && command != "editor-update" {
 		return invocation{}, fmt.Errorf("unknown command %q", command)
 	}
-	if command == "thread" || command == "message" {
+	if command == "thread" || command == "message" || command == "source" {
 		if at == len(argv) {
 			if output == "text" {
 				return help, nil
@@ -332,14 +346,22 @@ func parseInvocation(argv []string) (invocation, error) {
 		flags = "file check"
 	case "fix":
 		flags = "file check add-missing-message-ids"
-	case "thread-list":
+	case "source-inspect":
 		flags = "file"
-	case "thread-get", "thread-delete":
+	case "sync":
+		flags = "file check"
+	case "editor-update":
+		flags = "file operations-file"
+	case "thread-list":
+		flags = "file include-tracking"
+	case "thread-get":
+		flags = "file id include-tracking"
+	case "thread-delete":
 		flags = "file id"
 	case "thread-create":
-		flags = "file location author-kind author-name body-file external-author-id id message-id gitlab-json"
+		flags = "file location author-kind author-name body-file external-author-id id message-id gitlab-json if-source-revision"
 	case "thread-move":
-		flags = "file id location"
+		flags = "file id location if-source-revision"
 	case "message-add":
 		flags = "file thread author-kind author-name body-file external-author-id id gitlab-json if-last-author-kind"
 	case "message-update":
@@ -381,7 +403,7 @@ func parseInvocation(argv []string) (invocation, error) {
 		}
 		seen[name] = true
 		ordinary = ordinary || !guard
-		if !hasValue && !oneOf(name, "check", "add-missing-message-ids") {
+		if !hasValue && !oneOf(name, "check", "add-missing-message-ids", "include-tracking") {
 			at++ // Values named --help or -h are not help requests.
 		}
 	}
@@ -398,7 +420,7 @@ func jsonOutput(argv []string) bool {
 
 func mutationCommand(command string) bool {
 	switch command {
-	case "format", "fix", "apply", "thread-create", "thread-move", "thread-delete", "message-add", "message-update", "message-delete":
+	case "sync", "editor-update", "format", "fix", "apply", "thread-create", "thread-move", "thread-delete", "message-add", "message-update", "message-delete":
 		return true
 	}
 	return false
@@ -453,13 +475,13 @@ func textErrorStatus(b []byte) (int, error) {
 	switch code {
 	case "usage":
 		field, reason, ok := strings.Cut(strings.TrimPrefix(message, "usage:"), ":")
-		valid = ok && message == "usage:"+field+":"+reason && oneOf(field, "argv", "output", "body", "metadata", "operations", "revision", "stdin") && oneOf(reason, "missing", "required", "repeated", "malformed", "incompatible", "too_large", "stdin_multiple")
+		valid = ok && message == "usage:"+field+":"+reason && oneOf(field, "argv", "output", "body", "metadata", "operations", "revision", "source_revision", "stdin") && oneOf(reason, "missing", "required", "repeated", "malformed", "incompatible", "too_large", "stdin_multiple")
 	case "validation":
 		valid = strings.HasPrefix(message, "validation:")
 	case "repair":
 		valid = message == "repair:document"
 	case "conflict":
-		valid = oneOf(message, "conflict:revision", "conflict:lock_timeout", "conflict:identity_changed")
+		valid = oneOf(message, "conflict:revision", "conflict:source_revision", "conflict:lock_timeout", "conflict:identity_changed")
 	case "not_found":
 		valid = oneOf(message, "not_found:thread", "not_found:message")
 	case "precondition":
@@ -504,13 +526,17 @@ func oneOf(value string, values ...string) bool {
 // not just arbitrary matching bytes. Status 3 has both legal shapes: a check
 // result is success output, while an invalid target is an error.
 func validateEnvelopes(g golden, status int, out, err []byte) error {
+	protocol := 1
+	if g.FixtureVersion == 2 {
+		protocol = 2
+	}
 	invocation, parseErr := parseInvocation(g.Argv)
 	if g.Expect.InvocationError != "" {
 		if g.Expect.InvocationError != "argv" || parseErr == nil || status != 2 || len(out) != 0 {
 			return errors.New("invalid argv-error fixture declaration")
 		}
 		if jsonOutput(g.Argv) {
-			if decodeErr := decodeErrorEnvelope(err); decodeErr != nil {
+			if decodeErr := decodeVersionedErrorEnvelope(err, protocol); decodeErr != nil {
 				return decodeErr
 			}
 			if errorStatus, statusErr := errorStatus(err); statusErr != nil || errorStatus != status {
@@ -599,7 +625,7 @@ func validateEnvelopes(g golden, status int, out, err []byte) error {
 		return errors.New("JSON response wrote both stdout and stderr")
 	}
 	if len(out) > 0 {
-		if err := decodeEnvelope(out); err != nil {
+		if err := decodeVersionedEnvelope(out, protocol); err != nil {
 			return fmt.Errorf("stdout success envelope: %w", err)
 		}
 		var value envelope
@@ -618,7 +644,7 @@ func validateEnvelopes(g golden, status int, out, err []byte) error {
 		return nil
 	}
 	if len(err) > 0 {
-		if err := decodeErrorEnvelope(err); err != nil {
+		if err := decodeVersionedErrorEnvelope(err, protocol); err != nil {
 			return fmt.Errorf("stderr error envelope: %w", err)
 		}
 		wantStatus, err := errorStatus(err)
@@ -637,7 +663,7 @@ func checkSuccessCommand(command string, argv []string) bool {
 	if command == "validate" {
 		return true
 	}
-	if command != "format" && command != "fix" {
+	if command != "format" && command != "fix" && command != "sync" {
 		return false
 	}
 	for _, argument := range argv {

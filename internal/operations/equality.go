@@ -7,7 +7,7 @@ import (
 )
 
 type comparableDTO interface {
-	domain.Location | domain.Author | *domain.GitLab
+	domain.Location | domain.Author | *domain.GitLab | *domain.TrackingRecord
 }
 type equalRequest[T comparableDTO] struct{ Left, Right T }
 

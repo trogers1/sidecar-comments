@@ -21,13 +21,13 @@ func TestSubjectMessageCascadeLifecycle(t *testing.T) {
 	const firstMessage = `{"id":"` + messageID + `","author":{"kind":"human"},"body":"x"}`
 	const reply = `{"id":"` + replyID + `","author":{"kind":"agent"},"body":"reply"}`
 	bothThread := `{"id":"` + threadID + `","location":{"kind":"file"},"messages":[` + firstMessage + `,` + reply + `]}`
-	bothBytes := []byte("[@th_" + threadID + " file]\n" + role + "x\n\n---bot <!-- sidecar-meta: {\"id\":\"" + replyID + "\"} -->\nreply\n" + endThread)
+	bothBytes := []byte(formatHeader + "[@th_" + threadID + " file]\n" + untrackedMetadata + role + "x\n\n---bot <!-- sidecar-meta: {\"id\":\"" + replyID + "\"} -->\nreply\n" + endThread)
 	bothRevision := fmt.Sprintf("sha256:%x", sha256.Sum256(bothBytes))
 	got, err := runProcess(runRequest{Binary: binary, Args: []string{"--output", "json", "message", "add", "--file", "note.txt.comments", "--thread", threadID, "--author-kind", "agent", "--body-file", "body", "--id", replyID, "--if-last-author-kind", "human"}, Dir: dir, Timeout: 5 * time.Second, OutputLimit: 8192})
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := fmt.Sprintf(`{"protocol":1,"command":"message-add","changed":true,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", bothThread, reply, bothRevision, bothRevision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"message-add","changed":true,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", bothThread, reply, bothRevision, bothRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +47,7 @@ func TestSubjectMessageCascadeLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want = fmt.Sprintf(`{"protocol":1,"command":"message-update","changed":false,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", bothThread, reply, bothRevision, bothRevision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"message-update","changed":false,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", bothThread, reply, bothRevision, bothRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func TestSubjectMessageCascadeLifecycle(t *testing.T) {
 		t.Fatal(err)
 	}
 	originalRevision := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(canonicalNote)))
-	want = fmt.Sprintf(`{"protocol":1,"command":"message-delete","changed":true,"result":{"deleted_message_id":%q,"storage_revision":%q,"canonical_revision":%q}}`+"\n", replyID, originalRevision, originalRevision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"message-delete","changed":true,"result":{"deleted_message_id":%q,"storage_revision":%q,"canonical_revision":%q}}`+"\n", replyID, originalRevision, originalRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +88,7 @@ func TestSubjectMessageCascadeLifecycle(t *testing.T) {
 		t.Fatal(err)
 	}
 	emptyRevision := fmt.Sprintf("sha256:%x", sha256.Sum256(nil))
-	want = fmt.Sprintf(`{"protocol":1,"command":"message-delete","changed":true,"result":{"deleted_thread_id":%q,"deleted_message_id":%q,"previous_storage_revision":%q,"storage_revision":null,"canonical_revision":%q}}`+"\n", threadID, messageID, originalRevision, emptyRevision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"message-delete","changed":true,"result":{"deleted_thread_id":%q,"deleted_message_id":%q,"previous_storage_revision":%q,"storage_revision":null,"canonical_revision":%q}}`+"\n", threadID, messageID, originalRevision, emptyRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

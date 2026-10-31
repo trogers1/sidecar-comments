@@ -51,6 +51,14 @@ func corpusDocument(r corpusRequest) domain.DocumentValue {
 		if err != nil {
 			r.T.Fatal(err)
 		}
+		// Reuse only the legacy corpus IDs/messages as test data, not its
+		// attachment: v2 intentionally provides no production migration path.
+		opening, rest, ok := strings.Cut(string(content), "\n")
+		if !ok || !strings.HasSuffix(opening, " line:1]") {
+			r.T.Fatal("unexpected legacy fixture location")
+		}
+		opening = strings.TrimSuffix(opening, " line:1]") + " file]"
+		content = []byte("<!-- sidecar-format: 2 -->\n" + opening + "\n<!-- sidecar-tracking: {} -->\n" + rest)
 		parsed, err := format.Parse(format.ParseRequest{Bytes: content, Mode: "normal"})
 		if err != nil {
 			r.T.Fatal(err)
@@ -140,15 +148,58 @@ func checkRoundtrip(r roundtripRequest) {
 	}
 }
 
+type trackingParserSeedsRequest struct {
+	T      testing.TB
+	Corpus domain.DocumentValue
+}
+
+func trackingParserSeeds(r trackingParserSeedsRequest) [][]byte {
+	r.T.Helper()
+	prefix := strings.Repeat("é", domain.MaxContextBytes-1) + "\t\"\\\n"
+	selection := "selected\t\"\\<&>🌍"
+	suffix := "\t\"\\\n" + strings.Repeat("🌍", domain.MaxContextBytes)
+	source, err := domain.NewSourceValue(domain.NewSourceValueRequest{Bytes: []byte(prefix + selection + suffix)})
+	if err != nil {
+		r.T.Fatal(err)
+	}
+	location, err := source.Location(domain.SourceOffsetsRequest{Start: len(prefix), End: len(prefix) + len(selection)})
+	if err != nil {
+		r.T.Fatal(err)
+	}
+	record, err := source.Capture(domain.SourceLocationRequest{Location: location})
+	if err != nil {
+		r.T.Fatal(err)
+	}
+	seeds := [][]byte{}
+	for _, unresolved := range []bool{false, true} {
+		thread := r.Corpus.Threads(domain.DocumentThreadsRequest{})[0]
+		thread.Location = location
+		if unresolved {
+			thread.Location = domain.Location{Kind: domain.LocationUnresolved}
+		}
+		thread.Tracking = &record
+		document, err := domain.NewDocumentValue(domain.NewDocumentValueRequest{Threads: []domain.Thread{thread}})
+		if err != nil {
+			r.T.Fatal(err)
+		}
+		checkRoundtrip(roundtripRequest{T: r.T, Value: document})
+		seeds = append(seeds, format.Encode(format.EncodeRequest{Document: document}))
+	}
+	return seeds
+}
+
 func FuzzParseDocument(f *testing.F) {
 	corpus := corpusDocument(corpusRequest{T: f})
+	for _, seed := range trackingParserSeeds(trackingParserSeedsRequest{T: f, Corpus: corpus}) {
+		f.Add(seed)
+	}
 	canonical := format.Encode(format.EncodeRequest{Document: fixture(fixtureRequest{T: f, Body: "first\n\nlast\n\n", Corpus: corpus})})
 	formatter := bytes.ReplaceAll(canonical, []byte("\n"), []byte("\r\n"))
 	metadataSpacing := bytes.ReplaceAll(canonical, []byte(`{"id":`), []byte(`{ "id": `))
 	// Derive the missing-metadata role line from the encoder, not a second
 	// definition of the metadata schema or ID grammar.
 	lines := strings.Split(string(canonical), "\n")
-	lines[1] = "---" + domain.RoleUser
+	lines[3] = "---" + domain.RoleUser
 	repair := []byte(strings.Join(lines, "\n"))
 	for _, seed := range [][]byte{nil, canonical, formatter, metadataSpacing, bytes.TrimSuffix(canonical, []byte("\n")), repair, []byte("\xff"), append([]byte{0}, canonical...), append([]byte("\xef\xbb\xbf"), canonical...), canonical[:len(canonical)/2]} {
 		f.Add(seed)

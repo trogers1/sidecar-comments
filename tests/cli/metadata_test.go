@@ -26,7 +26,7 @@ func TestSubjectStoredMetadata(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			dir := t.TempDir()
-			document := []byte("[@th_" + threadID + " lost]\n---" + tc.role + " <!-- sidecar-meta: " + tc.metadata + " -->\n" + tc.body + "\n" + endThread)
+			document := []byte(formatHeader + "[@th_" + threadID + " lost]\n" + untrackedMetadata + "---" + tc.role + " <!-- sidecar-meta: " + tc.metadata + " -->\n" + tc.body + "\n" + endThread)
 			initial := []fileRequest{{Path: "note.txt.comments", Mode: 0640, Bytes: document}}
 			if err := writeFile(fileRequest{Path: filepath.Join(dir, initial[0].Path), Mode: initial[0].Mode, Bytes: document}); err != nil {
 				t.Fatal(err)
@@ -37,7 +37,7 @@ func TestSubjectStoredMetadata(t *testing.T) {
 				t.Fatal(err)
 			}
 			// Raw UTF-8 canonical JSON never applies HTML escaping or NFC rewriting.
-			want := fmt.Sprintf(`{"protocol":1,"command":"thread-get","changed":false,"result":{"thread":{"id":%q,"location":{"kind":"lost"},"messages":[{"id":%q,"author":%s,"body":"%s"%s}]},"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, tc.id, tc.author, tc.body, tc.gitlab, revision, revision)
+			want := fmt.Sprintf(`{"protocol":2,"command":"thread-get","changed":false,"result":{"thread":{"id":%q,"location":{"kind":"lost"},"messages":[{"id":%q,"author":%s,"body":"%s"%s}]},"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, tc.id, tc.author, tc.body, tc.gitlab, revision, revision)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}

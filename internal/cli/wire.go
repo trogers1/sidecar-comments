@@ -42,9 +42,14 @@ type validResult struct {
 	revision
 }
 type listResult struct {
-	Threads  []domain.Thread `json:"threads"`
-	Warnings []warning       `json:"warnings"`
+	Threads  []domain.PublicThread `json:"threads"`
+	Warnings []warning             `json:"warnings"`
 	revision
+}
+type sourceInspectResult struct {
+	SourceRevision string `json:"source_revision"`
+	LineCount      int    `json:"line_count"`
+	ByteCount      int    `json:"byte_count"`
 }
 type notFoundDetails struct {
 	Entity string `json:"entity"`
@@ -66,5 +71,5 @@ type unsupportedDetails struct {
 	Received string `json:"received"`
 }
 type wireDTO interface {
-	domain.RepairDetails | operations.PreconditionDetails | result | usageDetails | errorValue | errorEnvelope | successEnvelope | versionResult | invalidResult | validResult | listResult | notFoundDetails | assignmentsResult | formatResult | applyResult | unsupportedDetails
+	syncResult | editorResult | trackingListResult | trackingGetResult | domain.RepairDetails | operations.PreconditionDetails | result | usageDetails | errorValue | errorEnvelope | successEnvelope | versionResult | invalidResult | validResult | listResult | sourceInspectResult | notFoundDetails | assignmentsResult | formatResult | applyResult | unsupportedDetails | domain.ValidationDetails | domain.ConflictDetails | domain.IODetails
 }

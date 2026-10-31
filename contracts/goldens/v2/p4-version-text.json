@@ -1,0 +1,26 @@
+{
+  "fixture_version": 2,
+  "id": "p4-version-text",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "--output",
+    "text",
+    "version"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 0,
+    "stdout_template": "Sidecar {{CLI_VERSION}}\nFormat version: 2\nProtocol version: 2\n",
+    "stderr_b64": "",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

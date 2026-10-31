@@ -1,6 +1,6 @@
 # CLI releases
 
-This is a **CLI-only** release gate, not a full v1 ecosystem conformance claim.
+This is a **CLI-only** release gate for the current format/protocol, not a full ecosystem conformance claim. This checkout prepares CLI 0.2.0 with format 2 and protocol 2; those version numbers are independent. No publication is authorized by the thread-context implementation task.
 The Neovim adapter is deferred. The historical required-red inventory and
 `make full-red` remain separate, fail-closed obligations; passing the executable
 seed corpus does not imply that all inventory entries have runnable proof.
@@ -31,7 +31,7 @@ Published assets have fixed names:
 
 Each archive contains `sidecar`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES`, and `build-info.txt`
 (version, full commit/corpus revision, native platform, Go toolchain, format and
-protocol). README, MIT license, and third-party notice bytes are captured at build time and
+protocol). Format/protocol fields are derived from authoritative domain constants by `scripts/contract_definitions.go --versions`, not hard-coded to match a CLI release number. README, MIT license, and third-party notice bytes are captured at build time and
 checked alongside the executable. Archives contain precisely the staged, verified
 executable bytes, not a post-test rebuild.
 
@@ -64,11 +64,11 @@ directories are permitted. Official releases use Actions' clean checkout. A chec
 seal detects any staged changes before/after verification and before packaging;
 it is a local sequencing safeguard, not a signature against a malicious caller.
 
-`verify` runs `make cli-gate`: generated contract freshness; gofmt, vet, isolated
+`verify` runs `make cli-gate`: generated definition freshness plus contract coherence; gofmt, vet, isolated
 module tidy (including `tests/`); release-script negative/packaging checks; all Go
 tests against the staged binary; the independent external executable corpus;
 all Go tests with the race detector; a separate race-instrumented CLI through
-all CLI tests and the independent corpus; and four production fuzz targets
+all CLI tests and the independent corpus; and five production fuzz targets
 with one worker and five seconds each (override `FUZZ_TIME` explicitly for longer
 local runs). The race binary supplements, never replaces, staged-byte testing. Its subprocess
 launcher sets only `atexit_sleep_ms=0`, removing the race detector's default
@@ -76,8 +76,13 @@ one-second exit delay per CLI invocation while preserving other `GORACE` options
 This also works for corpus children with exact environments. Package-level race
 checks are unchanged. A deliberately racy smoke fixture confirms the launcher
 still emits race diagnostics and propagates failing exit codes.
-The two format targets cover parsing and body round trips; the two domain
-targets cover location round trips and deterministic revisions.
+The two format targets cover parsing (including populated attached/unresolved
+tracking seeds) and body round trips; the two domain targets cover location round
+trips and deterministic revisions. The operations target, `FuzzTrackingReconcile`,
+exercises the real source capture/reconciliation pipeline with bounded inputs,
+Unicode/context-window, retained-evidence, mapping-conservatism and search-work
+properties. Deterministic lifecycle and exact-budget regressions remain separate
+checks; a short fuzz run is not exhaustive proof.
 
 For an already staged binary, `make check` / `make cli-gate` requires both
 `SIDECAR_BIN` and `SIDECAR_CLI_VERSION`. `make test` also requires them so public
@@ -162,9 +167,7 @@ git push origin main
 
 The bump commands edit only the working-tree `VERSION`; they do not commit,
 tag, or publish. They increment its existing value, not a cached remote version.
-If the remote has advanced, choose a newer version and recommit. This migration
-already selects `0.1.2`, following locally known `v0.1.1`; confirm that remote
-tags have not advanced before the first push.
+If the remote has advanced, choose a newer version and recommit. The thread-context work prepares `0.2.0` as a breaking pre-1.0 minor release, with format/protocol 2 and no v1 reader or migration tooling. Confirm that remote tags have not reserved or surpassed it before an eventual separately authorized push. Implementation changes remain uncommitted until explicitly requested.
 
 Hooks can be bypassed and are not installed automatically on clone. The same
 version policy is enforced independently by CI before builds. For server-side

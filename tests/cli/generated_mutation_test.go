@@ -60,7 +60,7 @@ func TestSubjectGeneratedCreateAdd(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			request := `{"protocol":1,"operations":[{"op":"message_delete","thread_id":` + string(qt) + `,"message_id":` + string(qm) + `}]}`
+			request := `{"protocol":2,"operations":[{"op":"message_delete","thread_id":` + string(qt) + `,"message_id":` + string(qm) + `}]}`
 			if err := validateSchema(schemaRequest{JSON: []byte(request)}); err != nil {
 				t.Fatal(err)
 			}
@@ -69,9 +69,9 @@ func TestSubjectGeneratedCreateAdd(t *testing.T) {
 			}
 			message := fmt.Sprintf(`{"id":%q,"author":{"kind":"human"},"body":"x"}`, mid)
 			thread := fmt.Sprintf(`{"id":%q,"location":{"kind":"file"},"messages":[%s]}`, tid, message)
-			document := []byte("[@th_" + tid + " file]\n---user <!-- sidecar-meta: {\"id\":\"" + mid + "\"} -->\nx\n[/@th_" + tid + "]\n")
+			document := []byte(formatHeader + "[@th_" + tid + " file]\n" + untrackedMetadata + "---user <!-- sidecar-meta: {\"id\":\"" + mid + "\"} -->\nx\n[/@th_" + tid + "]\n")
 			revision := fmt.Sprintf("sha256:%x", sha256.Sum256(document))
-			want := fmt.Sprintf(`{"protocol":1,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q,"generated_ids":{"thread_id":%q,"message_id":%q}}}`+"\n", thread, revision, revision, tid, mid)
+			want := fmt.Sprintf(`{"protocol":2,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q,"generated_ids":{"thread_id":%q,"message_id":%q}}}`+"\n", thread, revision, revision, tid, mid)
 			if mode == "id" {
 				want = tid + "\n" + mid + "\n"
 			}
@@ -91,7 +91,7 @@ func TestSubjectGeneratedCreateAdd(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				expected := fmt.Sprintf(`{"protocol":1,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
+				expected := fmt.Sprintf(`{"protocol":2,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
 				if err := compareProcess(processExpectation{Got: checked, Want: processResult{Stdout: []byte(expected)}}); err != nil {
 					t.Fatal(err)
 				}
@@ -131,7 +131,7 @@ func TestSubjectGeneratedCreateAdd(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			request = `{"protocol":1,"operations":[{"op":"message_delete","thread_id":` + string(qt) + `,"message_id":` + string(qr) + `}]}`
+			request = `{"protocol":2,"operations":[{"op":"message_delete","thread_id":` + string(qt) + `,"message_id":` + string(qr) + `}]}`
 			if err := validateSchema(schemaRequest{JSON: []byte(request)}); err != nil {
 				t.Fatal(err)
 			}
@@ -141,9 +141,9 @@ func TestSubjectGeneratedCreateAdd(t *testing.T) {
 			// No UUID ordering comparison across these separate command processes.
 			reply := fmt.Sprintf(`{"id":%q,"author":{"kind":"agent"},"body":"x"}`, replyID)
 			thread = fmt.Sprintf(`{"id":%q,"location":{"kind":"file"},"messages":[%s,%s]}`, tid, message, reply)
-			document = []byte("[@th_" + tid + " file]\n---user <!-- sidecar-meta: {\"id\":\"" + mid + "\"} -->\nx\n\n---bot <!-- sidecar-meta: {\"id\":\"" + replyID + "\"} -->\nx\n[/@th_" + tid + "]\n")
+			document = []byte(formatHeader + "[@th_" + tid + " file]\n" + untrackedMetadata + "---user <!-- sidecar-meta: {\"id\":\"" + mid + "\"} -->\nx\n\n---bot <!-- sidecar-meta: {\"id\":\"" + replyID + "\"} -->\nx\n[/@th_" + tid + "]\n")
 			revision = fmt.Sprintf("sha256:%x", sha256.Sum256(document))
-			want = fmt.Sprintf(`{"protocol":1,"command":"message-add","changed":true,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q,"generated_id":%q}}`+"\n", thread, reply, revision, revision, replyID)
+			want = fmt.Sprintf(`{"protocol":2,"command":"message-add","changed":true,"result":{"thread":%s,"message":%s,"storage_revision":%q,"canonical_revision":%q,"generated_id":%q}}`+"\n", thread, reply, revision, revision, replyID)
 			if mode == "id" {
 				want = replyID + "\n"
 			}
@@ -163,7 +163,7 @@ func TestSubjectGeneratedCreateAdd(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				expected := fmt.Sprintf(`{"protocol":1,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
+				expected := fmt.Sprintf(`{"protocol":2,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
 				if err := compareProcess(processExpectation{Got: checked, Want: processResult{Stdout: []byte(expected)}}); err != nil {
 					t.Fatal(err)
 				}

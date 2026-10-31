@@ -1,4 +1,20 @@
-# v1 contract-harness behavior inventory
+# Contract-harness behavior inventory
+
+The table below is the historical v1 seed inventory. Current protocol-2 executable
+fixtures live in `contracts/corpus/v2.json` and `contracts/goldens/v2/`. Every old
+seed has a corresponding migrated fixture; `version-json` is replaced by the new
+v2 version case, `source-anchor` is an anchor-free tracked range, and
+`source-anchor-bad` now rejects removed anchor syntax. Stable BHV identifiers
+retain traceability, not unchanged anchor semantics. Additional v2 cases cover
+source inspect, v1 format rejection, empty sync check, tracking opt-in/redaction,
+unchanged tracked sync and editor deletion. These are artifact/schema-validated
+expectations, not an assertion that an executable corpus run has passed.
+
+The legacy required-red and design ledgers below remain historical independent
+obligations, including security/error/durability/delivery behavior. Their harness
+version suffixes do not denote public protocol2 and their pending cases are not
+silently cleared by migration.
+
 
 `contracts/behavior-inventory-v1.json` is the machine-readable **seed
 inventory**, not an exhaustive or authoritative coverage claim. The shadow
@@ -12,12 +28,16 @@ the corpus, then rejects orphaned, duplicate, or mismatched mappings. Its
 `required_red` entries are mandatory behavior packs without fixtures; they are
 explicit unavailable obligations, not deferred labels. `make contracts-check`
 validates the seed, documents, corpus, mapping, and goldens. `make
-full-red`/`make release` remains nonzero while any required-red entry exists.
+full-red` remains nonzero while any required-red entry exists. The maintained
+CLI-only release gate is separate: `make release` verifies through `cli-gate`,
+not `full-red`. Passing that gate does not discharge the historical obligations
+or establish full ecosystem conformance.
 
 The table below is a human-readable view of seeded direct fixtures only. It
 makes no claim that adjacent, unlisted, or mandatory required-red behavior is
-covered. The repository is pre-implementation, so executing seeded fixtures
-still requires a claimed executable via `SIDECAR_BIN`.
+covered. Executing seeded fixtures requires an explicitly supplied production
+executable via `SIDECAR_BIN` and an independently expected `SIDECAR_CLI_VERSION`;
+artifact/schema acceptance alone is not executable conformance.
 
 ## Seeded behavior IDs
 
@@ -123,8 +143,9 @@ UUID output as proof of either property.
 
 The pre-existing required-red packs for error precedence, secure-store
 races/durability, parser/domain properties and fuzzing, and Neovim fail closure
-remain. `full-red` and `release` therefore stay non-green; this
-pre-implementation repository does not claim P5 completion.
+remain. `full-red` therefore stays non-green. These historical obligations do
+not necessarily block the separate CLI-only release gate, and a passing CLI gate
+does not establish P5 completion.
 
 ## Harness-only checks
 

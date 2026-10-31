@@ -50,7 +50,7 @@ func assertStoredTerminalBody(r terminalBodyExpectation) {
 	if err != nil {
 		r.T.Fatal(err)
 	}
-	expected := "[@th_" + threadID + " lost]\n" + role + r.Body + "\n" + endThread
+	expected := formatHeader + "[@th_" + threadID + " lost]\n" + untrackedMetadata + role + r.Body + "\n" + endThread
 	if !bytes.Equal(disk, []byte(expected)) {
 		r.T.Fatalf("stored body changed: got %q want %q", disk, expected)
 	}
@@ -117,7 +117,7 @@ func TestSubjectTerminalSafeHumanBodies(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	operations := []byte(`{"protocol":1,"operations":[{"op":"message_update","thread_id":"` + threadID + `","message_id":"` + messageID + `","body":` + string(bodyJSON) + `}]}`)
+	operations := []byte(`{"protocol":2,"operations":[{"op":"message_update","thread_id":"` + threadID + `","message_id":"` + messageID + `","body":` + string(bodyJSON) + `}]}`)
 	if err := validateSchema(schemaRequest{JSON: operations}); err != nil {
 		t.Fatal(err)
 	}

@@ -14,7 +14,7 @@ import (
 func TestSubjectTargetMaximum(t *testing.T) {
 	binary := subjectBinary(subjectRequest{T: t})
 	dir := t.TempDir()
-	opening := "[@th_" + threadID + " lost]\n"
+	opening := formatHeader + "[@th_" + threadID + " lost]\n" + untrackedMetadata
 	roles := make([]string, 65)
 	overhead := len(opening) + len(endThread)
 	for i := range roles {
@@ -61,7 +61,7 @@ func TestSubjectTargetMaximum(t *testing.T) {
 		t.Fatal(err)
 	}
 	revision := fmt.Sprintf("sha256:%x", sha256.Sum256(original))
-	want := fmt.Sprintf(`{"protocol":1,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

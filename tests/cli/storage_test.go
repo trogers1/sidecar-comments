@@ -23,7 +23,7 @@ func TestSubjectTargetNames(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want := `{"protocol":1,"error":{"code":"validation","message":"validation:target_name:invalid","details":{"path":"target_name","reason":"invalid"}}}` + "\n"
+			want := `{"protocol":2,"error":{"code":"validation","message":"validation:target_name:invalid","details":{"path":"target_name","reason":"invalid"}}}` + "\n"
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
@@ -87,7 +87,7 @@ func TestSubjectUnsafeTargetObjects(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want := fmt.Sprintf(`{"protocol":1,"error":{"code":"validation","message":"validation:target_type:%s","details":{"path":"target_type","reason":%q}}}`+"\n", reason, reason)
+			want := fmt.Sprintf(`{"protocol":2,"error":{"code":"validation","message":"validation:target_type:%s","details":{"path":"target_type","reason":%q}}}`+"\n", reason, reason)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
@@ -166,7 +166,7 @@ func TestSubjectOversizedTarget(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := `{"protocol":1,"error":{"code":"validation","message":"validation:target_size:too_large","details":{"path":"target_size","reason":"too_large"}}}` + "\n"
+	want := `{"protocol":2,"error":{"code":"validation","message":"validation:target_size:too_large","details":{"path":"target_size","reason":"too_large"}}}` + "\n"
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

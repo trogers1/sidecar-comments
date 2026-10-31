@@ -14,7 +14,11 @@ bump-patch bump-minor bump-major:
 
 .PHONY: contracts-check contract-artifacts build test-contract test-contract-red preimplementation-check full-red require-sidecar-bin release test test-race test-fuzz test-neovim gofmt-check vet mod-tidy-check check cli-gate test-cli-helpers test-cli-helpers-race vet-cli test-cli-subject test-release-scripts
 
-contracts-check contract-artifacts:
+.PHONY: contract-definitions-check
+contract-definitions-check:
+	@$(GO) run scripts/contract_definitions.go --check
+
+contracts-check contract-artifacts: contract-definitions-check
 	@$(GO) run ./contracts/schema/check.go
 
 build: contracts-check
@@ -68,6 +72,7 @@ test-fuzz:
 	@$(GO) test ./internal/format -run '^$$' -fuzz '^FuzzDocumentBodyRoundTrip$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
 	@$(GO) test ./internal/domain -run '^$$' -fuzz '^FuzzLocationRoundTrip$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
 	@$(GO) test ./internal/domain -run '^$$' -fuzz '^FuzzRevisionDeterministic$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
+	@$(GO) test ./internal/operations -run '^$$' -fuzz '^FuzzTrackingReconcile$$' -fuzztime=$(FUZZ_TIME) -parallel=1 -timeout=60s
 
 test-neovim:
 	@echo 'Neovim is deferred and is not part of the CLI-only release claim.' >&2

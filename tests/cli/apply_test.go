@@ -16,8 +16,8 @@ func TestSubjectApplyLifecycle(t *testing.T) {
 	dir := t.TempDir()
 	create := `{"op":"thread_create","thread_id":"` + threadID + `","message_id":"` + messageID + `","location":{"kind":"lost"},"author":{"kind":"human"},"body":"x"}`
 	deletion := `{"op":"thread_delete","thread_id":"` + threadID + `"}`
-	rollback := `{"protocol":1,"operations":[` + create + `,{"op":"message_update","thread_id":"` + threadID + `","message_id":"018f0000-0000-7000-8000-000000000003","body":"y"}]}`
-	success := `{"protocol":1,"operations":[` + create + `,{"op":"message_update","thread_id":"` + threadID + `","message_id":"` + messageID + `","body":"y\n"},` + deletion + `]}`
+	rollback := `{"protocol":2,"operations":[` + create + `,{"op":"message_update","thread_id":"` + threadID + `","message_id":"018f0000-0000-7000-8000-000000000003","body":"y"}]}`
+	success := `{"protocol":2,"operations":[` + create + `,{"op":"message_update","thread_id":"` + threadID + `","message_id":"` + messageID + `","body":"y\n"},` + deletion + `]}`
 	if err := validateSchema(schemaRequest{JSON: []byte(rollback)}); err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +34,7 @@ func TestSubjectApplyLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := `{"protocol":1,"error":{"code":"not_found","message":"not_found:message","details":{"entity":"message","id":"018f0000-0000-7000-8000-000000000003","index":1}}}` + "\n"
+	want := `{"protocol":2,"error":{"code":"not_found","message":"not_found:message","details":{"entity":"message","id":"018f0000-0000-7000-8000-000000000003","index":1}}}` + "\n"
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 5, Stderr: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func TestSubjectApplyLifecycle(t *testing.T) {
 	firstThread := `{"id":"` + threadID + `","location":{"kind":"lost"},"messages":[` + firstMessage + `]}`
 	lastThread := `{"id":"` + threadID + `","location":{"kind":"lost"},"messages":[` + lastMessage + `]}`
 	emptyRevision := fmt.Sprintf("sha256:%x", sha256.Sum256(nil))
-	want = fmt.Sprintf(`{"protocol":1,"command":"apply","changed":true,"result":{"operations":[{"index":0,"op":"thread_create","changed":true,"result":{"thread":%s}},{"index":1,"op":"message_update","changed":true,"result":{"thread":%s,"message":%s}},{"index":2,"op":"thread_delete","changed":true,"result":{"deleted_thread_id":%q}}],"storage_revision":null,"canonical_revision":%q}}`+"\n", firstThread, lastThread, lastMessage, threadID, emptyRevision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"apply","changed":true,"result":{"operations":[{"index":0,"op":"thread_create","changed":true,"result":{"thread":%s}},{"index":1,"op":"message_update","changed":true,"result":{"thread":%s,"message":%s}},{"index":2,"op":"thread_delete","changed":true,"result":{"deleted_thread_id":%q}}],"storage_revision":null,"canonical_revision":%q}}`+"\n", firstThread, lastThread, lastMessage, threadID, emptyRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

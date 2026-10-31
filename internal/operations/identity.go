@@ -9,16 +9,25 @@ type Value struct {
 	dto       OperationDTO
 	threadID  domain.ThreadID
 	messageID domain.MessageID
+	tracking  *domain.TrackingRecord
 	valid     bool
 }
 type ValueRequest struct{}
 
 func (v Value) Op(r ValueRequest) string { return v.dto.Op }
+
+// DTO returns a defensive untrusted wire shape, never trusted capture data.
+func (v Value) DTO(r ValueRequest) OperationDTO {
+	return detachOperation(detachOperationRequest{DTO: v.dto})
+}
 func (v Value) Location(r ValueRequest) domain.Location {
 	return domain.CloneLocation(domain.CloneLocationRequest{Location: v.dto.Location})
 }
 
-type NewValueRequest struct{ DTO OperationDTO }
+type NewValueRequest struct {
+	DTO      OperationDTO
+	Tracking *domain.TrackingRecord
+}
 type ValidateOperationFieldsRequest struct {
 	DTO             OperationDTO
 	AllowMissingIDs bool
@@ -68,6 +77,9 @@ func ValidateOperationFields(r ValidateOperationFieldsRequest) error {
 		return invalid(invalidOperationRequest{})
 	}
 	if o.Op == domain.OpThreadCreate || o.Op == domain.OpThreadMove {
+		if o.Location.Kind == domain.LocationUnresolved {
+			return invalid(invalidOperationRequest{})
+		}
 		if err := domain.ValidateLocation(domain.ValidateLocationRequest{Location: o.Location}); err != nil {
 			return err
 		}
@@ -93,6 +105,14 @@ func NewValue(r NewValueRequest) (Value, error) {
 	if err := ValidateOperationFields(ValidateOperationFieldsRequest{DTO: r.DTO}); err != nil {
 		return Value{}, err
 	}
+	if r.Tracking != nil {
+		if r.DTO.Op != domain.OpThreadCreate && r.DTO.Op != domain.OpThreadMove {
+			return Value{}, domain.Validation(domain.ValidationRequest{Path: "tracking", Reason: "invalid"})
+		}
+		if err := domain.ValidateThreadTracking(domain.ValidateThreadTrackingRequest{Location: r.DTO.Location, Tracking: r.Tracking}); err != nil {
+			return Value{}, err
+		}
+	}
 	dto := detachOperation(detachOperationRequest{DTO: r.DTO})
 	tid, err := domain.NewThreadID(domain.NewThreadIDRequest{Text: dto.ThreadID})
 	if err != nil {
@@ -105,7 +125,7 @@ func NewValue(r NewValueRequest) (Value, error) {
 			return Value{}, err
 		}
 	}
-	return Value{dto: dto, threadID: tid, messageID: mid, valid: true}, nil
+	return Value{dto: dto, threadID: tid, messageID: mid, tracking: domain.CloneTracking(domain.CloneTrackingRequest{Tracking: r.Tracking}), valid: true}, nil
 }
 
 type FieldError struct {

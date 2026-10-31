@@ -31,14 +31,14 @@ func TestSubjectBodyCreateRetry(t *testing.T) {
 					input = []byte(transport.raw)
 				}
 				args := []string{"--output", "json", "thread", "create", "--file", "note.txt.comments", "--location", "file", "--author-kind", "human", "--body-file", bodyPath, "--id", threadID, "--message-id", messageID}
-				document := []byte("[@th_" + threadID + " file]\n" + role + transport.logical + "\n" + endThread)
+				document := []byte(formatHeader + "[@th_" + threadID + " file]\n" + untrackedMetadata + role + transport.logical + "\n" + endThread)
 				revision := fmt.Sprintf("sha256:%x", sha256.Sum256(document))
 				thread := fmt.Sprintf(`{"id":%q,"location":{"kind":"file"},"messages":[{"id":%q,"author":{"kind":"human"},"body":%q}]}`, threadID, messageID, transport.logical)
 				got, err := runProcess(runRequest{Binary: binary, Args: args, Dir: dir, Stdin: input, Timeout: 5 * time.Second, OutputLimit: 4096})
 				if err != nil {
 					t.Fatal(err)
 				}
-				want := fmt.Sprintf(`{"protocol":1,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
+				want := fmt.Sprintf(`{"protocol":2,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
 				if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 					t.Fatal(err)
 				}
@@ -57,7 +57,7 @@ func TestSubjectBodyCreateRetry(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				want = fmt.Sprintf(`{"protocol":1,"command":"thread-create","changed":false,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
+				want = fmt.Sprintf(`{"protocol":2,"command":"thread-create","changed":false,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
 				if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 					t.Fatal(err)
 				}
@@ -76,7 +76,7 @@ func TestSubjectBodyCreateRetry(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				want = fmt.Sprintf(`{"protocol":1,"error":{"code":"conflict","message":"conflict:revision","details":{"kind":"revision","expected":"missing","current_storage_revision":%q}}}`+"\n", revision)
+				want = fmt.Sprintf(`{"protocol":2,"error":{"code":"conflict","message":"conflict:revision","details":{"kind":"revision","expected":"missing","current_storage_revision":%q}}}`+"\n", revision)
 				if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 4, Stderr: []byte(want)}}); err != nil {
 					t.Fatal(err)
 				}

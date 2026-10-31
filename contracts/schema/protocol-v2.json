@@ -1,0 +1,4 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "../../docs/v2/schema/v2.json"
+}

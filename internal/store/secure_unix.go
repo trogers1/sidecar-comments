@@ -391,6 +391,11 @@ func (t *Transaction) Commit(r CommitRequest) (err error) {
 		if t.target == nil {
 			return nil
 		}
+		if r.Validate != nil {
+			if e := r.Validate(CommitValidationRequest{}); e != nil {
+				return e
+			}
+		}
 		if e := t.perform(storageAction{storageOperation: storageOperation{"unlink", "target"}, Action: func() error { return t.root.Remove(t.name) }}); e != nil {
 			return ioe(domain.IORequest{Operation: "unlink", Path: "target"})
 		}
@@ -455,6 +460,11 @@ func (t *Transaction) Commit(r CommitRequest) (err error) {
 		current, e := t.root.Lstat(name)
 		if e != nil || !os.SameFile(i, current) {
 			return ioe(domain.IORequest{Operation: "identity", Path: "temp"})
+		}
+		if r.Validate != nil {
+			if e := r.Validate(CommitValidationRequest{}); e != nil {
+				return e
+			}
 		}
 		if e = t.perform(storageAction{storageOperation: storageOperation{"rename", "target"}, Action: func() error { return t.root.Rename(name, t.name) }}); e != nil {
 			return ioe(domain.IORequest{Operation: "rename", Path: "target"})

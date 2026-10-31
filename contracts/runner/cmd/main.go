@@ -14,7 +14,7 @@ func main() {
 	var corpus, bin, version string
 	var timeout time.Duration
 	var requiredRed bool
-	flag.StringVar(&corpus, "corpus", "contracts/corpus/v1.json", "corpus manifest")
+	flag.StringVar(&corpus, "corpus", "contracts/corpus/v2.json", "corpus manifest")
 	flag.StringVar(&bin, "bin", "", "executable (defaults to SIDECAR_BIN then manifest)")
 	flag.StringVar(&version, "cli-version", "", "value for {{CLI_VERSION}} templates")
 	flag.DurationVar(&timeout, "timeout", 10*time.Second, "per-fixture timeout")

@@ -15,7 +15,9 @@ const threadID = "018f0000-0000-7000-8000-000000000001"
 const messageID = "018f0000-0000-7000-8000-000000000002"
 const role = "---user <!-- sidecar-meta: {\"id\":\"" + messageID + "\"} -->\n"
 const endThread = "[/@th_" + threadID + "]\n"
-const canonicalNote = "[@th_" + threadID + " file]\n" + role + "x\n" + endThread
+const formatHeader = "<!-- sidecar-format: 2 -->\n"
+const untrackedMetadata = "<!-- sidecar-tracking: {} -->\n"
+const canonicalNote = formatHeader + "[@th_" + threadID + " file]\n" + untrackedMetadata + role + "x\n" + endThread
 
 type subjectRequest struct{ T *testing.T }
 
@@ -62,9 +64,9 @@ func TestSubjectEmptyLifecycle(t *testing.T) {
 				status       int
 				out, failure string
 			}{
-				{"validate", []string{"validate", "--file", "note.txt.comments"}, 0, fmt.Sprintf(`{"protocol":1,"command":"validate","changed":false,"result":{"valid":true,"warnings":%s,"storage_revision":%s,"canonical_revision":%q}}`+"\n", warnings, storage, emptyHash), ""},
-				{"list", []string{"thread", "list", "--file", "note.txt.comments"}, 0, fmt.Sprintf(`{"protocol":1,"command":"thread-list","changed":false,"result":{"threads":[],"warnings":%s,"storage_revision":%s,"canonical_revision":%q}}`+"\n", warnings, storage, emptyHash), ""},
-				{"get", []string{"thread", "get", "--file", "note.txt.comments", "--id", threadID}, 5, "", `{"protocol":1,"error":{"code":"not_found","message":"not_found:thread","details":{"entity":"thread","id":"` + threadID + `"}}}` + "\n"},
+				{"validate", []string{"validate", "--file", "note.txt.comments"}, 0, fmt.Sprintf(`{"protocol":2,"command":"validate","changed":false,"result":{"valid":true,"warnings":%s,"storage_revision":%s,"canonical_revision":%q}}`+"\n", warnings, storage, emptyHash), ""},
+				{"list", []string{"thread", "list", "--file", "note.txt.comments"}, 0, fmt.Sprintf(`{"protocol":2,"command":"thread-list","changed":false,"result":{"threads":[],"warnings":%s,"storage_revision":%s,"canonical_revision":%q}}`+"\n", warnings, storage, emptyHash), ""},
+				{"get", []string{"thread", "get", "--file", "note.txt.comments", "--id", threadID}, 5, "", `{"protocol":2,"error":{"code":"not_found","message":"not_found:thread","details":{"entity":"thread","id":"` + threadID + `"}}}` + "\n"},
 			} {
 				t.Run(tc.name, func(t *testing.T) {
 					got, err := runProcess(runRequest{Binary: binary, Args: append([]string{"--output", "json"}, tc.args...), Dir: dir, Timeout: 5 * time.Second, OutputLimit: 4096})
@@ -94,7 +96,7 @@ func TestSubjectEmptyLifecycle(t *testing.T) {
 			if exists {
 				status = 3
 			}
-			want := fmt.Sprintf(`{"protocol":1,"command":"format","changed":false,"result":{"formatted":false,"storage_revision":%s,"canonical_revision":%q}}`+"\n", storage, emptyHash)
+			want := fmt.Sprintf(`{"protocol":2,"command":"format","changed":false,"result":{"formatted":false,"storage_revision":%s,"canonical_revision":%q}}`+"\n", storage, emptyHash)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: status, Stdout: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
@@ -112,7 +114,7 @@ func TestSubjectEmptyLifecycle(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want = fmt.Sprintf(`{"protocol":1,"command":"format","changed":%t,"result":{"formatted":%t,"storage_revision":null,"canonical_revision":%q}}`+"\n", exists, exists, emptyHash)
+			want = fmt.Sprintf(`{"protocol":2,"command":"format","changed":%t,"result":{"formatted":%t,"storage_revision":null,"canonical_revision":%q}}`+"\n", exists, exists, emptyHash)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
@@ -133,14 +135,14 @@ func TestSubjectEmptyLifecycle(t *testing.T) {
 // BHV: finite formatter variants and canonical-first body LF preservation.
 func TestSubjectFormatterVariants(t *testing.T) {
 	binary := subjectBinary(subjectRequest{T: t})
-	twoRoles := "[@th_" + threadID + " file]\n" + role + "x\n\n---bot <!-- sidecar-meta: {\"id\":\"018f0000-0000-7000-8000-000000000003\"} -->\ny\n" + endThread
+	twoRoles := formatHeader + "[@th_" + threadID + " file]\n" + untrackedMetadata + role + "x\n\n---bot <!-- sidecar-meta: {\"id\":\"018f0000-0000-7000-8000-000000000003\"} -->\ny\n" + endThread
 	second := strings.ReplaceAll(strings.ReplaceAll(canonicalNote, threadID, "018f0000-0000-7000-8000-000000000004"), messageID, "018f0000-0000-7000-8000-000000000005")
-	second = strings.Replace(second, " file]", " lost]", 1)
+	second = strings.TrimPrefix(strings.Replace(second, " file]", " lost]", 1), formatHeader)
 	for _, tc := range []struct{ name, input, canonical string }{
 		{"crlf", strings.ReplaceAll(canonicalNote, "\n", "\r\n"), canonicalNote},
 		{"missing_final_lf", strings.TrimSuffix(canonicalNote, "\n"), canonicalNote},
 		{"extra_final_lf", canonicalNote + "\n", canonicalNote},
-		{"thread_order", second + "\n" + canonicalNote, canonicalNote + "\n" + second},
+		{"thread_order", formatHeader + second + "\n" + strings.TrimPrefix(canonicalNote, formatHeader), canonicalNote + "\n" + second},
 		{"thread_separator", canonicalNote + second, canonicalNote + "\n" + second},
 		{"missing_role_separator", strings.Replace(twoRoles, "x\n\n---bot", "x\n---bot", 1), twoRoles},
 		{"canonical_trailing_body_lf", strings.Replace(twoRoles, "x\n\n---bot", "x\n\n\n---bot", 1), strings.Replace(twoRoles, "x\n\n---bot", "x\n\n\n---bot", 1)},
@@ -163,7 +165,7 @@ func TestSubjectFormatterVariants(t *testing.T) {
 			if tc.input != tc.canonical {
 				status = 3
 			}
-			want := fmt.Sprintf(`{"protocol":1,"command":"format","changed":false,"result":{"formatted":false,"storage_revision":%q,"canonical_revision":%q}}`+"\n", storage, canonical)
+			want := fmt.Sprintf(`{"protocol":2,"command":"format","changed":false,"result":{"formatted":false,"storage_revision":%q,"canonical_revision":%q}}`+"\n", storage, canonical)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: status, Stdout: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
@@ -181,7 +183,7 @@ func TestSubjectFormatterVariants(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want = fmt.Sprintf(`{"protocol":1,"command":"format","changed":%t,"result":{"formatted":%t,"storage_revision":%q,"canonical_revision":%q}}`+"\n", tc.input != tc.canonical, tc.input != tc.canonical, canonical, canonical)
+			want = fmt.Sprintf(`{"protocol":2,"command":"format","changed":%t,"result":{"formatted":%t,"storage_revision":%q,"canonical_revision":%q}}`+"\n", tc.input != tc.canonical, tc.input != tc.canonical, canonical, canonical)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
@@ -213,6 +215,7 @@ func TestSubjectMalformedBytes(t *testing.T) {
 		{"zero_line", strings.Replace(canonicalNote, " file]", " line:0]", 1), "target_content", "location"},
 		{"reversed_range", strings.Replace(canonicalNote, " file]", " range:2:1-1:1]", 1), "target_content", "location"},
 		{"empty_anchor", strings.Replace(canonicalNote, " file]", " range:1:1-1:2 | ]", 1), "target_content", "location"},
+		{"legacy_anchor", strings.Replace(canonicalNote, " file]", " range:1:1-1:2 | cw==]", 1), "target_content", "location"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			dir := t.TempDir()
@@ -227,7 +230,7 @@ func TestSubjectMalformedBytes(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				want := fmt.Sprintf(`{"protocol":1,"error":{"code":"validation","message":"validation:%s:%s","details":{"path":%q,"reason":%q}}}`+"\n", tc.path, tc.reason, tc.path, tc.reason)
+				want := fmt.Sprintf(`{"protocol":2,"error":{"code":"validation","message":"validation:%s:%s","details":{"path":%q,"reason":%q}}}`+"\n", tc.path, tc.reason, tc.path, tc.reason)
 				if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
 					t.Fatal(err)
 				}

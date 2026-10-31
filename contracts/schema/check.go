@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	if err := runner.ValidateArtifacts("contracts/corpus/v1.json"); err != nil {
+	if err := runner.ValidateArtifacts("contracts/corpus/v2.json"); err != nil {
 		fmt.Fprintf(os.Stderr, "contract artifacts: %v\n", err)
 		os.Exit(1)
 	}

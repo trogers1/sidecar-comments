@@ -28,6 +28,8 @@ type Request struct {
 }
 type config struct {
 	command, output, file, source, id, messageID, thread, location, kind, name, external, bodyFile, metadata, operations, revision, lastKind string
+	sourceRevision                                                                                                                           string
+	includeTracking                                                                                                                          bool
 	check, fix, help                                                                                                                         bool
 	diagnostic                                                                                                                               string
 	timeout                                                                                                                                  time.Duration
@@ -171,11 +173,11 @@ func parse(r parseRequest) (config, error) {
 	if c.command == "--version" {
 		c.command = "version"
 	}
-	if strings.Contains(c.command, "-") {
+	if strings.Contains(c.command, "-") && c.command != "editor-update" {
 		return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 	}
 	args = args[1:]
-	if c.command == "thread" || c.command == "message" {
+	if c.command == "thread" || c.command == "message" || c.command == "source" {
 		if len(args) == 0 && c.output != "text" {
 			return c, usage(usageRequest{Field: "argv", Reason: domain.UsageReasonMissing})
 		}
@@ -189,7 +191,7 @@ func parse(r parseRequest) (config, error) {
 	definition, ok := commandDefinitions[c.command]
 	flags := commandFlags(commandFlagsRequest{Definition: definition})
 	if !ok {
-		c.diagnostic = fmt.Sprintf("Unknown command %q.", strings.ReplaceAll(c.command, "-", " "))
+		c.diagnostic = fmt.Sprintf("Unknown command %q.", commandWords(commandWordsRequest{Command: c.command}))
 		return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 	}
 	mutation := isMutation(mutationRequest{Command: c.command})
@@ -201,9 +203,11 @@ func parse(r parseRequest) (config, error) {
 	}
 	fs := flag.NewFlagSet(c.command, flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
-	values := map[string]*string{"file": &c.file, "source": &c.source, "id": &c.id, "message-id": &c.messageID, "thread": &c.thread, "location": &c.location, "author-kind": &c.kind, "author-name": &c.name, "external-author-id": &c.external, "body-file": &c.bodyFile, "gitlab-json": &c.metadata, "operations-file": &c.operations, "if-revision": &c.revision, "if-last-author-kind": &c.lastKind}
+	values := map[string]*string{"if-source-revision": &c.sourceRevision, "file": &c.file, "source": &c.source, "id": &c.id, "message-id": &c.messageID, "thread": &c.thread, "location": &c.location, "author-kind": &c.kind, "author-name": &c.name, "external-author-id": &c.external, "body-file": &c.bodyFile, "gitlab-json": &c.metadata, "operations-file": &c.operations, "if-revision": &c.revision, "if-last-author-kind": &c.lastKind}
 	for _, name := range strings.Fields(flags) {
 		switch name {
+		case "include-tracking":
+			fs.BoolVar(&c.includeTracking, name, false, "")
 		case "check":
 			fs.BoolVar(&c.check, name, false, "")
 		case "add-missing-message-ids":
@@ -241,7 +245,7 @@ func parse(r parseRequest) (config, error) {
 			c.diagnostic = fmt.Sprintf("Unknown flag %q.", a)
 			return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
 		}
-		if !strings.Contains(a, "=") && name != "check" && name != "add-missing-message-ids" {
+		if !strings.Contains(a, "=") && name != "check" && name != "include-tracking" && name != "add-missing-message-ids" {
 			i++
 			if i >= len(args) {
 				c.diagnostic = "Missing value for --" + name + "."
@@ -258,6 +262,9 @@ func parse(r parseRequest) (config, error) {
 	}
 	if c.timeout < time.Millisecond || c.timeout > 60*time.Second {
 		return c, usage(usageRequest{Field: "argv", Reason: "malformed"})
+	}
+	if c.seen["if-source-revision"] && domain.ValidateSourceRevision(domain.ValidateSourceRevisionRequest{Text: c.sourceRevision}) != nil {
+		return c, usage(usageRequest{Field: "source_revision", Reason: "malformed"})
 	}
 	if c.seen["if-revision"] && c.revision != domain.RevisionMissing && domain.ValidateRevision(domain.ValidateRevisionRequest{Text: c.revision}) != nil {
 		return c, usage(usageRequest{Field: "revision", Reason: "malformed"})
@@ -364,6 +371,25 @@ func execute(r execRequest) (out outcome, err error) {
 		out.Bytes = raw(rawRequest[versionResult]{Value: versionResult{CLIVersion: Version(), FormatVersion: domain.FormatVersion, Protocol: domain.ProtocolVersion}})
 		return
 	}
+	if c.command == "source-inspect" {
+		path, e := store.DerivedSourcePath(store.DerivedSourcePathRequest{TargetPath: c.file})
+		if e != nil {
+			return out, e
+		}
+		source, e := store.ReadSourceValue(store.ReadSourceValueRequest{Path: path})
+		if e != nil {
+			return out, e
+		}
+		out.Bytes = raw(rawRequest[sourceInspectResult]{Value: sourceInspectResult{
+			SourceRevision: source.Fingerprint(domain.ValueRequest{}),
+			LineCount:      source.LineCount(domain.ValueRequest{}),
+			ByteCount:      source.ByteCount(domain.ValueRequest{}),
+		}})
+		return
+	}
+	if c.command == "sync" || c.command == "editor-update" {
+		return executeTracking(r)
+	}
 	op := operations.OperationDTO{Op: commandDefinitions[c.command].operation, ThreadID: c.id, MessageID: c.messageID, IfLastAuthorKind: c.lastKind}
 	if strings.HasPrefix(c.command, "message-") {
 		op.ThreadID = c.thread
@@ -444,6 +470,7 @@ func execute(r execRequest) (out outcome, err error) {
 			}
 			c.revision = batch.IfRevision
 		}
+		c.sourceRevision = batch.IfSourceRevision
 	}
 	if commandDefinitions[c.command].operation != "" {
 		if e := operations.ValidateOperationFields(operations.ValidateOperationFieldsRequest{DTO: op, AllowMissingIDs: true}); e != nil {
@@ -469,15 +496,41 @@ func execute(r execRequest) (out outcome, err error) {
 			locations = append(locations, o.Location(operations.ValueRequest{}))
 		}
 	}
+	var currentSource *domain.SourceValue
+	retryCreate := false
 	source := func(r sourceRequest) error {
-		if len(locations) == 0 {
+		required := c.sourceRevision != ""
+		if !retryCreate {
+			for _, loc := range locations {
+				required = required || loc.Kind != domain.LocationLost
+			}
+		}
+		if !required {
 			return nil
 		}
-		return store.ValidateSource(store.ValidateSourceRequest{Path: strings.TrimSuffix(c.file, ".comments"), Locations: locations})
+		path, e := store.DerivedSourcePath(store.DerivedSourcePathRequest{TargetPath: c.file})
+		if e != nil {
+			return e
+		}
+		s, e := store.ReadSourceValue(store.ReadSourceValueRequest{Path: path})
+		if e != nil {
+			return e
+		}
+		if c.sourceRevision != "" && c.sourceRevision != s.Fingerprint(domain.ValueRequest{}) {
+			return domain.SourceRevisionConflict(domain.SourceRevisionConflictRequest{Expected: c.sourceRevision, CurrentSourceRevision: s.Fingerprint(domain.ValueRequest{})})
+		}
+		currentSource = &s
+		return nil
 	}
 	snap, e := store.Read(store.ReadRequest{Path: c.file, Kind: store.ReadTarget})
 	if e != nil {
 		return out, e
+	}
+	if observed, e := format.Parse(format.ParseRequest{Bytes: snap.Bytes, Mode: "normal"}); e == nil {
+		retryCreate = c.command == "thread-create" && existingCreate(existingCreateRequest{Document: observed.Value, ID: op.ThreadID})
+		if c.command == "apply" {
+			locations = applySourceLocations(applySourceLocationsRequest{Document: observed.Value, Operations: batch.Operations})
+		}
 	}
 	if err = source(sourceRequest{}); err != nil {
 		return
@@ -516,8 +569,17 @@ func execute(r execRequest) (out outcome, err error) {
 	if e != nil {
 		return out, e
 	}
+	retryCreate = c.command == "thread-create" && existingCreate(existingCreateRequest{Document: doc.Value, ID: op.ThreadID})
+	if c.command == "apply" {
+		locations = applySourceLocations(applySourceLocationsRequest{Document: doc.Value, Operations: batch.Operations})
+	}
+	currentSource = nil
 	if err = source(sourceRequest{}); err != nil {
 		return
+	}
+	capturedRevision := ""
+	if currentSource != nil {
+		capturedRevision = currentSource.Fingerprint(domain.ValueRequest{})
 	}
 	var repairThreads []domain.Thread
 	diagnostics := []domain.Diagnostic{}
@@ -560,7 +622,19 @@ func execute(r execRequest) (out outcome, err error) {
 		}
 		return
 	case "thread-list":
-		out.Bytes = raw(rawRequest[listResult]{Value: listResult{Threads: doc.Value.Threads(domain.DocumentThreadsRequest{}), Warnings: warnings, revision: rev}})
+		if c.includeTracking {
+			threads := []domain.Thread{}
+			for _, t := range doc.Value.Entries(domain.DocumentEntriesRequest{}) {
+				threads = append(threads, t.DTO(domain.ValueRequest{}))
+			}
+			out.Bytes = raw(rawRequest[trackingListResult]{Value: trackingListResult{Threads: threads, Warnings: warnings, revision: rev}})
+			return
+		}
+		threads := make([]domain.PublicThread, 0)
+		for _, thread := range doc.Value.Entries(domain.DocumentEntriesRequest{}) {
+			threads = append(threads, thread.PublicDTO(domain.ValueRequest{}))
+		}
+		out.Bytes = raw(rawRequest[listResult]{Value: listResult{Threads: threads, Warnings: warnings, revision: rev}})
 		return
 	case "thread-get":
 		id, e := domain.NewThreadID(domain.NewThreadIDRequest{Text: c.id})
@@ -569,7 +643,11 @@ func execute(r execRequest) (out outcome, err error) {
 		}
 		for _, t := range doc.Value.Entries(domain.DocumentEntriesRequest{}) {
 			if t.ID(domain.ValueRequest{}) == id {
-				dto := t.DTO(domain.ValueRequest{})
+				if c.includeTracking {
+					out.Bytes = raw(rawRequest[trackingGetResult]{Value: trackingGetResult{Thread: t.DTO(domain.ValueRequest{}), revision: rev}})
+					return
+				}
+				dto := t.PublicDTO(domain.ValueRequest{})
 				out.Bytes = raw(rawRequest[result]{Value: result{Result: operations.Result{Thread: &dto}, revision: rev}})
 				return
 			}
@@ -600,6 +678,13 @@ func execute(r execRequest) (out outcome, err error) {
 		}
 		out.Changed = len(assignments) > 0
 	} else if c.command != "format" {
+		var captured *domain.TrackingRecord
+		if c.command != "apply" {
+			captured, err = captureOperation(captureOperationRequest{Document: doc.Value, DTO: op, Source: currentSource, Command: c.command})
+			if err != nil {
+				return
+			}
+		}
 		if c.command == "thread-create" && op.ThreadID == "" {
 			op.ThreadID, err = uniqueID(uniqueIDRequest{Document: doc.Value, Namespace: "thread"})
 			if err != nil {
@@ -622,7 +707,7 @@ func execute(r execRequest) (out outcome, err error) {
 		}
 		ops := batch.Operations
 		if c.command != "apply" {
-			value, e := operations.NewValue(operations.NewValueRequest{DTO: op})
+			value, e := operations.NewValue(operations.NewValueRequest{DTO: op, Tracking: captured})
 			if e != nil {
 				return out, e
 			}
@@ -632,6 +717,17 @@ func execute(r execRequest) (out outcome, err error) {
 			var index *int
 			if c.command == "apply" {
 				index = &i
+			}
+			if c.command == "apply" {
+				dto := o.DTO(operations.ValueRequest{})
+				tracking, e := captureOperation(captureOperationRequest{Document: doc.Value, DTO: dto, Source: currentSource, Command: dto.Op, Index: index})
+				if e != nil {
+					return out, e
+				}
+				o, e = operations.NewValue(operations.NewValueRequest{DTO: dto, Tracking: tracking})
+				if e != nil {
+					return out, e
+				}
 			}
 			response, e := operations.Execute(operations.Request{Document: doc.Value, Operation: o, Index: index})
 			if e != nil {
@@ -666,7 +762,15 @@ func execute(r execRequest) (out outcome, err error) {
 			out.Exit = domain.ExitValidation
 		}
 	} else if different {
-		if err = tx.Commit(store.CommitRequest{Bytes: canonical}); err != nil {
+		if err = tx.Commit(store.CommitRequest{Bytes: canonical, Validate: func(store.CommitValidationRequest) error {
+			if e := source(sourceRequest{}); e != nil {
+				return e
+			}
+			if capturedRevision != "" && currentSource.Fingerprint(domain.ValueRequest{}) != capturedRevision {
+				return domain.SourceRevisionConflict(domain.SourceRevisionConflictRequest{Expected: capturedRevision, CurrentSourceRevision: currentSource.Fingerprint(domain.ValueRequest{})})
+			}
+			return nil
+		}}); err != nil {
 			return
 		}
 		out.Changed = true
@@ -699,13 +803,15 @@ func execute(r execRequest) (out outcome, err error) {
 }
 
 type applyDTO struct {
-	Protocol   int                       `json:"protocol"`
-	IfRevision string                    `json:"if_revision,omitempty"`
-	Operations []operations.OperationDTO `json:"operations"`
+	Protocol         int                       `json:"protocol"`
+	IfRevision       string                    `json:"if_revision,omitempty"`
+	IfSourceRevision string                    `json:"if_source_revision,omitempty"`
+	Operations       []operations.OperationDTO `json:"operations"`
 }
 type applyRequest struct {
-	IfRevision string
-	Operations []operations.Value
+	IfSourceRevision string
+	IfRevision       string
+	Operations       []operations.Value
 }
 type operationResult struct {
 	Index   int               `json:"index"`
@@ -732,6 +838,7 @@ func decodeApply(r applyDecodeRequest) (applyRequest, error) {
 		return a, &domain.Error{Code: domain.CodeUnsupported, Message: "unsupported:protocol", Exit: domain.ExitUnsupported, Details: raw(rawRequest[unsupportedDetails]{Value: unsupportedDetails{Received: "protocol"}})}
 	}
 	a.IfRevision = dto.IfRevision
+	a.IfSourceRevision = dto.IfSourceRevision
 	for _, o := range dto.Operations {
 		value, err := operations.NewValue(operations.NewValueRequest{DTO: o})
 		if err != nil {

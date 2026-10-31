@@ -17,6 +17,7 @@ func TestSubjectDocumentLimits(t *testing.T) {
 		t.Run(kind, func(t *testing.T) {
 			dir := t.TempDir()
 			var document strings.Builder
+			document.WriteString(formatHeader)
 			args := []string{"--output", "json"}
 			operation := ""
 			if kind == "threads" {
@@ -26,7 +27,7 @@ func TestSubjectDocumentLimits(t *testing.T) {
 					if i > 1 {
 						document.WriteByte('\n')
 					}
-					document.WriteString("[@th_" + id + " lost]\n---user <!-- sidecar-meta: {\"id\":\"" + mid + "\"} -->\nx\n[/@th_" + id + "]\n")
+					document.WriteString("[@th_" + id + " lost]\n" + untrackedMetadata + "---user <!-- sidecar-meta: {\"id\":\"" + mid + "\"} -->\nx\n[/@th_" + id + "]\n")
 				}
 				args = append(args, "thread", "create", "--file", "note.txt.comments", "--location", "lost", "--author-kind", "human", "--body-file", "body", "--id", "018f0002-0000-7000-8000-000000000001", "--message-id", "018f0002-0000-7000-8000-000000000002")
 				operation = "thread-create"
@@ -36,7 +37,7 @@ func TestSubjectDocumentLimits(t *testing.T) {
 					if i > 1 {
 						document.WriteByte('\n')
 					}
-					document.WriteString("[@th_" + id + " lost]\n")
+					document.WriteString("[@th_" + id + " lost]\n" + untrackedMetadata)
 					for j := 1; j <= 256; j++ {
 						if j > 1 {
 							document.WriteByte('\n')
@@ -48,7 +49,7 @@ func TestSubjectDocumentLimits(t *testing.T) {
 				args = append(args, "thread", "create", "--file", "note.txt.comments", "--location", "lost", "--author-kind", "human", "--body-file", "body", "--id", "018f0002-0000-7000-8000-000000000001", "--message-id", messageID)
 				operation = "thread-create"
 			} else {
-				document.WriteString("[@th_" + threadID + " lost]\n")
+				document.WriteString("[@th_" + threadID + " lost]\n" + untrackedMetadata)
 				for i := 1; i <= 256; i++ {
 					if i > 1 {
 						document.WriteByte('\n')
@@ -87,7 +88,7 @@ func TestSubjectDocumentLimits(t *testing.T) {
 				t.Fatal(err)
 			}
 			revision := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(document.String())))
-			want := fmt.Sprintf(`{"protocol":1,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
+			want := fmt.Sprintf(`{"protocol":2,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}
@@ -123,7 +124,7 @@ func TestSubjectDocumentLimits(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want = fmt.Sprintf(`{"protocol":1,"error":{"code":"precondition","message":"precondition:%s:limit_%s","details":{"operation":%q,"reason":"limit_%s"}}}`+"\n", operation, kind, operation, kind)
+			want = fmt.Sprintf(`{"protocol":2,"error":{"code":"precondition","message":"precondition:%s:limit_%s","details":{"operation":%q,"reason":"limit_%s"}}}`+"\n", operation, kind, operation, kind)
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 6, Stderr: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}

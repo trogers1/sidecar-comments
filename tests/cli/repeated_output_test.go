@@ -8,7 +8,7 @@ import (
 // A second global selector is rejected; it cannot override error rendering.
 func TestSubjectRepeatedOutput(t *testing.T) {
 	binary := subjectBinary(subjectRequest{T: t})
-	failure := `{"protocol":1,"error":{"code":"usage","message":"usage:output:repeated","details":{"field":"output","reason":"repeated"}}}` + "\n"
+	failure := `{"protocol":2,"error":{"code":"usage","message":"usage:output:repeated","details":{"field":"output","reason":"repeated"}}}` + "\n"
 	if err := validateSchema(schemaRequest{JSON: []byte(failure)}); err != nil {
 		t.Fatal(err)
 	}

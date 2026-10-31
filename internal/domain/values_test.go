@@ -7,7 +7,6 @@ import (
 )
 
 func TestLocationConstructorRejectsInvalidClosedUnion(t *testing.T) {
-	anchor := "YQ=="
 	text, err := domain.NewID(domain.NewIDRequest{})
 	if err != nil {
 		t.Fatal(err)
@@ -26,8 +25,8 @@ func TestLocationConstructorRejectsInvalidClosedUnion(t *testing.T) {
 	}
 	for _, location := range []domain.Location{
 		{}, {Kind: "unknown"},
-		{Kind: domain.LocationFile, Line: 1}, {Kind: domain.LocationLost, Anchor: &anchor},
-		{Kind: domain.LocationLine, Line: 1, StartLine: 1}, {Kind: domain.LocationLine, Line: 1, Anchor: &anchor},
+		{Kind: domain.LocationFile, Line: 1}, {Kind: domain.LocationLost, Line: 1},
+		{Kind: domain.LocationLine, Line: 1, StartLine: 1},
 		{Kind: domain.LocationLine, Line: -1},
 		{Kind: domain.LocationRange, Line: 1, StartLine: 1, StartColumn: 1, EndLine: 1, EndColumn: 2},
 		{Kind: domain.LocationRange, StartLine: 1, StartColumn: 2, EndLine: 1, EndColumn: 1},
@@ -59,7 +58,6 @@ func TestTypedValuesRejectZerosAndDetachAliases(t *testing.T) {
 	}
 	name := "Alice"
 	discussion := "discussion"
-	anchor := "YQ=="
 	author := domain.Author{Kind: domain.AuthorHuman, Name: &name}
 	gitlab := domain.GitLab{Kind: domain.GitLabNote, ProjectID: 1, NoteID: 1, DiscussionID: &discussion}
 	message, err := domain.NewMessageValue(domain.NewMessageValueRequest{ID: mid, Author: author, Body: "body", GitLab: &gitlab})
@@ -69,9 +67,17 @@ func TestTypedValuesRejectZerosAndDetachAliases(t *testing.T) {
 	if _, err := domain.NewMessageValue(domain.NewMessageValueRequest{Author: author, Body: "body"}); err == nil {
 		t.Fatal("accepted zero message ID")
 	}
-	location := domain.Location{Kind: domain.LocationRange, StartLine: 1, StartColumn: 1, EndLine: 1, EndColumn: 2, Anchor: &anchor}
+	location := domain.Location{Kind: domain.LocationRange, StartLine: 1, StartColumn: 1, EndLine: 1, EndColumn: 2}
 	messages := []domain.MessageValue{message}
-	thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: tid, Location: location, Messages: messages})
+	source, err := domain.NewSourceValue(domain.NewSourceValueRequest{Bytes: []byte("a")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tracking, err := source.Capture(domain.SourceLocationRequest{Location: location})
+	if err != nil {
+		t.Fatal(err)
+	}
+	thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: tid, Location: location, Messages: messages, Tracking: &tracking})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,20 +109,20 @@ func TestTypedValuesRejectZerosAndDetachAliases(t *testing.T) {
 	}
 	name = "changed"
 	discussion = "changed"
-	anchor = "changed"
+	tracking.SelectedText = "changed"
 	messages[0] = domain.MessageValue{}
 	threads[0] = domain.ThreadValue{}
 	entries := document.Entries(domain.DocumentEntriesRequest{})
 	entries[0].Messages(domain.ValueRequest{})[0] = domain.MessageValue{}
-	*entries[0].Location(domain.ValueRequest{}).Anchor = "changed"
+	entries[0].Tracking(domain.ValueRequest{}).SelectedText = "changed"
 	*entries[0].Messages(domain.ValueRequest{})[0].Author(domain.ValueRequest{}).Name = "changed"
 	*entries[0].Messages(domain.ValueRequest{})[0].GitLab(domain.ValueRequest{}).DiscussionID = "changed"
 	dto := entries[0].DTO(domain.ValueRequest{})
-	*dto.Location.Anchor = "changed"
+	dto.Tracking.SelectedText = "changed"
 	*dto.Messages[0].Author.Name = "changed"
 	entries[0] = domain.ThreadValue{}
 	actual := document.Threads(domain.DocumentThreadsRequest{})
-	if *actual[0].Location.Anchor != "YQ==" || *actual[0].Messages[0].Author.Name != "Alice" || *actual[0].Messages[0].GitLab.DiscussionID != "discussion" {
+	if actual[0].Tracking.SelectedText != "a" || *actual[0].Messages[0].Author.Name != "Alice" || *actual[0].Messages[0].GitLab.DiscussionID != "discussion" {
 		t.Fatalf("mutable aliases escaped: %+v", actual)
 	}
 	empty := domain.DocumentValue{}

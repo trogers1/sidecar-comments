@@ -1,4 +1,33 @@
-# Sidecar v1 black-box contract runner
+# Sidecar protocol-2 black-box contract runner
+
+The authoritative executable manifest is `contracts/corpus/v2.json`, using
+`contracts/schema/executable-v2.json` and `contracts/schema/protocol-v2.json`.
+The separately named `schema/corpus-v2.json` remains a **harness design version**,
+not a public-protocol version. Format/protocol 2 target CLI 0.2.0; this is not a
+release or a full conformance claim.
+
+V2 schemas resolve the normative `docs/v2/schema/v2.json` and frozen v1 leaf
+schema locally under both reference and declared IDs. Unknown resources fail;
+no network fetching is allowed. `runtime-v2.json` is a public generated definition
+artifact: coherence checks compare its declared versions and structural bounds
+with the normative schema. They do not prove matching behavior or byte-generation
+freshness for the entire schema. The parent tooling owns definition freshness.
+
+Every historical seed has a v2 counterpart with its stable behavior ID, except
+`version-json`, whose new explicit v2 version fixture replaces it. `source-anchor`
+now validates an anchor-free tracked range; `source-anchor-bad` tests rejection
+of the removed encoded anchor grammar. `migrate_corpus_v2.py` authors these
+fixtures solely from historical inputs and public limits, never subject output.
+`tracking_fixtures_v2.py` independently authors tracked read/privacy, check/no-op
+sync and editor deletion examples. Neither script is a product migration tool.
+
+Historical `corpus/v1.json`, `behavior-inventory-v1.json`, and pack ledgers remain
+structurally checked and retain their old obligations. Pending storage, security,
+durability and delivery obligations are **not discharged** by this migration.
+The design ledgers' v2 names remain harness versions, not protocol-2 evidence.
+Executable validation of the migrated corpus is still required; schema acceptance
+alone is not a passing corpus run.
+
 
 `sidecar-contract` executes the checked-in corpus against a process named by
 `SIDECAR_BIN`. It does not import or link a Sidecar implementation. Each case
@@ -51,17 +80,18 @@ path:
 
 ```sh
 make test-contract-red
-make test-contract SIDECAR_BIN=/absolute/path/to/sidecar SIDECAR_CLI_VERSION=1.0.0
+make test-contract SIDECAR_BIN=/absolute/path/to/sidecar SIDECAR_CLI_VERSION=dev
 ```
 
 Supply the independently known expected build version through `SIDECAR_CLI_VERSION`
 or the runner's `-cli-version` option. The `{{CLI_VERSION}}` template defaults to
-`dev` if neither is provided; the current production CLI reports `1.0.0`.
+`dev` if neither is provided; supply the independently known build version.
 This setting belongs to the harness, not the production process.
 
 `make build` builds the production CLI and contract harness binaries.
 `make preimplementation-check` retains its historical name; it does not establish
-complete production conformance. `make full-red`,
-`make release`, and the legacy `make check` release alias intentionally remain
-non-green while the inventory's explicit `required_red` fixture packs are
-unavailable; none claims that the partial seed corpus is full coverage.
+complete production conformance. `make full-red` intentionally remains non-green
+while the inventory's explicit `required_red` fixture packs are unavailable.
+`make release` and the legacy `make check` alias run the maintained CLI-only gate,
+not `full-red`; passing them does not discharge the historical inventory or claim
+that this executable corpus is full ecosystem coverage.

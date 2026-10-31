@@ -22,14 +22,14 @@ func TestSubjectMaximumBodyAndMetadataInput(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	document := []byte("[@th_" + threadID + " lost]\n---user <!-- sidecar-meta: {\"id\":\"" + messageID + "\",\"gitlab\":" + gitlab + "} -->\n" + logical + "\n" + endThread)
+	document := []byte(formatHeader + "[@th_" + threadID + " lost]\n" + untrackedMetadata + "---user <!-- sidecar-meta: {\"id\":\"" + messageID + "\",\"gitlab\":" + gitlab + "} -->\n" + logical + "\n" + endThread)
 	revision := fmt.Sprintf("sha256:%x", sha256.Sum256(document))
 	got, err := runProcess(runRequest{Binary: binary, Args: []string{"--output", "json", "thread", "create", "--file", "note.txt.comments", "--location", "lost", "--author-kind", "human", "--body-file", "body", "--id", threadID, "--message-id", messageID, "--gitlab-json", "metadata"}, Dir: dir, Timeout: 5 * time.Second, OutputLimit: 1 << 20})
 	if err != nil {
 		t.Fatal(err)
 	}
 	thread := fmt.Sprintf(`{"id":%q,"location":{"kind":"lost"},"messages":[{"id":%q,"author":{"kind":"human"},"body":%q,"gitlab":%s}]}`, threadID, messageID, logical, gitlab)
-	want := fmt.Sprintf(`{"protocol":1,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

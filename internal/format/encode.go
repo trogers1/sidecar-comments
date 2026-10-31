@@ -1,11 +1,17 @@
 package format
 
 import (
-	"encoding/base64"
 	"github.com/trogers1/sidecar-comments/internal/domain"
 	"sort"
 	"strconv"
 	"strings"
+)
+
+var formatHeader = "<!-- sidecar-format: " + strconv.Itoa(domain.FormatVersion) + " -->"
+
+const (
+	trackingPrefix = "<!-- sidecar-tracking: "
+	commentSuffix  = " -->"
 )
 
 type Document struct {
@@ -90,22 +96,6 @@ func less(r lessRequest) bool {
 			return av[i] < bv[i]
 		}
 	}
-	if (a.Anchor == nil) != (b.Anchor == nil) {
-		return a.Anchor == nil
-	}
-	if a.Anchor != nil {
-		aa, e := base64.StdEncoding.DecodeString(*a.Anchor)
-		if e != nil {
-			panic(e)
-		}
-		bb, e := base64.StdEncoding.DecodeString(*b.Anchor)
-		if e != nil {
-			panic(e)
-		}
-		if string(aa) != string(bb) {
-			return string(aa) < string(bb)
-		}
-	}
 	return r.A.ID < r.B.ID
 }
 func Encode(r EncodeRequest) []byte {
@@ -115,11 +105,15 @@ func encodeThreads(r encodeThreadsRequest) []byte {
 	ts := append([]domain.Thread(nil), r.Threads...)
 	sort.Slice(ts, func(i, j int) bool { return less(lessRequest{A: ts[i], B: ts[j]}) })
 	var b strings.Builder
+	if len(ts) > 0 {
+		b.WriteString(formatHeader + "\n")
+	}
 	for i, t := range ts {
 		if i > 0 {
 			b.WriteByte('\n')
 		}
 		b.WriteString(domain.ThreadOpenPrefix + t.ID + " " + domain.LocationText(domain.LocationTextRequest{Location: t.Location}) + "]\n")
+		b.WriteString(trackingPrefix + trackingMetadata(trackingMetadataRequest{Tracking: t.Tracking}) + commentSuffix + "\n")
 		for j, m := range t.Messages {
 			if j > 0 {
 				b.WriteByte('\n')

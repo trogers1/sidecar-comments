@@ -9,6 +9,8 @@ import (
 type flagDoc struct{ value, description, example string }
 
 var flagDocs = map[string]flagDoc{
+	"include-tracking":        {"", "Explicitly include retained excerpts in JSON reads.", ""},
+	"if-source-revision":      {"REVISION", "Require the normalized saved-source fingerprint.", "sha256:" + strings.Repeat("0", 64)},
 	"file":                    {"PATH", "Sidecar file (the source path plus .comments).", "proposal.md.comments"},
 	"source":                  {"PATH", "Validate locations against this UTF-8 source file.", "proposal.md"},
 	"id":                      {"ID", "Thread or message ID; optional on creation (generated if omitted).", "01900000-0000-7000-8000-000000000001"},
@@ -28,18 +30,27 @@ var flagDocs = map[string]flagDoc{
 	"add-missing-message-ids": {"", "Assign missing message IDs (required for fix).", ""},
 }
 
+type commandWordsRequest struct{ Command string }
+
+func commandWords(r commandWordsRequest) string {
+	if r.Command == "editor-update" {
+		return r.Command
+	}
+	return strings.ReplaceAll(r.Command, "-", " ")
+}
+
 type helpRequest struct{ Command string }
 
 func helpText(r helpRequest) string {
 	var b strings.Builder
 	root := r.Command == ""
-	group := r.Command == "thread" || r.Command == "message"
+	group := r.Command == "thread" || r.Command == "message" || r.Command == "source"
 	if root {
 		b.WriteString("🛵 Sidecar — Comments ride alongside your text\n\nUsage: sidecar [--output text|json|id|none] COMMAND [FLAGS]\n\nCommands:\n")
 	} else if group {
 		fmt.Fprintf(&b, "Usage: sidecar %s COMMAND [FLAGS]\n\nCommands:\n", r.Command)
 	} else {
-		fmt.Fprintf(&b, "%s\n\nUsage: sidecar [--output text|json|id|none] %s [FLAGS]\n\nFlags:\n", commandDefinitions[r.Command].description, strings.ReplaceAll(r.Command, "-", " "))
+		fmt.Fprintf(&b, "%s\n\nUsage: sidecar [--output text|json|id|none] %s [FLAGS]\n\nFlags:\n", commandDefinitions[r.Command].description, commandWords(commandWordsRequest{Command: r.Command}))
 	}
 	if root || group {
 		names := make([]string, 0, len(commandDefinitions))
@@ -50,7 +61,7 @@ func helpText(r helpRequest) string {
 		}
 		sort.Strings(names)
 		for _, name := range names {
-			fmt.Fprintf(&b, "  %-20s %s\n", strings.ReplaceAll(name, "-", " "), commandDefinitions[name].description)
+			fmt.Fprintf(&b, "  %-20s %s\n", commandWords(commandWordsRequest{Command: name}), commandDefinitions[name].description)
 		}
 	} else {
 		d := commandDefinitions[r.Command]
@@ -66,7 +77,7 @@ func helpText(r helpRequest) string {
 			}
 			fmt.Fprintf(&b, "  --%-24s %s%s\n", strings.TrimSpace(name+" "+doc.value), doc.description, suffix)
 		}
-		fmt.Fprintf(&b, "\nExample:\n  sidecar %s", strings.ReplaceAll(r.Command, "-", " "))
+		fmt.Fprintf(&b, "\nExample:\n  sidecar %s", commandWords(commandWordsRequest{Command: r.Command}))
 		for _, name := range strings.Fields(d.allowed) {
 			if name == "file" || strings.Contains(required, " "+name+" ") || r.Command == "fix" && name == "add-missing-message-ids" {
 				fmt.Fprintf(&b, " --%s", name)

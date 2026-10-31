@@ -1,0 +1,27 @@
+{
+  "fixture_version": 2,
+  "id": "p4-message-update-required",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "message",
+    "update",
+    "--file",
+    "a.comments"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_template": "error usage: Missing required flag --thread.\nSidecar: \"a.comments\"\nCheck the input and try again.\nFor usage, run: sidecar message update --help\n",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

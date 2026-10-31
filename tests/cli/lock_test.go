@@ -40,7 +40,7 @@ func TestSubjectLockTimeout(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := `{"protocol":1,"error":{"code":"conflict","message":"conflict:lock_timeout","details":{"kind":"lock_timeout"}}}` + "\n"
+	want := `{"protocol":2,"error":{"code":"conflict","message":"conflict:lock_timeout","details":{"kind":"lock_timeout"}}}` + "\n"
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 4, Stderr: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

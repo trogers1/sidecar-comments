@@ -11,11 +11,10 @@ import (
 // Location grammar and revision hashing are production domain boundaries. No
 // CLI recovery or mocked validation should mask a panic or invalid result.
 func FuzzLocationRoundTrip(f *testing.F) {
-	anchor := "YQ=="
 	for _, location := range []domain.Location{
 		{Kind: domain.LocationFile}, {Kind: domain.LocationLost},
 		{Kind: domain.LocationLine, Line: 1},
-		{Kind: domain.LocationRange, StartLine: 1, StartColumn: 1, EndLine: 2, EndColumn: 3, Anchor: &anchor},
+		{Kind: domain.LocationRange, StartLine: 1, StartColumn: 1, EndLine: 2, EndColumn: 3},
 	} {
 		if err := domain.ValidateLocation(domain.ValidateLocationRequest{Location: location}); err != nil {
 			f.Fatal(err)

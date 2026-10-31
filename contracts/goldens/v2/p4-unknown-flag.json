@@ -1,0 +1,25 @@
+{
+  "fixture_version": 2,
+  "id": "p4-unknown-flag",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "version",
+    "--wat"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_template": "error usage: Unknown flag \"--wat\".\nCheck the input and try again.\nFor usage, run: sidecar version --help\n",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

@@ -34,6 +34,7 @@ type ThreadValue struct {
 	id       ThreadID
 	location Location
 	messages []MessageValue
+	tracking *TrackingRecord
 	valid    bool
 }
 
@@ -49,6 +50,7 @@ type NewThreadValueRequest struct {
 	ID       ThreadID
 	Location Location
 	Messages []MessageValue
+	Tracking *TrackingRecord
 }
 type NewDocumentFromValuesRequest struct{ Threads []ThreadValue }
 type NewDocumentValueRequest struct{ Threads []Thread }
@@ -58,12 +60,7 @@ type DocumentThreadsRequest struct{}
 type cloneLocationRequest struct{ Location Location }
 
 func cloneLocation(r cloneLocationRequest) Location {
-	l := r.Location
-	if l.Anchor != nil {
-		a := *l.Anchor
-		l.Anchor = &a
-	}
-	return l
+	return r.Location
 }
 
 type cloneAuthorRequest struct{ Author Author }
@@ -127,7 +124,10 @@ func NewThreadValue(r NewThreadValueRequest) (ThreadValue, error) {
 		}
 		seen[m.id] = true
 	}
-	return ThreadValue{id: r.ID, location: cloneLocation(cloneLocationRequest{Location: r.Location}), messages: append([]MessageValue(nil), r.Messages...), valid: true}, nil
+	if err := ValidateThreadTracking(ValidateThreadTrackingRequest{Location: r.Location, Tracking: r.Tracking}); err != nil {
+		return ThreadValue{}, err
+	}
+	return ThreadValue{tracking: CloneTracking(CloneTrackingRequest{Tracking: r.Tracking}), id: r.ID, location: cloneLocation(cloneLocationRequest{Location: r.Location}), messages: append([]MessageValue(nil), r.Messages...), valid: true}, nil
 }
 func NewDocumentFromValues(r NewDocumentFromValuesRequest) (DocumentValue, error) {
 	if len(r.Threads) > MaxThreads {
@@ -136,6 +136,13 @@ func NewDocumentFromValues(r NewDocumentFromValuesRequest) (DocumentValue, error
 	threads := map[ThreadID]bool{}
 	messages := map[MessageID]bool{}
 	total := 0
+	trackingThreads := make([]Thread, len(r.Threads))
+	for i, t := range r.Threads {
+		trackingThreads[i] = Thread{Location: t.location, Tracking: t.tracking}
+	}
+	if err := ValidateDocumentTracking(ValidateDocumentTrackingRequest{Threads: trackingThreads}); err != nil {
+		return DocumentValue{}, err
+	}
 	for _, t := range r.Threads {
 		if !t.valid || threads[t.id] {
 			return DocumentValue{}, invalid(invalidRequest{})
@@ -178,7 +185,7 @@ func NewDocumentValue(r NewDocumentValueRequest) (DocumentValue, error) {
 				return DocumentValue{}, err
 			}
 		}
-		threads[i], err = NewThreadValue(NewThreadValueRequest{ID: tid, Location: t.Location, Messages: messages})
+		threads[i], err = NewThreadValue(NewThreadValueRequest{ID: tid, Location: t.Location, Messages: messages, Tracking: t.Tracking})
 		if err != nil {
 			return DocumentValue{}, err
 		}
@@ -208,7 +215,18 @@ func (t ThreadValue) DTO(r ValueRequest) Thread {
 	for i, m := range t.messages {
 		messages[i] = m.DTO(ValueRequest{})
 	}
-	return Thread{ID: t.id.Text(IDTextRequest{}), Location: t.Location(ValueRequest{}), Messages: messages}
+	return Thread{ID: t.id.Text(IDTextRequest{}), Location: t.Location(ValueRequest{}), Messages: messages, Tracking: t.Tracking(ValueRequest{})}
+}
+func (t ThreadValue) Tracking(r ValueRequest) *TrackingRecord {
+	return CloneTracking(CloneTrackingRequest{Tracking: t.tracking})
+}
+func (t ThreadValue) PublicDTO(r ValueRequest) PublicThread {
+	d := t.DTO(r)
+	p := PublicThread{ID: d.ID, Location: d.Location, Messages: d.Messages}
+	if v := d.Tracking; v != nil {
+		p.Tracking = &TrackingSummary{Version: v.Version, SourceRevision: v.SourceRevision, LastLocation: v.LastLocation, PrefixAtStart: v.PrefixAtStart, SuffixAtEnd: v.SuffixAtEnd}
+	}
+	return p
 }
 func (d DocumentValue) Entries(r DocumentEntriesRequest) []ThreadValue {
 	return append([]ThreadValue(nil), d.threads...)

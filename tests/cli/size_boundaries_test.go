@@ -38,9 +38,9 @@ func TestSubjectSourceSizeBoundary(t *testing.T) {
 				t.Fatal(err)
 			}
 			revision := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(canonicalNote)))
-			want := processResult{Stdout: []byte(fmt.Sprintf(`{"protocol":1,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision))}
+			want := processResult{Stdout: []byte(fmt.Sprintf(`{"protocol":2,"command":"validate","changed":false,"result":{"valid":true,"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision))}
 			if size > 16<<20 {
-				want = processResult{Status: 3, Stderr: []byte(`{"protocol":1,"error":{"code":"validation","message":"validation:source_size:too_large","details":{"path":"source_size","reason":"too_large"}}}` + "\n")}
+				want = processResult{Status: 3, Stderr: []byte(`{"protocol":2,"error":{"code":"validation","message":"validation:source_size:too_large","details":{"path":"source_size","reason":"too_large"}}}` + "\n")}
 			}
 			if err := compareProcess(processExpectation{Got: got, Want: want}); err != nil {
 				t.Fatal(err)
@@ -86,7 +86,7 @@ func TestSubjectBodyMaximum(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := fmt.Sprintf(`{"protocol":1,"command":"thread-get","changed":false,"result":{"thread":{"id":%q,"location":{"kind":"file"},"messages":[{"id":%q,"author":{"kind":"human"},"body":%q}]},"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, messageID, body, revision, revision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"thread-get","changed":false,"result":{"thread":{"id":%q,"location":{"kind":"file"},"messages":[{"id":%q,"author":{"kind":"human"},"body":%q}]},"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, messageID, body, revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

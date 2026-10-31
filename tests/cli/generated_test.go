@@ -55,7 +55,7 @@ func TestSubjectVersion(t *testing.T) {
 		}
 	}
 	version.WriteByte('"')
-	want := `{"protocol":1,"command":"version","changed":false,"result":{"cli_version":` + version.String() + `,"format_version":1,"protocol":1}}` + "\n"
+	want := `{"protocol":2,"command":"version","changed":false,"result":{"cli_version":` + version.String() + `,"format_version":2,"protocol":2}}` + "\n"
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -71,10 +71,10 @@ func TestSubjectVersion(t *testing.T) {
 func TestSubjectFixRetry(t *testing.T) {
 	binary := subjectBinary(subjectRequest{T: t})
 	dir := t.TempDir()
-	opening := "[@th_" + threadID + " lost]\n"
+	opening := formatHeader + "[@th_" + threadID + " lost]\n" + untrackedMetadata
 	firstRepair := opening + "---user\nx\n" + endThread
 	const secondThreadID = "018f0000-0000-7000-8000-000000000004"
-	secondOpening := "[@th_" + secondThreadID + " lost]\n"
+	secondOpening := "[@th_" + secondThreadID + " lost]\n" + untrackedMetadata
 	secondEnd := "[/@th_" + secondThreadID + "]\n"
 	repair := firstRepair + "\n" + secondOpening + "---bot\ny\n" + secondEnd
 	initial := []fileRequest{{Path: ".note.txt.comments.sidecar.lock", Mode: 0600}, {Path: "note.txt.comments", Mode: 0640, Bytes: []byte(repair)}}
@@ -112,7 +112,7 @@ func TestSubjectFixRetry(t *testing.T) {
 	// byte and revision is independently reconstructed, never read as an oracle.
 	document := []byte(opening + "---user <!-- sidecar-meta: {\"id\":\"" + id + "\"} -->\nx\n" + endThread + "\n" + secondOpening + "---bot <!-- sidecar-meta: {\"id\":\"" + secondID + "\"} -->\ny\n" + secondEnd)
 	revision := fmt.Sprintf("sha256:%x", sha256.Sum256(document))
-	want := fmt.Sprintf(`{"protocol":1,"command":"fix","changed":true,"result":{"assignments":[{"thread_id":%q,"message_ordinal":1,"line":2,"byte_offset":%d,"message_id":%q},{"thread_id":%q,"message_ordinal":1,"line":7,"byte_offset":%d,"message_id":%q}],"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, len(opening)+1, id, secondThreadID, len(firstRepair)+1+len(secondOpening)+1, secondID, revision, revision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"fix","changed":true,"result":{"assignments":[{"thread_id":%q,"message_ordinal":1,"line":4,"byte_offset":%d,"message_id":%q},{"thread_id":%q,"message_ordinal":1,"line":10,"byte_offset":%d,"message_id":%q}],"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, len(opening)+1, id, secondThreadID, len(firstRepair)+1+len(secondOpening)+1, secondID, revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func TestSubjectFixRetry(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want = fmt.Sprintf(`{"protocol":1,"command":"fix","changed":false,"result":{"assignments":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"fix","changed":false,"result":{"assignments":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

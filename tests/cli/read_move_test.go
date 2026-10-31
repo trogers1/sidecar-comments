@@ -24,7 +24,7 @@ func TestSubjectReadMoveLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := fmt.Sprintf(`{"protocol":1,"command":"thread-list","changed":false,"result":{"threads":[%s],"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"thread-list","changed":false,"result":{"threads":[%s],"warnings":[],"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -42,7 +42,7 @@ func TestSubjectReadMoveLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want = fmt.Sprintf(`{"protocol":1,"command":"thread-get","changed":false,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"thread-get","changed":false,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", thread, revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestSubjectReadMoveLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want = fmt.Sprintf(`{"protocol":1,"command":"thread-move","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", lostThread, lostRevision, lostRevision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"thread-move","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", lostThread, lostRevision, lostRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +82,7 @@ func TestSubjectReadMoveLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want = fmt.Sprintf(`{"protocol":1,"command":"thread-move","changed":false,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", lostThread, lostRevision, lostRevision)
+	want = fmt.Sprintf(`{"protocol":2,"command":"thread-move","changed":false,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", lostThread, lostRevision, lostRevision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

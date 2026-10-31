@@ -12,7 +12,7 @@ import (
 
 // One public lifecycle, not a parser/serializer oracle supplied by the subject.
 // format.md defines framing and metadata id,name order; cli.md defines argv
-// and check status; protocol.md and schema/v1.json define envelope field order.
+// and check status; protocol.md and schema/v2.json define envelope field order.
 func TestFormatLifecycle(t *testing.T) {
 	binary := os.Getenv("SIDECAR_BIN")
 	if binary == "" {
@@ -28,11 +28,11 @@ func TestFormatLifecycle(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	original := []byte("[@th_018f0000-0000-7000-8000-000000000001 file]\n" +
+	original := []byte(formatHeader + "[@th_018f0000-0000-7000-8000-000000000001 file]\n" + untrackedMetadata +
 		"---user <!-- sidecar-meta: { \"name\" : \"Taylor\", \"id\" : \"018f0000-0000-7000-8000-000000000002\" } -->\n" +
 		"Please clarify this note.\n" +
 		"[/@th_018f0000-0000-7000-8000-000000000001]\n")
-	canonical := []byte("[@th_018f0000-0000-7000-8000-000000000001 file]\n" +
+	canonical := []byte(formatHeader + "[@th_018f0000-0000-7000-8000-000000000001 file]\n" + untrackedMetadata +
 		"---user <!-- sidecar-meta: {\"id\":\"018f0000-0000-7000-8000-000000000002\",\"name\":\"Taylor\"} -->\n" +
 		"Please clarify this note.\n" +
 		"[/@th_018f0000-0000-7000-8000-000000000001]\n")
@@ -60,7 +60,7 @@ func TestFormatLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stdout: []byte(fmt.Sprintf("{\"protocol\":1,\"command\":\"format\",\"changed\":false,\"result\":{\"formatted\":false,\"storage_revision\":%q,\"canonical_revision\":%q}}\n", originalRevision, canonicalRevision))}}); err != nil {
+	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stdout: []byte(fmt.Sprintf("{\"protocol\":2,\"command\":\"format\",\"changed\":false,\"result\":{\"formatted\":false,\"storage_revision\":%q,\"canonical_revision\":%q}}\n", originalRevision, canonicalRevision))}}); err != nil {
 		t.Fatal(err)
 	}
 	if err := validateSchema(schemaRequest{JSON: got.Stdout}); err != nil {
@@ -80,7 +80,7 @@ func TestFormatLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 0, Stdout: []byte(fmt.Sprintf("{\"protocol\":1,\"command\":\"format\",\"changed\":true,\"result\":{\"formatted\":true,\"storage_revision\":%q,\"canonical_revision\":%q}}\n", canonicalRevision, canonicalRevision))}}); err != nil {
+	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 0, Stdout: []byte(fmt.Sprintf("{\"protocol\":2,\"command\":\"format\",\"changed\":true,\"result\":{\"formatted\":true,\"storage_revision\":%q,\"canonical_revision\":%q}}\n", canonicalRevision, canonicalRevision))}}); err != nil {
 		t.Fatal(err)
 	}
 	if err := validateSchema(schemaRequest{JSON: got.Stdout}); err != nil {
@@ -101,7 +101,7 @@ func TestFormatLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 0, Stdout: []byte(fmt.Sprintf("{\"protocol\":1,\"command\":\"validate\",\"changed\":false,\"result\":{\"valid\":true,\"warnings\":[],\"storage_revision\":%q,\"canonical_revision\":%q}}\n", canonicalRevision, canonicalRevision))}}); err != nil {
+	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 0, Stdout: []byte(fmt.Sprintf("{\"protocol\":2,\"command\":\"validate\",\"changed\":false,\"result\":{\"valid\":true,\"warnings\":[],\"storage_revision\":%q,\"canonical_revision\":%q}}\n", canonicalRevision, canonicalRevision))}}); err != nil {
 		t.Fatal(err)
 	}
 	if err := validateSchema(schemaRequest{JSON: got.Stdout}); err != nil {
@@ -120,7 +120,7 @@ func TestFormatLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 0, Stdout: []byte(fmt.Sprintf("{\"protocol\":1,\"command\":\"format\",\"changed\":false,\"result\":{\"formatted\":false,\"storage_revision\":%q,\"canonical_revision\":%q}}\n", canonicalRevision, canonicalRevision))}}); err != nil {
+	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 0, Stdout: []byte(fmt.Sprintf("{\"protocol\":2,\"command\":\"format\",\"changed\":false,\"result\":{\"formatted\":false,\"storage_revision\":%q,\"canonical_revision\":%q}}\n", canonicalRevision, canonicalRevision))}}); err != nil {
 		t.Fatal(err)
 	}
 	if err := validateSchema(schemaRequest{JSON: got.Stdout}); err != nil {

@@ -6,14 +6,17 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
 const (
-	corpusSchemaURL   = "https://github.com/trogers1/sidecar-comments/contracts/schema/corpus-v1.json"
-	protocolSchemaURL = "https://github.com/trogers1/sidecar-comments/contracts/schema/v1.json"
-	documentSchemaURL = "https://github.com/trogers1/sidecar-comments/docs/v1/schema/v1.json"
+	corpusSchemaURL     = "https://github.com/trogers1/sidecar-comments/contracts/schema/corpus-v1.json"
+	protocolSchemaURL   = "https://github.com/trogers1/sidecar-comments/contracts/schema/v1.json"
+	documentSchemaURL   = "https://github.com/trogers1/sidecar-comments/docs/v1/schema/v1.json"
+	v2DocumentSchemaURL = "https://github.com/trogers1/sidecar-comments/docs/v2/schema/v2.json"
+	v2ProtocolSchemaURL = "https://github.com/trogers1/sidecar-comments/contracts/schema/protocol-v2.json"
 )
 
 type schemaValidationRequest struct {
@@ -55,6 +58,9 @@ type packGoldenValidators struct {
 // child protocol bytes), and must not be copied into production code or used
 // as a trust-boundary DTO decoder.
 func validateJSONSchemas(request schemaValidationRequest) error {
+	if request.ParsedCorpus.Protocol == "contracts/schema/protocol-v2.json" {
+		return validateV2Artifacts(request)
+	}
 	corpusSchema, err := readUnique(filepath.Join(request.Base, "contracts/schema/corpus-v1.json"))
 	if err != nil {
 		return err
@@ -278,6 +284,151 @@ func compileProtocolValidator(base string) (*protocolValidator, error) {
 		return nil, fmt.Errorf("protocol schema meta-validation: %w", err)
 	}
 	return &protocolValidator{schema: validator}, nil
+}
+
+// localOnlyLoader makes every unregistered reference a hard failure, never a fetch.
+type localOnlyLoader struct{}
+
+func (localOnlyLoader) Load(location string) (any, error) {
+	return nil, fmt.Errorf("unregistered local schema resource %s", location)
+}
+
+func compileV2Schemas(base string) (*jsonschema.Compiler, error) {
+	compiler := jsonschema.NewCompiler()
+	compiler.AssertFormat()
+	compiler.UseLoader(localOnlyLoader{})
+	for _, resource := range []struct{ path, location string }{
+		{"contracts/schema/corpus-v1.json", corpusSchemaURL},
+		{"contracts/schema/executable-v2.json", "https://github.com/trogers1/sidecar-comments/contracts/schema/executable-v2.json"},
+		{"contracts/schema/protocol-v2.json", v2ProtocolSchemaURL},
+		{"docs/v2/schema/v2.json", v2DocumentSchemaURL},
+		{"docs/v1/schema/v1.json", documentSchemaURL},
+	} {
+		data, err := readUnique(filepath.Join(base, resource.path))
+		if err != nil {
+			return nil, err
+		}
+		if err = addSchemaResource(compiler, resource.location, data); err != nil {
+			return nil, err
+		}
+	}
+	// Register the frozen leaf schema's declared ID as well as its relative URL.
+	leaf, err := readUnique(filepath.Join(base, "docs/v1/schema/v1.json"))
+	if err != nil {
+		return nil, err
+	}
+	if err = addSchemaResource(compiler, "https://github.com/trogers1/sidecar-comments/schema/v1.json", leaf); err != nil {
+		return nil, err
+	}
+	return compiler, nil
+}
+
+func compileV2ProtocolValidator(base string) (*protocolValidator, error) {
+	compiler, err := compileV2Schemas(base)
+	if err != nil {
+		return nil, err
+	}
+	schema, err := compiler.Compile(v2ProtocolSchemaURL)
+	if err != nil {
+		return nil, err
+	}
+	return &protocolValidator{schema: schema}, nil
+}
+
+func validateV2Artifacts(request schemaValidationRequest) error {
+	compiler, err := compileV2Schemas(request.Base)
+	if err != nil {
+		return err
+	}
+	location := "https://github.com/trogers1/sidecar-comments/contracts/schema/executable-v2.json"
+	manifest, err := compiler.Compile(location)
+	if err != nil {
+		return err
+	}
+	if err = validateSchemaInstance(manifest, request.Corpus); err != nil {
+		return err
+	}
+	golden, err := compiler.Compile(location + "#/$defs/golden")
+	if err != nil {
+		return err
+	}
+	protocol, err := compiler.Compile(v2ProtocolSchemaURL)
+	if err != nil {
+		return err
+	}
+	if err = validateRuntimeV2Coherence(request.Base); err != nil {
+		return err
+	}
+	return validateGoldenSchemas(request.Base, golden, protocol, request.ParsedCorpus)
+}
+
+// This checks public declared definitions, not private runtime behavior or schema generation.
+func validateRuntimeV2Coherence(base string) error {
+	data, err := readUnique(filepath.Join(base, "contracts/schema/runtime-v2.json"))
+	if err != nil {
+		return err
+	}
+	var runtime struct {
+		Protocol       int            `json:"protocol"`
+		Format         int            `json:"format"`
+		Tracking       int            `json:"tracking"`
+		Limits         map[string]int `json:"limits"`
+		LocationKinds  []string       `json:"location_kinds"`
+		AuthorKinds    []string       `json:"author_kinds"`
+		OperationKinds []string       `json:"operation_kinds"`
+	}
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err = decoder.Decode(&runtime); err != nil {
+		return err
+	}
+	data, err = readUnique(filepath.Join(base, "docs/v2/schema/v2.json"))
+	if err != nil {
+		return err
+	}
+	var document map[string]any
+	if err = json.Unmarshal(data, &document); err != nil {
+		return err
+	}
+	checks := []struct {
+		path string
+		want int
+	}{
+		{"SuccessEnvelope/properties/protocol/const", runtime.Protocol},
+		{"ApplyRequest/properties/protocol/const", runtime.Protocol},
+		{"EditorUpdateRequest/properties/protocol/const", runtime.Protocol},
+		{"StoredDocument/properties/format/const", runtime.Format},
+		{"TrackingRecord/properties/version/const", runtime.Tracking},
+		{"TrackingRecord/properties/selected_text/maxLength", runtime.Limits["selection_bytes"]},
+		{"TrackingRecord/properties/prefix/maxLength", runtime.Limits["context_bytes"]},
+		{"TrackingRecord/properties/suffix/maxLength", runtime.Limits["context_bytes"]},
+		{"ApplyRequest/properties/operations/maxItems", runtime.Limits["apply_operations"]},
+		{"EditorUpdateRequest/properties/updates/maxItems", runtime.Limits["apply_operations"]},
+		{"SourceInspectResult/properties/byte_count/maximum", runtime.Limits["source_bytes"]},
+		{"StoredDocument/properties/threads/maxItems", runtime.Limits["threads"]},
+		{"ThreadDTO/properties/messages/maxItems", runtime.Limits["messages_thread"]},
+	}
+	for _, check := range checks {
+		var value any = document
+		for _, component := range strings.Split("$defs/"+check.path, "/") {
+			object, ok := value.(map[string]any)
+			if !ok {
+				return fmt.Errorf("schema coherence: invalid path %s", check.path)
+			}
+			value, ok = object[component]
+			if !ok {
+				return fmt.Errorf("schema coherence: missing path %s", check.path)
+			}
+		}
+		number, ok := value.(float64)
+		if !ok || check.want <= 0 || number != float64(check.want) {
+			return fmt.Errorf("schema/runtime definition mismatch: %s", check.path)
+		}
+	}
+	if !sameStrings(runtime.LocationKinds, []string{"file", "line", "range", "lost", "unresolved"}) || !sameStrings(runtime.AuthorKinds, []string{"human", "agent", "external"}) || !sameStrings(runtime.OperationKinds, []string{"thread_create", "thread_move", "thread_delete", "message_add", "message_update", "message_delete"}) {
+		return errors.New("runtime definition enum mismatch")
+	}
+	return nil
 }
 
 func (validator *protocolValidator) validateActual(stdout, stderr []byte) error {

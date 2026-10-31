@@ -1,0 +1,20 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "$id":"https://github.com/trogers1/sidecar-comments/contracts/schema/executable-v2.json",
+ "title":"Executable corpus for public protocol 2 (not the harness corpus-v2 design)",
+ "type":"object",
+ "properties":{
+  "corpus_version":{"const":1},
+  "schema":{"const":"contracts/schema/executable-v2.json"},
+  "protocol_schema":{"const":"contracts/schema/protocol-v2.json"},
+  "runner":{"$ref":"corpus-v1.json#/properties/runner"},
+  "requirements":{"type":"object","minProperties":1,"additionalProperties":{"type":"object","properties":{"source":{"type":"string","pattern":"^docs/v[12]/"},"subject":{"type":"string","minLength":1}},"required":["source","subject"],"additionalProperties":false}},
+  "fixtures":{"type":"array","minItems":1,"items":{"type":"object","properties":{"id":{"type":"string"},"golden":{"type":"string","pattern":"^contracts/goldens/v2/[a-z0-9-]+\\.json$"},"requirements":{"$ref":"corpus-v1.json#/properties/fixtures/items/properties/requirements"},"coverage":{"$ref":"corpus-v1.json#/properties/fixtures/items/properties/coverage"}},"required":["id","golden","requirements","coverage"],"additionalProperties":false}}
+ },
+ "required":["corpus_version","schema","protocol_schema","runner","requirements","fixtures"],"additionalProperties":false,
+ "$defs":{"golden":{"type":"object","properties":{
+ "fixture_version":{"const":2},"id":{"$ref":"corpus-v1.json#/$defs/golden/properties/id"},
+ "requirements":{"type":"array","minItems":1,"items":{"type":"string","pattern":"^V[12]-[A-Z0-9-]+$"}},
+ "argv":{"$ref":"corpus-v1.json#/$defs/golden/properties/argv"},"env":{"$ref":"corpus-v1.json#/$defs/golden/properties/env"},"stdin_b64":{"$ref":"corpus-v1.json#/$defs/base64"},"requires":{"$ref":"corpus-v1.json#/$defs/golden/properties/requires"},"initial_fs":{"$ref":"corpus-v1.json#/$defs/fs"},"expect":{"$ref":"corpus-v1.json#/$defs/expected"}
+ },"required":["fixture_version","id","requirements","argv","env","stdin_b64","requires","initial_fs","expect"],"additionalProperties":false}}
+}

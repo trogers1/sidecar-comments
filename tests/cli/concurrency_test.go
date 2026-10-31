@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -26,10 +27,10 @@ func TestSubjectIndependentWriters(t *testing.T) {
 	documents := make([]string, 2)
 	threads := make([]string, 2)
 	for i := range ids {
-		documents[i] = "[@th_" + ids[i] + " lost]\n---user <!-- sidecar-meta: {\"id\":\"" + messages[i] + "\"} -->\nx\n[/@th_" + ids[i] + "]\n"
+		documents[i] = formatHeader + "[@th_" + ids[i] + " lost]\n" + untrackedMetadata + "---user <!-- sidecar-meta: {\"id\":\"" + messages[i] + "\"} -->\nx\n[/@th_" + ids[i] + "]\n"
 		threads[i] = fmt.Sprintf(`{"id":%q,"location":{"kind":"lost"},"messages":[{"id":%q,"author":{"kind":"human"},"body":"x"}]}`, ids[i], messages[i])
 	}
-	combined := []byte(documents[0] + "\n" + documents[1])
+	combined := []byte(documents[0] + "\n" + strings.TrimPrefix(documents[1], formatHeader))
 	combinedRevision := fmt.Sprintf("sha256:%x", sha256.Sum256(combined))
 	start := make(chan struct{})
 	results := make([]chan processResult, 2)
@@ -68,7 +69,7 @@ func TestSubjectIndependentWriters(t *testing.T) {
 			if i == first {
 				revision = fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(documents[i])))
 			}
-			want := fmt.Sprintf(`{"protocol":1,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", threads[i], revision, revision)
+			want := fmt.Sprintf(`{"protocol":2,"command":"thread-create","changed":true,"result":{"thread":%s,"storage_revision":%q,"canonical_revision":%q}}`+"\n", threads[i], revision, revision)
 			if compareProcess(processExpectation{Got: observed[i], Want: processResult{Stdout: []byte(want)}}) != nil {
 				matches = false
 			}

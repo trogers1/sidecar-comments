@@ -1,4 +1,4 @@
-// Package runner executes Sidecar v1 fixtures solely through a child executable.
+// Package runner executes versioned fixtures solely through a child executable.
 package runner
 
 import (
@@ -191,7 +191,7 @@ func readUnique(path string) ([]byte, error) {
 
 func ValidateArtifacts(corpusPath string) error {
 	if corpusPath == "" {
-		corpusPath = "contracts/corpus/v1.json"
+		corpusPath = "contracts/corpus/v2.json"
 	}
 	corpusBytes, err := readUnique(corpusPath)
 	if err != nil {
@@ -214,7 +214,30 @@ func ValidateArtifacts(corpusPath string) error {
 	if _, err = validateRequiredRedRegistry(base); err != nil {
 		return err
 	}
-	if err := validateBehaviorInventory(base, c); err != nil {
+	inventoryCorpus := c
+	if c.Protocol == "contracts/schema/protocol-v2.json" {
+		inventoryCorpus, err = decodeCorpus(filepath.Join(base, "contracts/corpus/v1.json"))
+		if err != nil {
+			return err
+		}
+		// Each seed must remain runnable under v2 (anchor semantics are explicitly
+		// superseded in the maintenance tool and README), not merely historical.
+		byID := make(map[string]fixtureRef)
+		for _, ref := range c.Fixtures {
+			byID[ref.ID] = ref
+		}
+		for _, old := range inventoryCorpus.Fixtures {
+			ref, ok := byID[old.ID]
+			if !ok || (old.ID != "version-json" && !sameStrings(ref.Coverage, old.Coverage)) {
+				return fmt.Errorf("missing v2 seed migration %s", old.ID)
+			}
+		}
+		// Historical inventories are checked separately, never credited as v2 runs.
+		if err = ValidateArtifacts(filepath.Join(base, "contracts/corpus/v1.json")); err != nil {
+			return err
+		}
+	}
+	if err := validateBehaviorInventory(base, inventoryCorpus); err != nil {
 		return err
 	}
 	if err := ValidateObligationLedgerV2(base); err != nil {
@@ -224,7 +247,7 @@ func ValidateArtifacts(corpusPath string) error {
 }
 func Run(c Config) (Report, error) {
 	if c.CorpusPath == "" {
-		c.CorpusPath = "contracts/corpus/v1.json"
+		c.CorpusPath = "contracts/corpus/v2.json"
 	}
 	if c.Timeout <= 0 {
 		c.Timeout = 10 * time.Second
@@ -264,6 +287,9 @@ func Run(c Config) (Report, error) {
 		c.CLIVersion = "dev"
 	}
 	protocolValidator, err := compileProtocolValidator(base)
+	if manifest.Protocol == "contracts/schema/protocol-v2.json" {
+		protocolValidator, err = compileV2ProtocolValidator(base)
+	}
 	if err != nil {
 		return artifactFailureReport(err)
 	}
@@ -329,7 +355,8 @@ func repoRoot(corpusPath string) (string, error) {
 	return filepath.Dir(filepath.Dir(filepath.Dir(absolute))), nil
 }
 func validateCorpus(base string, c corpus) error {
-	if c.CorpusVersion != 1 || c.Schema != "contracts/schema/corpus-v1.json" || c.Protocol != "contracts/schema/v1.json" {
+	v2 := c.Schema == "contracts/schema/executable-v2.json" && c.Protocol == "contracts/schema/protocol-v2.json"
+	if c.CorpusVersion != 1 || (!v2 && (c.Schema != "contracts/schema/corpus-v1.json" || c.Protocol != "contracts/schema/v1.json")) {
 		return errors.New("unsupported corpus manifest")
 	}
 	if c.Runner.DefaultBin == "" || c.Runner.EnvBin != "SIDECAR_BIN" || c.Runner.CLIVersionEnv != "SIDECAR_CLI_VERSION" || c.Runner.Comparison != "byte-exact after approved template expansion" || c.Runner.TemplateVersion != 1 || len(c.Runner.Templates) != 5 {
@@ -383,7 +410,11 @@ func validateCorpus(base string, c corpus) error {
 			return fmt.Errorf("orphan requirement %s", id)
 		}
 	}
-	entries, err := os.ReadDir(filepath.Join(base, "contracts/goldens/v1"))
+	goldenRoot := "contracts/goldens/v1"
+	if v2 {
+		goldenRoot = "contracts/goldens/v2"
+	}
+	entries, err := os.ReadDir(filepath.Join(base, goldenRoot))
 	if err != nil {
 		return err
 	}
@@ -391,14 +422,14 @@ func validateCorpus(base string, c corpus) error {
 		if item.IsDir() {
 			return fmt.Errorf("unexpected golden directory %s", item.Name())
 		}
-		if strings.HasSuffix(item.Name(), ".json") && !goldens["contracts/goldens/v1/"+item.Name()] {
+		if strings.HasSuffix(item.Name(), ".json") && !goldens[goldenRoot+"/"+item.Name()] {
 			return fmt.Errorf("orphan golden %s", item.Name())
 		}
 	}
 	return nil
 }
 func validateGolden(g golden) error {
-	if g.FixtureVersion != 1 || g.ID == "" || len(g.Requirements) == 0 || g.Argv == nil || g.Env == nil || g.Requires == nil || g.Initial.Entries == nil || g.Expect.Final.Entries == nil || g.Expect.Status == nil || *g.Expect.Status < 0 || *g.Expect.Status > 8 {
+	if (g.FixtureVersion != 1 && g.FixtureVersion != 2) || g.ID == "" || len(g.Requirements) == 0 || g.Argv == nil || g.Env == nil || g.Requires == nil || g.Initial.Entries == nil || g.Expect.Final.Entries == nil || g.Expect.Status == nil || *g.Expect.Status < 0 || *g.Expect.Status > 8 {
 		return errors.New("invalid golden shape")
 	}
 	if (g.Expect.Stdout == nil) == (g.Expect.StdoutTemplate == nil) {
@@ -500,7 +531,7 @@ func validateFS(f fsSpec) error {
 }
 func safeReference(p string) bool { return safePath(p) }
 func safeGolden(p string) bool {
-	return safePath(p) && strings.HasPrefix(p, "contracts/goldens/v1/") && strings.HasSuffix(p, ".json")
+	return safePath(p) && (strings.HasPrefix(p, "contracts/goldens/v1/") || strings.HasPrefix(p, "contracts/goldens/v2/")) && strings.HasSuffix(p, ".json")
 }
 
 // safePath performs the semantic checks that JSON Schema regular expressions

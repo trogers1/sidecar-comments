@@ -1,0 +1,42 @@
+{
+  "protocol": 2,
+  "format": 2,
+  "tracking": 1,
+  "limits": {
+    "apply_bytes": 1048576,
+    "apply_operations": 256,
+    "body_bytes": 65536,
+    "context_bytes": 256,
+    "message_metadata_bytes": 16384,
+    "messages_document": 16384,
+    "messages_thread": 256,
+    "min_match_context_bytes": 32,
+    "selection_bytes": 4096,
+    "source_bytes": 16777216,
+    "sync_work_bytes": 268435456,
+    "target_bytes": 4194304,
+    "threads": 1024,
+    "tracking_bytes": 1048576,
+    "tracking_metadata_bytes": 28672
+  },
+  "location_kinds": [
+    "file",
+    "line",
+    "range",
+    "lost",
+    "unresolved"
+  ],
+  "author_kinds": [
+    "human",
+    "agent",
+    "external"
+  ],
+  "operation_kinds": [
+    "thread_create",
+    "thread_move",
+    "thread_delete",
+    "message_add",
+    "message_update",
+    "message_delete"
+  ]
+}

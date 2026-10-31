@@ -13,7 +13,7 @@ func TestSubjectDeleteOutputModes(t *testing.T) {
 	previous := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(canonicalNote)))
 	empty := fmt.Sprintf("sha256:%x", sha256.Sum256(nil))
 	result := fmt.Sprintf(`{"deleted_thread_id":%q,"previous_storage_revision":%q,"storage_revision":null,"canonical_revision":%q}`, threadID, previous, empty)
-	envelope := `{"protocol":1,"command":"thread-delete","changed":true,"result":` + result + "}\n"
+	envelope := `{"protocol":2,"command":"thread-delete","changed":true,"result":` + result + "}\n"
 	if err := validateSchema(schemaRequest{JSON: []byte(envelope)}); err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func TestSubjectDeleteOutputModes(t *testing.T) {
 			}
 			failure := "error not_found not_found:thread\n"
 			if mode == "json" {
-				failure = `{"protocol":1,"error":{"code":"not_found","message":"not_found:thread","details":{"entity":"thread","id":"` + threadID + `"}}}` + "\n"
+				failure = `{"protocol":2,"error":{"code":"not_found","message":"not_found:thread","details":{"entity":"thread","id":"` + threadID + `"}}}` + "\n"
 			}
 			if mode == "text" {
 				assertHumanOutput(humanOutputExpectation{T: t, Got: got, Status: 5, Error: true, Terms: []string{"thread", threadID}})

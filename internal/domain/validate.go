@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"encoding/base64"
 	"fmt"
 	"golang.org/x/text/unicode/norm"
 	"regexp"
@@ -29,11 +28,11 @@ func invalid(r invalidRequest) error {
 
 type ParseLocationRequest struct{ Text string }
 
-var locationPattern = regexp.MustCompile(`^range:([1-9][0-9]*):([1-9][0-9]*)-([1-9][0-9]*):([1-9][0-9]*)(?: \| ([A-Za-z0-9+/]*={0,2}))?$`)
+var locationPattern = regexp.MustCompile(`^range:([1-9][0-9]*):([1-9][0-9]*)-([1-9][0-9]*):([1-9][0-9]*)$`)
 
 func ParseLocation(r ParseLocationRequest) (Location, error) {
 	fail := Validation(ValidationRequest{Path: "target_content", Reason: "location"})
-	if r.Text == LocationFile || r.Text == LocationLost {
+	if r.Text == LocationFile || r.Text == LocationLost || r.Text == LocationUnresolved {
 		return Location{Kind: r.Text}, nil
 	}
 	if strings.HasPrefix(r.Text, "line:") {
@@ -60,14 +59,6 @@ func ParseLocation(r ParseLocationRequest) (Location, error) {
 	if l.StartLine > l.EndLine || (l.StartLine == l.EndLine && l.StartColumn >= l.EndColumn) {
 		return Location{}, fail
 	}
-	if strings.Contains(r.Text, " | ") {
-		a := m[5]
-		b, e := base64.StdEncoding.Strict().DecodeString(a)
-		if e != nil || len(b) == 0 || len(b) > MaxAnchorBytes || !utf8.Valid(b) || base64.StdEncoding.EncodeToString(b) != a {
-			return Location{}, fail
-		}
-		l.Anchor = &a
-	}
 	return l, nil
 }
 
@@ -76,15 +67,12 @@ type LocationTextRequest struct{ Location Location }
 func LocationText(r LocationTextRequest) string {
 	l := r.Location
 	switch l.Kind {
-	case LocationFile, LocationLost:
+	case LocationFile, LocationLost, LocationUnresolved:
 		return l.Kind
 	case LocationLine:
 		return fmt.Sprintf("line:%d", l.Line)
 	case LocationRange:
 		s := fmt.Sprintf("range:%d:%d-%d:%d", l.StartLine, l.StartColumn, l.EndLine, l.EndColumn)
-		if l.Anchor != nil {
-			s += " | " + *l.Anchor
-		}
 		return s
 	default:
 		panic("invalid location")
@@ -197,12 +185,12 @@ func ValidateLocation(r ValidateLocationRequest) error {
 	l := r.Location
 	fail := Validation(ValidationRequest{Path: "target_content", Reason: "location"})
 	switch l.Kind {
-	case LocationFile, LocationLost:
-		if l.Line != 0 || l.StartLine != 0 || l.StartColumn != 0 || l.EndLine != 0 || l.EndColumn != 0 || l.Anchor != nil {
+	case LocationFile, LocationLost, LocationUnresolved:
+		if l.Line != 0 || l.StartLine != 0 || l.StartColumn != 0 || l.EndLine != 0 || l.EndColumn != 0 {
 			return fail
 		}
 	case LocationLine:
-		if l.StartLine != 0 || l.StartColumn != 0 || l.EndLine != 0 || l.EndColumn != 0 || l.Anchor != nil {
+		if l.StartLine != 0 || l.StartColumn != 0 || l.EndLine != 0 || l.EndColumn != 0 {
 			return fail
 		}
 	case LocationRange:

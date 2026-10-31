@@ -17,10 +17,10 @@ type OperationDTO struct {
 	IfLastAuthorKind string          `json:"if_last_author_kind,omitempty"`
 }
 type Result struct {
-	Thread           *domain.Thread  `json:"thread,omitempty"`
-	Message          *domain.Message `json:"message,omitempty"`
-	DeletedThreadID  string          `json:"deleted_thread_id,omitempty"`
-	DeletedMessageID string          `json:"deleted_message_id,omitempty"`
+	Thread           *domain.PublicThread `json:"thread,omitempty"`
+	Message          *domain.Message      `json:"message,omitempty"`
+	DeletedThreadID  string               `json:"deleted_thread_id,omitempty"`
+	DeletedMessageID string               `json:"deleted_message_id,omitempty"`
 }
 type Request struct {
 	Document  domain.DocumentValue
@@ -90,20 +90,22 @@ func Execute(r Request) (Response, error) {
 		if err != nil {
 			return Response{}, err
 		}
-		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: r.Operation.threadID, Location: o.Location, Messages: []domain.MessageValue{message}})
-		if err != nil {
-			return Response{}, err
-		}
 		if ti >= 0 {
-			if !equalThreads(equalThreadsRequest{Left: threads[ti], Right: thread}) {
+			previous := threads[ti]
+			messages := previous.Messages(domain.ValueRequest{})
+			if !equal(equalRequest[domain.Location]{Left: previous.Location(domain.ValueRequest{}), Right: o.Location}) || len(messages) != 1 || messages[0].ID(domain.ValueRequest{}) != message.ID(domain.ValueRequest{}) || messages[0].Body(domain.ValueRequest{}) != message.Body(domain.ValueRequest{}) || !equal(equalRequest[domain.Author]{Left: messages[0].Author(domain.ValueRequest{}), Right: message.Author(domain.ValueRequest{})}) || !equal(equalRequest[*domain.GitLab]{Left: messages[0].GitLab(domain.ValueRequest{}), Right: message.GitLab(domain.ValueRequest{})}) {
 				return fail(failRequest{Code: domain.CodePrecondition, Reason: "retry_mismatch"})
 			}
-			dto := threads[ti].DTO(domain.ValueRequest{})
+			dto := threads[ti].PublicDTO(domain.ValueRequest{})
 			response.Result.Thread = &dto
 			return response, nil
 		}
 		if messageExists {
 			return fail(failRequest{Code: domain.CodePrecondition, Reason: "id_collision"})
+		}
+		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: r.Operation.threadID, Location: o.Location, Messages: []domain.MessageValue{message}, Tracking: r.Operation.tracking})
+		if err != nil {
+			return Response{}, err
 		}
 		threads = append(threads, thread)
 		resultThread = &thread
@@ -114,10 +116,11 @@ func Execute(r Request) (Response, error) {
 		}
 		previous := threads[ti]
 		response.Changed = !equal(equalRequest[domain.Location]{Left: previous.Location(domain.ValueRequest{}), Right: o.Location})
-		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: o.Location, Messages: previous.Messages(domain.ValueRequest{})})
+		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: o.Location, Messages: previous.Messages(domain.ValueRequest{}), Tracking: r.Operation.tracking})
 		if err != nil {
 			return Response{}, err
 		}
+		response.Changed = response.Changed || !equal(equalRequest[*domain.TrackingRecord]{Left: previous.Tracking(domain.ValueRequest{}), Right: thread.Tracking(domain.ValueRequest{})})
 		threads[ti] = thread
 		resultThread = &thread
 	case domain.OpThreadDelete:
@@ -147,7 +150,7 @@ func Execute(r Request) (Response, error) {
 			return Response{}, err
 		}
 		messages = append(messages, message)
-		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: previous.Location(domain.ValueRequest{}), Messages: messages})
+		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: previous.Location(domain.ValueRequest{}), Messages: messages, Tracking: previous.Tracking(domain.ValueRequest{})})
 		if err != nil {
 			return Response{}, err
 		}
@@ -171,7 +174,7 @@ func Execute(r Request) (Response, error) {
 			return Response{}, err
 		}
 		messages[mi] = message
-		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: previous.Location(domain.ValueRequest{}), Messages: messages})
+		thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: previous.Location(domain.ValueRequest{}), Messages: messages, Tracking: previous.Tracking(domain.ValueRequest{})})
 		if err != nil {
 			return Response{}, err
 		}
@@ -193,7 +196,7 @@ func Execute(r Request) (Response, error) {
 			threads = append(threads[:ti], threads[ti+1:]...)
 			response.Result.DeletedThreadID = o.ThreadID
 		} else {
-			thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: previous.Location(domain.ValueRequest{}), Messages: messages})
+			thread, err := domain.NewThreadValue(domain.NewThreadValueRequest{ID: previous.ID(domain.ValueRequest{}), Location: previous.Location(domain.ValueRequest{}), Messages: messages, Tracking: previous.Tracking(domain.ValueRequest{})})
 			if err != nil {
 				return Response{}, err
 			}
@@ -213,6 +216,13 @@ func Execute(r Request) (Response, error) {
 	if total > domain.MaxMessagesDocument {
 		return fail(failRequest{Code: domain.CodePrecondition, Reason: "limit_messages_document"})
 	}
+	trackingThreads := make([]domain.Thread, len(threads))
+	for i, t := range threads {
+		trackingThreads[i] = domain.Thread{Location: t.Location(domain.ValueRequest{}), Tracking: t.Tracking(domain.ValueRequest{})}
+	}
+	if err := domain.ValidateDocumentTracking(domain.ValidateDocumentTrackingRequest{Threads: trackingThreads}); err != nil {
+		return fail(failRequest{Code: domain.CodePrecondition, Reason: "limit_tracking"})
+	}
 	value, err := domain.NewDocumentFromValues(domain.NewDocumentFromValuesRequest{Threads: threads})
 	if err != nil {
 		return Response{}, err
@@ -220,7 +230,7 @@ func Execute(r Request) (Response, error) {
 	response.Document = value
 	// DTO conversion is confined to the public result serialization boundary.
 	if resultThread != nil {
-		dto := resultThread.DTO(domain.ValueRequest{})
+		dto := resultThread.PublicDTO(domain.ValueRequest{})
 		response.Result.Thread = &dto
 	}
 	if resultMessage != nil {

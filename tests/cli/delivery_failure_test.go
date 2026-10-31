@@ -78,7 +78,7 @@ func TestSubjectCommittedDeliveryFailure(t *testing.T) {
 	}
 	revision := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(canonical)))
 	body := strings.TrimSuffix(string(initial[1].Bytes), "\n")
-	expected := fmt.Sprintf(`{"protocol":1,"command":"thread-get","changed":false,"result":{"thread":{"id":%q,"location":{"kind":"lost"},"messages":[{"id":%q,"author":{"kind":"human"},"body":%q}]},"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, messageID, body, revision, revision)
+	expected := fmt.Sprintf(`{"protocol":2,"command":"thread-get","changed":false,"result":{"thread":{"id":%q,"location":{"kind":"lost"},"messages":[{"id":%q,"author":{"kind":"human"},"body":%q}]},"storage_revision":%q,"canonical_revision":%q}}`+"\n", threadID, messageID, body, revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(expected)}}); err != nil {
 		t.Fatal(err)
 	}

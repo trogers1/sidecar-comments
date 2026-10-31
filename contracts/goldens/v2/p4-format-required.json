@@ -1,0 +1,24 @@
+{
+  "fixture_version": 2,
+  "id": "p4-format-required",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "format"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_template": "error usage: Missing required flag --file (the .comments sidecar path).\nCheck the input and try again.\nFor usage, run: sidecar format --help\n",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

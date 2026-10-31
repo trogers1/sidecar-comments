@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"strconv"
 )
 
@@ -26,9 +27,19 @@ type dtoValueRequest struct {
 // ValidateDTO checks lexical JSON and exact recursive wire shape before concrete decoding.
 func ValidateDTO(r ValidateDTORequest) error {
 	if err := ValidateJSON(ValidateJSONRequest{Bytes: r.Bytes}); err != nil {
+		if r.Kind == "tracking_metadata" || r.Kind == "tracking" {
+			return trackingError(trackingErrorRequest{Reason: "invalid"})
+		}
 		return err
 	}
 	if err := dtoValue(dtoValueRequest{Bytes: bytes.TrimSpace(r.Bytes), Kind: r.Kind}); err != nil {
+		if r.Kind == "tracking_metadata" || r.Kind == "tracking" {
+			var e *Error
+			if errors.As(err, &e) && e.Message == "validation:tracking:too_large" {
+				return err
+			}
+			return trackingError(trackingErrorRequest{Reason: "invalid"})
+		}
 		return invalid(invalidRequest{})
 	}
 	return nil
@@ -85,7 +96,7 @@ func dtoValue(r dtoValueRequest) error {
 	}
 	var fields []dtoField
 	switch r.Kind {
-	case "string", "name", "identity", "id", "body", "revision", "author_kind", "anchor":
+	case "string", "name", "identity", "id", "body", "revision", "source_revision", "author_kind":
 		var s string
 		if r.Bytes[0] != '"' || json.Unmarshal(r.Bytes, &s) != nil {
 			return fail
@@ -105,9 +116,8 @@ func dtoValue(r dtoValueRequest) error {
 			return ValidateRevision(ValidateRevisionRequest{Text: s})
 		case "author_kind":
 			return ValidateAuthorKind(ValidateAuthorKindRequest{Kind: s})
-		case "anchor": // Decoded anchor checks are centralized in ParseLocation.
-			_, err := ParseLocation(ParseLocationRequest{Text: "range:1:1-1:2 | " + s})
-			return err
+		case "source_revision":
+			return ValidateSourceRevision(ValidateSourceRevisionRequest{Text: s})
 		}
 		return nil
 	case "positive":
@@ -155,14 +165,61 @@ func dtoValue(r dtoValueRequest) error {
 		case LocationLine:
 			fields = []dtoField{{Name: "kind", Kind: "string", Required: true}, {Name: "line", Kind: "positive", Required: true}}
 		case LocationRange:
-			fields = []dtoField{{Name: "kind", Kind: "string", Required: true}, {Name: "start_line", Kind: "positive", Required: true}, {Name: "start_column", Kind: "positive", Required: true}, {Name: "end_line", Kind: "positive", Required: true}, {Name: "end_column", Kind: "positive", Required: true}, {Name: "anchor", Kind: "anchor", Required: false}}
+			fields = []dtoField{{Name: "kind", Kind: "string", Required: true}, {Name: "start_line", Kind: "positive", Required: true}, {Name: "start_column", Kind: "positive", Required: true}, {Name: "end_line", Kind: "positive", Required: true}, {Name: "end_column", Kind: "positive", Required: true}}
 		default:
 			return fail
 		}
+	case "boolean":
+		if !bytes.Equal(r.Bytes, []byte("true")) && !bytes.Equal(r.Bytes, []byte("false")) {
+			return fail
+		}
+		return nil
+	case "tracking_metadata":
+		if len(r.Bytes) > MaxTrackingMetadataBytes {
+			return trackingError(trackingErrorRequest{Reason: "too_large"})
+		}
+		fields = []dtoField{{Name: "tracking", Kind: "tracking", Required: false}}
+	case "tracking":
+		fields = []dtoField{{Name: "version", Kind: "positive", Required: true}, {Name: "source_revision", Kind: "source_revision", Required: true}, {Name: "last_location", Kind: "location", Required: true}, {Name: "selected_text", Kind: "string", Required: true}, {Name: "prefix", Kind: "string", Required: true}, {Name: "suffix", Kind: "string", Required: true}, {Name: "prefix_at_start", Kind: "boolean", Required: true}, {Name: "suffix_at_end", Kind: "boolean", Required: true}}
 	case "metadata":
 		fields = []dtoField{{Name: "id", Kind: "id", Required: true}, {Name: "name", Kind: "name", Required: false}, {Name: "external_author", Kind: "external_author", Required: false}, {Name: "gitlab", Kind: "gitlab", Required: false}}
 	case "apply":
-		fields = []dtoField{{Name: "protocol", Kind: "positive", Required: true}, {Name: "if_revision", Kind: "revision", Required: false}, {Name: "operations", Kind: "operations", Required: true}}
+		fields = []dtoField{{Name: "protocol", Kind: "positive", Required: true}, {Name: "if_revision", Kind: "revision", Required: false}, {Name: "if_source_revision", Kind: "source_revision", Required: false}, {Name: "operations", Kind: "operations", Required: true}}
+	case "editor":
+		fields = []dtoField{{Name: "protocol", Kind: "positive", Required: true}, {Name: "if_revision", Kind: "revision", Required: true}, {Name: "source_revision", Kind: "source_revision", Required: true}, {Name: "updates", Kind: "editor_updates", Required: true}}
+	case "editor_updates":
+		if r.Bytes[0] != '[' {
+			return fail
+		}
+		var updates []json.RawMessage
+		if json.Unmarshal(r.Bytes, &updates) != nil || len(updates) < 1 || len(updates) > MaxApplyOperations {
+			return fail
+		}
+		for _, u := range updates {
+			if err := dtoValue(dtoValueRequest{Bytes: bytes.TrimSpace(u), Kind: "editor_update"}); err != nil {
+				return err
+			}
+		}
+		return nil
+	case "editor_update":
+		var update EditorUpdate
+		if json.Unmarshal(r.Bytes, &update) != nil {
+			return fail
+		}
+		fields = []dtoField{{Name: "thread_id", Kind: "id", Required: true}}
+		if update.Location != nil && update.Deleted == nil {
+			fields = append(fields, dtoField{Name: "location", Kind: "attached_location", Required: true})
+		} else if update.Location == nil && update.Deleted != nil && *update.Deleted {
+			fields = append(fields, dtoField{Name: "deleted", Kind: "boolean", Required: true})
+		} else {
+			return fail
+		}
+	case "attached_location":
+		var l Location
+		if json.Unmarshal(r.Bytes, &l) != nil || (l.Kind != LocationLine && l.Kind != LocationRange) {
+			return fail
+		}
+		return dtoValue(dtoValueRequest{Bytes: r.Bytes, Kind: "location"})
 	case "operations":
 		if r.Bytes[0] != '[' {
 			return fail
@@ -203,6 +260,13 @@ func dtoValue(r dtoValueRequest) error {
 	}
 	if e := dtoObject(dtoObjectRequest{Bytes: r.Bytes, Fields: fields}); e != nil {
 		return e
+	}
+	if r.Kind == "tracking" {
+		var t TrackingRecord
+		if json.Unmarshal(r.Bytes, &t) != nil {
+			return fail
+		}
+		return ValidateTrackingRecord(ValidateTrackingRecordRequest{Tracking: t})
 	}
 	if r.Kind == "location" {
 		var l Location

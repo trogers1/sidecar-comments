@@ -1,0 +1,29 @@
+{
+  "fixture_version": 2,
+  "id": "p4-output-repeated",
+  "requirements": [
+    "V1-CLI-SURFACE"
+  ],
+  "argv": [
+    "--output",
+    "text",
+    "--output",
+    "json",
+    "version"
+  ],
+  "env": [],
+  "stdin_b64": "",
+  "requires": [],
+  "initial_fs": {
+    "entries": []
+  },
+  "expect": {
+    "status": 2,
+    "stdout_b64": "",
+    "stderr_template": "error usage: Invalid --output: a flag was supplied more than once.\nCheck the input and try again.\nFor usage, run: sidecar --help\n",
+    "invocation_error": "argv",
+    "final_fs": {
+      "entries": []
+    }
+  }
+}

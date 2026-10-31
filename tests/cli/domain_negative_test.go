@@ -39,7 +39,7 @@ func TestSubjectInvalidStoredDomain(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			dir := t.TempDir()
-			document := []byte("[@th_" + threadID + " lost]\n---user <!-- sidecar-meta: " + tc.meta + " -->\n" + tc.body + "\n" + endThread)
+			document := []byte(formatHeader + "[@th_" + threadID + " lost]\n" + untrackedMetadata + "---user <!-- sidecar-meta: " + tc.meta + " -->\n" + tc.body + "\n" + endThread)
 			initial := []fileRequest{{Path: "note.txt.comments", Mode: 0640, Bytes: document}}
 			if err := writeFile(fileRequest{Path: filepath.Join(dir, initial[0].Path), Mode: initial[0].Mode, Bytes: document}); err != nil {
 				t.Fatal(err)
@@ -48,7 +48,7 @@ func TestSubjectInvalidStoredDomain(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want := `{"protocol":1,"error":{"code":"validation","message":"validation:target_content:invalid","details":{"path":"target_content","reason":"invalid"}}}` + "\n"
+			want := `{"protocol":2,"error":{"code":"validation","message":"validation:target_content:invalid","details":{"path":"target_content","reason":"invalid"}}}` + "\n"
 			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
 				t.Fatal(err)
 			}

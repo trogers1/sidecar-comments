@@ -21,7 +21,7 @@ func TestSubjectApplyMaximumRequest(t *testing.T) {
 		operations[i] = operation
 		results[i] = fmt.Sprintf(`{"index":%d,"op":"message_update","changed":false,"result":{"thread":%s,"message":%s}}`, i, thread, message)
 	}
-	request := `{"protocol":1,"operations":[` + strings.Join(operations, ",") + `]}`
+	request := `{"protocol":2,"operations":[` + strings.Join(operations, ",") + `]}`
 	request += strings.Repeat(" ", (1<<20)-len(request))
 	if err := validateSchema(schemaRequest{JSON: []byte(request)}); err != nil {
 		t.Fatal(err)
@@ -37,7 +37,7 @@ func TestSubjectApplyMaximumRequest(t *testing.T) {
 		t.Fatal(err)
 	}
 	revision := fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(canonicalNote)))
-	want := fmt.Sprintf(`{"protocol":1,"command":"apply","changed":false,"result":{"operations":[%s],"storage_revision":%q,"canonical_revision":%q}}`+"\n", strings.Join(results, ","), revision, revision)
+	want := fmt.Sprintf(`{"protocol":2,"command":"apply","changed":false,"result":{"operations":[%s],"storage_revision":%q,"canonical_revision":%q}}`+"\n", strings.Join(results, ","), revision, revision)
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Stdout: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}

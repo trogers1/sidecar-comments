@@ -13,6 +13,8 @@ Review a draft, discuss a design, annotate research notes, or leave feedback on 
 
 No review server or account required. Keep the pair together locally, share them, or commit them to Git so the conversation travels with the document.
 
+> **Versions:** the CLI, the sidecar file format, and the machine protocol are versioned independently; `sidecar --version` shows all three. Sidecar reads only its current format and rejects other format versions, including in `format` and `fix`; there is no migration tool.
+
 **Different text formats, same little sidecar:** Markdown, plain text, source code, and other UTF-8 text files. Location checking reads text; it does not interpret PDF, Word, or other binary document formats.
 
 > **Road conditions:** writes are supported on **macOS Apple Silicon** and **Linux x86-64**; other platforms have reduced, read-only support. Publication is gated on both supported platforms passing the CLI checks. Neovim integration is a [separate future feature](plans/neovim-adapter.md), not a requirement for the standalone CLI.
@@ -50,7 +52,7 @@ with `make bump-patch` (or `bump-minor` / `bump-major`), and commit `VERSION` wi
 their changes before pushing. CI independently enforces the version gate. See the
 [release runbook](docs/releases.md) for setup, protection rules, and recovery.
 
-For a pinned installation, choose an immutable **`vX.Y.Z` tag** from the [releases page](https://github.com/trogers1/sidecar-comments/releases). Use that exact tag below (for example `v0.1.1`). A release link is available only after the workflow has successfully published it; this checkout does not itself publish a release.
+For a pinned installation, choose an immutable **`vX.Y.Z` tag** from the [releases page](https://github.com/trogers1/sidecar-comments/releases). Use that exact tag below (for example `v0.1.1`).
 
 | Your machine | Archive |
 | --- | --- |
@@ -190,11 +192,40 @@ Deleting the last message removes its thread. Deleting the last thread removes t
 | `file` | The whole document |
 | `line:12` | Line 12 |
 | `range:12:1-12:8` | Line 12, byte columns 1 through 7 |
-| `lost` | A thread without a resolved source location |
+| `lost` | A deliberately unlocated thread, excluded from automatic tracking |
 
-Lines and columns start at **1**. Range ends are exclusive; columns count **UTF-8 bytes**, not displayed characters. Ranges can span lines and optionally carry an anchor; see [locations](docs/v1/source-and-location.md).
+Lines and columns start at **1**. Range ends are exclusive; columns count **UTF-8 bytes**, not displayed characters. Ranges can span lines. See [tracking and locations](docs/v2/tracking.md).
 
-Create and move check the source derived by removing one final `.comments` suffix. The source must exist and the requested location must fit, except for `lost`, which skips source access. Threads do **not** automatically follow document edits.
+Create and move check the source derived by removing one final `.comments` suffix. The source must exist and the requested location must fit, except for `lost`, which skips source access. Line comments track the whole line excluding its terminator. Line/range selected text is limited to 4,096 UTF-8 bytes; oversize attachments are rejected rather than silently truncated.
+
+### Follow document edits
+
+The CLI does not watch or rewrite your document. After saving edits, inspect reconciliation without changing the sidecar, then persist supported mappings:
+
+```sh
+sidecar --output json sync --file proposal.md.comments --check
+sidecar --output json sync --file proposal.md.comments
+```
+
+Sync looks for the exact selected text, using the surrounding text as evidence; it never guesses the nearest occurrence or uses fuzzy scores. Supported interior edits and boundary expansions are reported as inferred modifications. Ambiguous, deleted, unsupported, or search-limited selections become `unresolved`: the conversation and last tracking evidence are preserved, without pretending stale coordinates are an active attachment. Repeated sync is stable; later unique evidence can recover the attachment. To deliberately reattach, use `thread move` with a current line/range.
+
+Ordinary sync exits 0 when its transaction succeeds even with unresolved outcomes. Check mode never writes or takes a write lock; it reports `changed:false` and `would_change`, exiting 3 for proposed changes or unresolved threads. Read per-thread reasons and evidence in JSON. Replies, reads, edits and deletion remain available without locating every thread or reading the source.
+
+An editor can submit exact saved-source coordinates using `editor-update`; it must supply both the source fingerprint and sidecar storage revision. The CLI reads the saved file, not unsaved buffer text. Source inspection is independent of sidecar validity:
+
+```sh
+sidecar --output json source inspect --file proposal.md.comments
+```
+
+Moving to `file` or `lost` removes automatic tracking excerpts. Deleting a thread removes its conversation too—there is no separate resolved state or reopen command.
+
+### Retained source context and privacy
+
+Each tracked thread keeps its current selected text, up to 256 UTF-8 bytes on either side, edge markers, coordinates and logical-source fingerprint inside the sidecar. Total decoded tracking text is limited to 1 MiB and the serialized sidecar to 4 MiB. No full-source baseline, snapshot directory, hidden cache, or accumulating context history is written. The source and sidecar alone are portable; Git history is never searched implicitly.
+
+Ordinary machine reads and mutation results return tracking summaries, not retained excerpts. Explicit `thread get` or `thread list` with `--include-tracking` exposes them in JSON. Human summaries and diagnostics do not dump context. The sidecar itself contains retained source text: share it accordingly.
+
+Deletion or moving to file/lost removes tracking from the current file, not from previous Git commits, backups, filesystem snapshots or shared copies. User-authored message quotations are conversation content, not disposable tracking evidence. Secure erasure is not promised.
 
 ### Who's riding?
 
@@ -218,7 +249,7 @@ sidecar format --file proposal.md.comments
 sidecar fix --add-missing-message-ids --file proposal.md.comments
 ```
 
-The file is readable text, but its format is deliberately strict—not arbitrary Markdown. Invalid or pre-v1 files are rejected rather than guessed at or migrated. `fix` is a narrow repair tool, not a general recovery button. See the [format reference](docs/v1/format.md) before hand-editing.
+The file is readable text, but its format is deliberately strict—not arbitrary Markdown. Invalid or v1 files are rejected rather than guessed at or migrated. `fix` is a narrow repair tool, not a general recovery button. Nonempty v2 files require an explicit format header and dedicated tracking metadata after each thread opening. See the [format reference](docs/v2/format.md) before hand-editing.
 
 ## Need directions?
 
@@ -262,14 +293,16 @@ printf 'First note on this file.\n' |
 
 That example intentionally fails with a conflict if you've already created `proposal.md.comments`.
 
-For multiple edits in one transaction, use `sidecar apply --file PATH --operations-file PATH` (or `-` for stdin). The request contains `protocol: 1` and an `operations` array. See the [CLI contract](docs/v1/cli.md#apply) and [protocol/schema](docs/v1/protocol.md) for request shapes and preconditions.
+For coordinates computed before a mutation, machine clients must use both the sidecar guard and normalized source fingerprint (`--if-source-revision` on create/move). A source change after the final precommit check is outside the sidecar transaction guarantee: the CLI does not lock the source. On conflict, reread and retry explicitly; do not blindly replay generated-ID mutations.
+
+For multiple edits in one transaction, use `sidecar apply --file PATH --operations-file PATH` (or `-` for stdin). The request contains `protocol: 2`, an `operations` array, and optional `if_revision`/`if_source_revision` guards. Editor batches require both guards and reject the whole batch on failure; they are never split into separate commits. See the [v2 protocol and CLI contract](docs/v2/protocol.md) and [schema](docs/v2/schema/v2.json).
 
 | Exit | Meaning |
 | --- | --- |
 | `0` | Success |
 | `2` | Invalid command or request input |
-| `3` | Validation failure, repair needed, or a failed formatting/repair check |
-| `4` | Conflict: revision, lock timeout, or file identity |
+| `3` | Validation/repair failure, failed formatting/repair check, or sync-check drift/unresolved state |
+| `4` | Conflict: sidecar/source revision, lock timeout, or file identity |
 | `5` | Thread or message not found |
 | `6` | Operation precondition failed |
 | `7` | I/O failure |
@@ -279,15 +312,15 @@ Writes on unsupported platforms fail with exit 7 (`io`, operation `unsupported_s
 
 ## Under the seat · development & reference
 
-The [v1 specification](docs/v1/index.md) is authoritative. Useful stops:
+The [v2 specification](docs/v2/index.md) is authoritative for this checkout; it explicitly inherits unchanged v1 provisions without accepting v1 files. Useful stops:
 
-- [CLI commands and flags](docs/v1/cli.md)
-- [Text format](docs/v1/format.md)
-- [Source locations](docs/v1/source-and-location.md)
-- [JSON protocol](docs/v1/protocol.md) and [schema](docs/v1/schema/v1.json)
-- [Storage and security](docs/v1/storage-security.md)
-- [Conformance and release gates](docs/v1/conformance.md)
-- [Remaining release work](plans/red-suite-roadmap.md)
+- [CLI commands, guards and protocol](docs/v2/protocol.md)
+- [Text format, lifecycle and privacy](docs/v2/format.md)
+- [Source capture and bounded reconciliation](docs/v2/tracking.md)
+- [JSON Schema](docs/v2/schema/v2.json)
+- [Inherited storage and security guarantees](docs/v1/storage-security.md)
+- [Independent executable coverage](contracts/COVERAGE.md)
+- [Approved implementation and acceptance plan](plans/thread-context-sync.md)
 
 The CLI stores local conversations; it is not a GitLab client and does not import or synchronize remote reviews. GitLab fields, when supplied, are descriptive metadata only.
 
@@ -314,7 +347,7 @@ Build the CLI and independent contract harness, then run the focused public-proc
 
 ```sh
 make build
-SIDECAR_BIN="$PWD/bin/sidecar" go test ./tests/cli \
+SIDECAR_BIN="$PWD/bin/sidecar" SIDECAR_CLI_VERSION=dev go test ./tests/cli \
   -run '^(TestSubject.*|TestFormatLifecycle)$' -count=1 -timeout=120s
 ```
 

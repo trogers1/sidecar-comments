@@ -14,9 +14,7 @@ import (
 	"github.com/trogers1/sidecar-comments/internal/store"
 )
 
-const threadID = "018f0000-0000-7000-8000-000000000001"
-const messageID = "018f0000-0000-7000-8000-000000000002"
-const transactionDocument = "[@th_" + threadID + " file]\n---user <!-- sidecar-meta: {\"id\":\"" + messageID + "\"} -->\nx\n[/@th_" + threadID + "]\n"
+const transactionDocument = "<!-- sidecar-format: 2 -->\n[@th_" + threadID + " file]\n<!-- sidecar-tracking: {} -->\n---user <!-- sidecar-meta: {\"id\":\"" + messageID + "\"} -->\nx\n[/@th_" + threadID + "]\n"
 
 // Run uses real parsing, rendering and transactions. The per-request constructor
 // changes disk after initial validation and immediately before real acquisition;
@@ -43,16 +41,16 @@ func TestRunRevalidatesAtTransactionBoundary(t *testing.T) {
 			args := []string{"--output", "json", "thread", "move", "--if-revision", oldRevision, "--file", target, "--id", threadID, "--location", "line:2"}
 			expectedTarget := document
 			expectedStatus := domain.ExitValidation
-			expectedStderr := `{"protocol":1,"error":{"code":"validation","message":"validation:source_coordinate:location","details":{"path":"source_coordinate","reason":"location"}}}` + "\n"
+			expectedStderr := `{"protocol":2,"error":{"code":"validation","message":"validation:source_coordinate:location","details":{"path":"source_coordinate","reason":"location"}}}` + "\n"
 			if changed == "revision" || changed == "missing-created" {
 				if changed == "revision" {
 					expectedTarget = bytes.Replace(document, []byte("\nx\n"), []byte("\nconcurrent edit\n"), 1)
 				}
 				current := domain.HashRevision(domain.HashRevisionRequest{Bytes: expectedTarget})
 				expectedStatus = domain.ExitConflict
-				expectedStderr = fmt.Sprintf(`{"protocol":1,"error":{"code":"conflict","message":"conflict:revision","details":{"kind":"revision","expected":%q,"current_storage_revision":%q}}}`+"\n", oldRevision, current)
+				expectedStderr = fmt.Sprintf(`{"protocol":2,"error":{"code":"conflict","message":"conflict:revision","details":{"kind":"revision","expected":%q,"current_storage_revision":%q}}}`+"\n", oldRevision, current)
 			} else if changed == "source-encoding" {
-				expectedStderr = `{"protocol":1,"error":{"code":"validation","message":"validation:source_encoding:nul","details":{"path":"source_encoding","reason":"nul"}}}` + "\n"
+				expectedStderr = `{"protocol":2,"error":{"code":"validation","message":"validation:source_encoding:nul","details":{"path":"source_encoding","reason":"nul"}}}` + "\n"
 			}
 			calls := 0
 			var stdout, stderr bytes.Buffer

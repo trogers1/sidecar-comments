@@ -3,27 +3,34 @@ package domain
 import "encoding/json"
 
 const (
-	MaxTargetBytes      = 4194304
-	MaxSourceBytes      = 16777216
-	MaxThreads          = 1024
-	MaxMessagesThread   = 256
-	MaxMessagesDocument = 16384
-	MaxAnchorBytes      = 4096
-	MaxBodyBytes        = 65536
-	MaxMetadataBytes    = 16384
-	MaxApplyBytes       = 1048576
-	MaxApplyOperations  = 256
+	MaxTargetBytes       = 4194304
+	MaxSourceBytes       = 16777216
+	MaxThreads           = 1024
+	MaxMessagesThread    = 256
+	MaxMessagesDocument  = 16384
+	MaxAnchorBytes       = 4096
+	MaxBodyBytes         = 65536
+	MaxMetadataBytes     = 16384
+	MaxApplyBytes        = 1048576
+	MaxApplyOperations   = 256
+	TrackingVersion      = 1
+	MaxContextBytes      = 256
+	MinMatchContextBytes = 32
+	MaxSyncWorkBytes     = 16 * MaxSourceBytes
+	MaxTrackingBytes     = MaxApplyBytes
+	// JSON may escape every decoded byte as six bytes; overhead covers keys,
+	// revision, booleans and five maximum-width integer coordinates.
+	MaxTrackingMetadataBytes = 6*(MaxAnchorBytes+2*MaxContextBytes) + 1024
 )
 
 // Location is an untrusted wire shape, not a validated immutable value.
 type Location struct {
-	Kind        string  `json:"kind"`
-	Line        int     `json:"line,omitempty"`
-	StartLine   int     `json:"start_line,omitempty"`
-	StartColumn int     `json:"start_column,omitempty"`
-	EndLine     int     `json:"end_line,omitempty"`
-	EndColumn   int     `json:"end_column,omitempty"`
-	Anchor      *string `json:"anchor,omitempty"`
+	Kind        string `json:"kind"`
+	Line        int    `json:"line,omitempty"`
+	StartLine   int    `json:"start_line,omitempty"`
+	StartColumn int    `json:"start_column,omitempty"`
+	EndLine     int    `json:"end_line,omitempty"`
+	EndColumn   int    `json:"end_column,omitempty"`
 }
 
 // ExternalAuthor is an untrusted wire shape.
@@ -57,9 +64,24 @@ type Message struct {
 
 // Thread is an untrusted wire shape. Construct DocumentValue at the domain boundary.
 type Thread struct {
-	ID       string    `json:"id"`
-	Location Location  `json:"location"`
-	Messages []Message `json:"messages"`
+	ID       string          `json:"id"`
+	Location Location        `json:"location"`
+	Messages []Message       `json:"messages"`
+	Tracking *TrackingRecord `json:"tracking,omitempty"`
+}
+
+// EditorRequest and EditorUpdate are untrusted protocol shapes; ValidateDTO
+// checks their closed unions before concrete decoding.
+type EditorRequest struct {
+	Protocol       int            `json:"protocol"`
+	IfRevision     string         `json:"if_revision"`
+	SourceRevision string         `json:"source_revision"`
+	Updates        []EditorUpdate `json:"updates"`
+}
+type EditorUpdate struct {
+	ThreadID string    `json:"thread_id"`
+	Location *Location `json:"location,omitempty"`
+	Deleted  *bool     `json:"deleted,omitempty"`
 }
 
 // Diagnostic is the repair-report wire shape, not a validated document value.

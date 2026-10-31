@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	ProtocolVersion    = 1
-	FormatVersion      = 1
+	ProtocolVersion    = 2
+	FormatVersion      = 2
 	ExitUsage          = 2
 	ExitValidation     = 3
 	ExitConflict       = 4
@@ -30,6 +30,7 @@ const (
 	LocationLine       = "line"
 	LocationRange      = "range"
 	LocationLost       = "lost"
+	LocationUnresolved = "unresolved"
 	AuthorHuman        = "human"
 	AuthorAgent        = "agent"
 	AuthorExternal     = "external"
@@ -132,6 +133,8 @@ func LocationRank(r LocationRankRequest) int {
 		return 2
 	case LocationLost:
 		return 3
+	case LocationUnresolved:
+		return 4
 	default:
 		panic("invalid location kind")
 	}

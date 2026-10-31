@@ -65,7 +65,7 @@ func TestSubjectInvalidSourceAndLock(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				want := fmt.Sprintf(`{"protocol":1,"error":{"code":"validation","message":"validation:%s:%s","details":{"path":%q,"reason":%q}}}`+"\n", path, reason, path, reason)
+				want := fmt.Sprintf(`{"protocol":2,"error":{"code":"validation","message":"validation:%s:%s","details":{"path":%q,"reason":%q}}}`+"\n", path, reason, path, reason)
 				if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
 					t.Fatal(err)
 				}
@@ -141,7 +141,7 @@ func TestSubjectMissingSourcePrecedence(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := `{"protocol":1,"error":{"code":"io","message":"io:open","details":{"operation":"open","path":"source"}}}` + "\n"
+	want := `{"protocol":2,"error":{"code":"io","message":"io:open","details":{"operation":"open","path":"source"}}}` + "\n"
 	if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 7, Stderr: []byte(want)}}); err != nil {
 		t.Fatal(err)
 	}
