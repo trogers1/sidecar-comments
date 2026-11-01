@@ -357,6 +357,7 @@ func hash(r hashRequest) string {
 }
 
 type sourceRequest struct{}
+type attachedRequest struct{}
 type transactionCleanupRequest struct{}
 
 type execRequest struct {
@@ -498,14 +499,16 @@ func execute(r execRequest) (out outcome, err error) {
 	}
 	var currentSource *domain.SourceValue
 	retryCreate := false
-	source := func(r sourceRequest) error {
-		required := c.sourceRevision != ""
-		if !retryCreate {
-			for _, loc := range locations {
-				required = required || loc.Kind != domain.LocationLost
+	attached := func(r attachedRequest) bool {
+		for _, loc := range locations {
+			if loc.Kind != domain.LocationLost {
+				return true
 			}
 		}
-		if !required {
+		return false
+	}
+	source := func(r sourceRequest) error {
+		if c.sourceRevision == "" && (retryCreate || !attached(attachedRequest{})) {
 			return nil
 		}
 		path, e := store.DerivedSourcePath(store.DerivedSourcePathRequest{TargetPath: c.file})
@@ -526,10 +529,14 @@ func execute(r execRequest) (out outcome, err error) {
 	if e != nil {
 		return out, e
 	}
-	if observed, e := format.Parse(format.ParseRequest{Bytes: snap.Bytes, Mode: "normal"}); e == nil {
-		retryCreate = c.command == "thread-create" && existingCreate(existingCreateRequest{Document: observed.Value, ID: op.ThreadID})
-		if c.command == "apply" {
-			locations = applySourceLocations(applySourceLocationsRequest{Document: observed.Value, Operations: batch.Operations})
+	// The document can only remove source requirements (a create retry, or apply
+	// creates of existing threads), so parse before locking only when one exists.
+	if c.sourceRevision == "" && attached(attachedRequest{}) && (c.command == "thread-create" || c.command == "apply") {
+		if observed, e := format.Parse(format.ParseRequest{Bytes: snap.Bytes, Mode: "normal"}); e == nil {
+			retryCreate = c.command == "thread-create" && existingCreate(existingCreateRequest{Document: observed.Value, ID: op.ThreadID})
+			if c.command == "apply" {
+				locations = applySourceLocations(applySourceLocationsRequest{Document: observed.Value, Operations: batch.Operations})
+			}
 		}
 	}
 	if err = source(sourceRequest{}); err != nil {
