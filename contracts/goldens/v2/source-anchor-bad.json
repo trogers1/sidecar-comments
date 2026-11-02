@@ -34,7 +34,7 @@
   "expect": {
     "status": 3,
     "stdout_b64": "",
-    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:location\",\"details\":{\"path\":\"target_content\",\"reason\":\"location\"}}}\n",
+    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:location\",\"details\":{\"path\":\"target_content\",\"reason\":\"location\",\"diagnostics\":[{\"code\":\"thread_location\",\"message\":\"The thread location is invalid.\",\"hint\":\"Use a canonical file, line, range, or lost location.\",\"line\":2,\"column\":43,\"byte_offset\":70}]}}}\n",
     "final_fs": {
       "entries": [
         {

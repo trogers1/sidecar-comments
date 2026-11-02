@@ -27,7 +27,7 @@
   "expect": {
     "status": 3,
     "stdout_b64": "",
-    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_encoding:bom\",\"details\":{\"path\":\"target_encoding\",\"reason\":\"bom\"}}}\n",
+    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_encoding:bom\",\"details\":{\"path\":\"target_encoding\",\"reason\":\"bom\",\"diagnostics\":[{\"code\":\"encoding_bom\",\"message\":\"The sidecar starts with a UTF-8 byte-order mark.\",\"hint\":\"Remove the byte-order mark and save as plain UTF-8.\",\"line\":1,\"column\":1,\"byte_offset\":1}]}}}\n",
     "final_fs": {
       "entries": [
         {

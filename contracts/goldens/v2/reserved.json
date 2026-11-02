@@ -27,7 +27,7 @@
   "expect": {
     "status": 3,
     "stdout_b64": "",
-    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\"}}}\n",
+    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\",\"diagnostics\":[{\"code\":\"message_metadata_delimiter\",\"message\":\"The message metadata comment is malformed.\",\"hint\":\"Follow the role with a space and \\u003c!-- sidecar-meta: JSON --\\u003e.\",\"line\":5,\"column\":7,\"byte_offset\":189}]}}}\n",
     "final_fs": {
       "entries": [
         {

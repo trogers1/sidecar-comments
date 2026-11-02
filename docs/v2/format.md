@@ -16,7 +16,7 @@ Thread delimiters, roles, message metadata and body grammar are otherwise unchan
 
 `metadata-json` is exactly the schema `ThreadMetadata`: `{}` or `{"tracking":TrackingRecord}`. Never put tracking into a message or GitLab object. The opening location is the active attachment; `unresolved` has no coordinates. Persisted thread reconstruction is `StoredThread`, not public `ThreadDTO`.
 
-Formatter/repair input allowances remain the frozen v1 allowances applied to this grammar. They never permit absent/extra headers or absent/malformed tracking metadata. Only missing human/agent message IDs are repairable. Normal readers accept canonical bytes and the existing zero-byte exception, not formatter variants.
+Formatter/repair input allowances otherwise remain the v1 allowances applied to this grammar. They never permit absent/extra document headers or absent/malformed tracking metadata. Only missing human/agent message IDs are repairable. Message role headers may have trailing ASCII spaces or tabs in all read modes; this includes bare `---user` / `---bot` headers when checking for missing IDs. Canonical serialization removes this header whitespace. Trailing ASCII spaces, tabs and blank lines after the final thread closing delimiter are also accepted; canonical serialization removes this padding. This allowance does not waive the final newline requirement. Message body whitespace is never trimmed by either allowance. Normal readers otherwise accept canonical bytes and the existing zero-byte exception, not formatter variants.
 
 ## Closed tracking record
 

@@ -49,10 +49,7 @@ func TestSubjectInvalidStoredDomain(t *testing.T) {
 				t.Fatal(err)
 			}
 			want := `{"protocol":2,"error":{"code":"validation","message":"validation:target_content:invalid","details":{"path":"target_content","reason":"invalid"}}}` + "\n"
-			if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
-				t.Fatal(err)
-			}
-			if err := validateSchema(schemaRequest{JSON: got.Stderr}); err != nil {
+			if err := compareLocatedValidation(locatedValidationExpectation{Got: got, Want: want, Document: document}); err != nil {
 				t.Fatal(err)
 			}
 			files, err := observeFiles(filesRequest{Dir: dir, ByteLimit: 1 << 20})

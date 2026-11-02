@@ -27,7 +27,7 @@
   "expect": {
     "status": 3,
     "stdout_b64": "",
-    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\"}}}\n",
+    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\",\"diagnostics\":[{\"code\":\"unexpected_delimiter\",\"message\":\"The thread closing delimiter does not match the opening thread ID.\",\"hint\":\"Replace this delimiter with [/@th_018f0000-0000-7000-8000-000000000001].\",\"line\":6,\"column\":1,\"byte_offset\":189}]}}}\n",
     "final_fs": {
       "entries": [
         {

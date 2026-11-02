@@ -27,7 +27,7 @@
   "expect": {
     "status": 3,
     "stdout_b64": "",
-    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\"}}}\n",
+    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\",\"diagnostics\":[{\"code\":\"invalid_header\",\"message\":\"The format header is missing or malformed.\",\"hint\":\"Restore the format header from a sidecar written by this version.\",\"line\":1,\"column\":1,\"byte_offset\":1}]}}}\n",
     "final_fs": {
       "entries": [
         {

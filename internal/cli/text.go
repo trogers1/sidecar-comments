@@ -518,6 +518,14 @@ func suggestedTarget(r validationTextRequest) string {
 // readable form of the detail so new failures are never silently generic.
 func validationText(r validationTextRequest) (string, string) {
 	d := r.Details
+	if len(d.Diagnostics) > 0 {
+		problem := d.Diagnostics[0]
+		file := r.File
+		if strings.ContainsFunc(file, unicode.IsControl) {
+			file = fmt.Sprintf("%q", file)
+		}
+		return fmt.Sprintf("%s:%d:%d: %s", file, problem.Line, problem.Column, problem.Message), problem.Hint
+	}
 	noun := objectNoun(objectNounRequest{Path: d.Path})
 	switch {
 	case d.Path == "source_coordinate":

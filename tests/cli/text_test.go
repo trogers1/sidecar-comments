@@ -261,7 +261,7 @@ func TestSubjectHumanErrorGuidance(t *testing.T) {
 			}},
 		{name: "crlf_sidecar", symbol: "validation:target_endings:endings", status: 3,
 			args:  []string{"thread", "list", "--file", "note.txt.comments"},
-			terms: []string{"must use LF line endings", "sidecar format --file PATH"},
+			terms: []string{"unsupported line endings", "Use LF line endings", "sidecar format can convert consistent CRLF endings"},
 			setup: func(t *testing.T, dir string) {
 				guidanceWrite(guidanceWriteRequest{T: t, Path: filepath.Join(dir, "note.txt.comments"), Text: strings.ReplaceAll(canonicalNote, "\n", "\r\n")})
 			}},
@@ -306,7 +306,7 @@ func TestSubjectHumanErrorGuidance(t *testing.T) {
 			}},
 		{name: "corrupt_tracking", symbol: "validation:tracking:invalid", status: 3,
 			args:   []string{"thread", "move", "--file", "note.txt.comments", "--id", threadID, "--location", "lost"},
-			terms:  []string{"malformed or inconsistent", "Restore the sidecar from version control"},
+			terms:  []string{"malformed, noncanonical, or inconsistent with the location", "Restore the tracking line from version control", "correct its JSON fields and location"},
 			absent: []string{"move the affected thread"},
 			setup: func(t *testing.T, dir string) {
 				guidanceTracked(guidanceFixtureRequest{T: t, Binary: binary, Dir: dir})

@@ -231,10 +231,7 @@ func TestSubjectMalformedBytes(t *testing.T) {
 					t.Fatal(err)
 				}
 				want := fmt.Sprintf(`{"protocol":2,"error":{"code":"validation","message":"validation:%s:%s","details":{"path":%q,"reason":%q}}}`+"\n", tc.path, tc.reason, tc.path, tc.reason)
-				if err := compareProcess(processExpectation{Got: got, Want: processResult{Status: 3, Stderr: []byte(want)}}); err != nil {
-					t.Fatal(err)
-				}
-				if err := validateSchema(schemaRequest{JSON: got.Stderr}); err != nil {
+				if err := compareLocatedValidation(locatedValidationExpectation{Got: got, Want: want, Document: []byte(tc.input)}); err != nil {
 					t.Fatal(err)
 				}
 				files, err := observeFiles(filesRequest{Dir: dir, ByteLimit: 4096})

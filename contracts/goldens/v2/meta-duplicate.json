@@ -26,7 +26,7 @@
   "expect": {
     "status": 3,
     "stdout_b64": "",
-    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\"}}}\n",
+    "stderr_template": "{\"protocol\":2,\"error\":{\"code\":\"validation\",\"message\":\"validation:target_content:invalid\",\"details\":{\"path\":\"target_content\",\"reason\":\"invalid\",\"diagnostics\":[{\"code\":\"message_metadata\",\"message\":\"Message metadata must be a valid JSON object with a valid id and only supported fields.\",\"hint\":\"Correct the JSON and id; supported fields are id, name, external_author, and gitlab.\",\"line\":4,\"column\":28,\"byte_offset\":133}]}}}\n",
     "final_fs": {
       "entries": [
         {

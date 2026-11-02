@@ -164,9 +164,22 @@ type MessageMetadata struct {
 	ExternalAuthor *ExternalAuthor `json:"external_author,omitempty"`
 	GitLab         *GitLab         `json:"gitlab,omitempty"`
 }
+
+// ContentDiagnostic locates a fatal content error using 1-based byte coordinates.
+// EOF is located one byte past the input.
+type ContentDiagnostic struct {
+	Code       string `json:"code"`
+	Message    string `json:"message"`
+	Hint       string `json:"hint"`
+	Line       int    `json:"line"`
+	Column     int    `json:"column"`
+	ByteOffset int    `json:"byte_offset"`
+}
+
 type ValidationDetails struct {
-	Path   string `json:"path"`
-	Reason string `json:"reason"`
+	Path        string              `json:"path"`
+	Reason      string              `json:"reason"`
+	Diagnostics []ContentDiagnostic `json:"diagnostics,omitempty"`
 }
 type IODetails struct {
 	Operation              string `json:"operation"`

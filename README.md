@@ -185,6 +185,24 @@ sidecar thread delete --file proposal.md.comments --id "$THREAD_ID"
 
 Deleting the last message removes its thread. Deleting the last thread removes the sidecar file. An absent sidecar is an empty conversation, not an error.
 
+### Fix a malformed sidecar
+
+Run `sidecar validate --file proposal.md.comments`. Parser errors show the
+sidecar line and byte column, explain the problem, and suggest a fix. Correct
+the first error and validate again; fatal framing errors stop parsing rather
+than producing misleading follow-on errors. Validation does not modify files.
+
+For bots and editors, `sidecar --output json validate --file proposal.md.comments`
+returns located parser errors in `error.details.diagnostics` on stderr. Coordinates
+are one-based UTF-8 byte positions in the `.comments` file, **not the source**.
+See the [diagnostic contract](docs/v2/protocol.md#located-sidecar-diagnostics).
+Missing-message-ID repair diagnostics still use `result.repair.diagnostics`.
+Trailing spaces and tabs on message headers are accepted, including bare
+`---user` / `---bot` headers awaiting ID repair; canonical output removes that
+header whitespace without trimming message bodies. Extra blank lines and spaces
+or tabs after the final thread closing delimiter are accepted too and removed
+by formatting.
+
 ### Where does a thread sit?
 
 | `--location` | Meaning |

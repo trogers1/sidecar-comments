@@ -63,7 +63,7 @@ The schema closes all error detail enums. Error messages exactly interpolate the
 | code | exit | message / details |
 |---|---:|---|
 | usage | 2 | `usage:{field}:{reason}`, `{field,reason}` |
-| validation | 3 | `validation:{path}:{reason}`, `{path,reason}` |
+| validation | 3 | `validation:{path}:{reason}`, `{path,reason,diagnostics?}` |
 | repair | 3 | `repair:document`, existing `{diagnostics}` |
 | conflict | 4 | `conflict:revision`, existing revision details |
 | conflict | 4 | `conflict:source_revision`, `{kind:"source_revision",expected:Revision,current_source_revision:Revision}` |
@@ -73,6 +73,28 @@ The schema closes all error detail enums. Error messages exactly interpolate the
 | precondition | 6 | `precondition:{operation}:{reason}`, `{operation,reason,index?}` |
 | io | 7 | `io:{operation}`, existing IO details |
 | unsupported | 8 | `unsupported:{received}`, existing unsupported details |
+
+### Located sidecar diagnostics
+
+Parser validation errors may include `details.diagnostics`, a nonempty array of
+`{code,message,hint,line,column,byte_offset}`. `code` identifies the specific
+problem; `message` explains it and `hint` describes how to fix it. These fields
+contain CLI-authored guidance, not excerpts of the file. The existing envelope
+code, symbolic message, path, reason and exit status are unchanged.
+
+Coordinates refer to the **sidecar passed with `--file`**, not its source.
+`line`, `column` and `byte_offset` are all one-based; columns and offsets count
+UTF-8 bytes. An EOF diagnostic can point just after the last byte. Editors should
+convert to zero-based coordinates and clamp EOF positions for display. Do not
+attach unlocated filesystem, source or argument errors to a sidecar line.
+
+The parser reports the first fatal error rather than guessing how to recover
+past damaged framing. Fix it and validate again to discover subsequent errors.
+The existing missing-message-ID repair diagnostics remain a separate shape and
+can contain multiple entries. Human text shows located errors and their fix
+hints directly; JSON clients consume the structured array on stderr. Successful
+`validate` responses with `valid:false` continue to report repair diagnostics in
+`result.repair.diagnostics` on stdout.
 
 Unresolved matching is success data, never an error envelope. Source guard mismatch is conflict, not source-coordinate validation. Missing/unreadable required source stays io:open with path source, not a revision conflict with null current. `source_anchor` is removed; invalid legacy anchor input is rejected structurally. Corrupt persisted records use validation:tracking:invalid (or too_large for decoded bounds); inconsistent location/record lifecycle uses validation:tracking:invalid. Malformed stored location remains validation:target_content:location; source coordinate failures remain validation:source_coordinate:location.
 
